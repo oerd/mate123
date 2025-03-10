@@ -45,7 +45,7 @@ interface Translations {
 
 export const translations: Record<Language, Translations> = {
   en: {
-    title: 'Math Practice for Kids',
+    title: 'Math Practice',
     checkAnswer: 'Check Answer',
     correct: 'Correct! 🎉',
     tryAgain: 'Try again! 🤔',
@@ -87,7 +87,7 @@ export const translations: Record<Language, Translations> = {
     loadedFromUrl: 'Settings loaded from shared link'
   },
   de: {
-    title: 'Mathe-Übung für Kinder',
+    title: 'Mathe-Übung',
     checkAnswer: 'Antwort prüfen',
     correct: 'Richtig! 🎉',
     tryAgain: 'Versuche es nochmal! 🤔',
@@ -129,7 +129,7 @@ export const translations: Record<Language, Translations> = {
     loadedFromUrl: 'Einstellungen aus geteiltem Link geladen'
   },
   it: {
-    title: 'Esercizi di Matematica per Bambini',
+    title: 'Esercizi di Matematica',
     checkAnswer: 'Verifica Risposta',
     correct: 'Corretto! 🎉',
     tryAgain: 'Riprova! 🤔',
@@ -171,7 +171,7 @@ export const translations: Record<Language, Translations> = {
     loadedFromUrl: 'Impostazioni caricate da link condiviso'
   },
   fr: {
-    title: 'Exercices de Mathématiques pour Enfants',
+    title: 'Exercices de Mathématiques',
     checkAnswer: 'Vérifier la Réponse',
     correct: 'Correct! 🎉',
     tryAgain: 'Essaie encore! 🤔',
@@ -213,10 +213,10 @@ export const translations: Record<Language, Translations> = {
     loadedFromUrl: 'Paramètres chargés depuis un lien partagé'
   },
   sq: {
-    title: 'Praktikë Matematike për Fëmijë',
+    title: 'Praktikë Matematike',
     checkAnswer: 'Kontrollo Përgjigjen',
-    correct: 'Saktë! 🎉',
-    tryAgain: 'Provo përsëri! 🤔',
+    correct: '🎉 Saktë!',
+    tryAgain: '🤔 Provo përsëri!',
     newProblem: 'Problem i Ri',
     settings: 'Cilësimet',
     languageSettings: 'Cilësimet e Gjuhës',
