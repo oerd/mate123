@@ -142,7 +142,7 @@ export default function Home() {
   useEffect(() => {
     if (!testParameters.operations.includes(operation)) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setOperation(testParameters.operations[0]);
+      setOperation(testParameters.operations[0] || 'addition');
     } else {
       generateNewProblem();
     }
