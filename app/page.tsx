@@ -3,13 +3,14 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { useLanguage } from './LanguageContext';
-import { useTestParameters, operationLookup, Operation } from './TestParametersContext';
+import { useTestParameters, Operation } from './TestParametersContext';
 import { translations } from './translations';
 import { SettingsIcon } from './components/SettingsIcon';
 import { OperationToggle } from './components/OperationToggle';
 import { LanguageSelector } from './components/LanguageSelector';
-import { AnswerButton } from './components/AnswerButton';
 import { generateProblem } from './utils/mathLogic';
+import { ProblemDisplay } from './components/ProblemDisplay';
+import { ResultGrid } from './components/ResultGrid';
 
 export default function Home() {
   const { language, setLanguage } = useLanguage();
@@ -52,7 +53,6 @@ export default function Home() {
   }, [testParameters.numberOfResults, testParameters.sortResults]);
 
   const generateNewProblem = useCallback(() => {
-    // Use the robust utility function from mathLogic.ts
     const problem = generateProblem(testParameters, operation);
     
     setFirstNumber(problem.num1);
@@ -63,11 +63,8 @@ export default function Home() {
     setFeedback(null);
     setSelectedOptionIndex(null);
     
-    // We need to generate options AFTER setting the correct answer.
-    // However, since state updates are async, we can pass the answer directly.
     setAnswerOptions(generateAnswerOptions(problem.answer));
 
-    // Focus input for better UX (kids often lose focus after clicking buttons)
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
       inputRef.current?.focus();
@@ -110,7 +107,6 @@ export default function Home() {
       if (isCorrect) {
         generateNewProblem();
       } else {
-        // Refocus input on error so they can try again immediately
         inputRef.current?.focus();
       }
     }, 1500);
@@ -125,12 +121,6 @@ export default function Home() {
     setUserAnswer(option.toString());
     setSelectedOptionIndex(index);
     
-    // We don't track the short animation timer (300ms) with the global ref
-    // because it might overlap with the main 1500ms transition if clicked rapidly
-    // But for safety, we should really just track one main flow.
-    // Let's use a local variable or just risk the small overlap, 
-    // BUT we must protect the inner timeout which does state updates.
-    
     setTimeout(() => {
       const isCorrect = option === Math.round(correctAnswer * 100) / 100;
       
@@ -144,7 +134,6 @@ export default function Home() {
           generateNewProblem();
         } else {
           setSelectedOptionIndex(null);
-          // Refocus input
           inputRef.current?.focus();
         }
       }, 1500);
@@ -169,7 +158,6 @@ export default function Home() {
     };
   }, [showLanguageSelector]);
 
-  // Cleanup timers on unmount
   useEffect(() => {
     return () => {
       if (timerRef.current) {
@@ -243,60 +231,25 @@ export default function Home() {
         />
       )}
       
-      <div className={`math-problem-container p-8 rounded-xl shadow-lg bg-ctp-mantle border border-ctp-surface0 transition-all duration-300 ${
-        isAnimating && feedback === 'correct' ? 'animate-success' : 
-        isAnimating && feedback === 'incorrect' ? 'animate-error' : ''
-      }`}>
-        <div className="text-5xl font-bold flex items-center justify-center gap-4 mb-8 text-ctp-text">
-          <span>{firstNumber}</span>
-          <span>{operationLookup(operation)}</span>
-          <span>{secondNumber}</span>
-          <span>=</span>
-          <span>?</span>
-        </div>
-        
-        <form onSubmit={handleSubmit} className="flex flex-col items-center">
-          <input
-            ref={inputRef}
-            type="number"
-            value={userAnswer}
-            onChange={(e) => setUserAnswer(e.target.value)}
-            className="text-4xl p-4 w-32 text-center border-2 border-ctp-surface2 rounded-lg bg-ctp-surface0 text-ctp-text focus:border-ctp-blue focus:outline-none"
-            placeholder="?"
-            autoFocus
-          />
-          
-          <button 
-            type="submit"
-            className="mt-6 px-6 py-3 bg-ctp-blue text-ctp-base font-bold rounded-lg hover:bg-ctp-lavender transition-colors"
-          >
-            {t.checkAnswer}
-          </button>
-        </form>
-        
-        {feedback && (
-          <div className={`mt-6 text-2xl font-bold text-center ${
-            feedback === 'correct' ? 'text-ctp-green' : 'text-ctp-red'
-          }`}>
-            {feedback === 'correct' ? t.correct : t.tryAgain}
-          </div>
-        )}
-      </div>
+      <ProblemDisplay
+        firstNumber={firstNumber}
+        secondNumber={secondNumber}
+        operation={operation}
+        userAnswer={userAnswer}
+        setUserAnswer={setUserAnswer}
+        onSubmit={handleSubmit}
+        feedback={feedback}
+        isAnimating={isAnimating}
+        language={language}
+        inputRef={inputRef}
+        t={t}
+      />
       
-      <div className="mt-8 w-full max-w-xl">
-        <div className="flex flex-wrap justify-center gap-3">
-          {answerOptions.map((option, index) => (
-            <AnswerButton
-              key={index}
-              value={option}
-              index={index}
-              isSelected={selectedOptionIndex === index}
-              isDisabled={selectedOptionIndex !== null && selectedOptionIndex !== index}
-              onClick={handleOptionClick}
-            />
-          ))}
-        </div>
-      </div>
+      <ResultGrid
+        answerOptions={answerOptions}
+        selectedOptionIndex={selectedOptionIndex}
+        onOptionClick={handleOptionClick}
+      />
       
       <button
         onClick={generateNewProblem}
