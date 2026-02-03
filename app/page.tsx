@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useLanguage } from './LanguageContext';
 import { useTestParameters, operationLookup, Operation } from './TestParametersContext';
@@ -27,7 +27,7 @@ export default function Home() {
   const [languageTooltip, setLanguageTooltip] = useState<string | null>(null);
   const [selectedOptionIndex, setSelectedOptionIndex] = useState<number | null>(null);
 
-  const generateAnswerOptions = (correctAnswer: number) => {
+  const generateAnswerOptions = useCallback((correctAnswer: number) => {
     const displayCorrectAnswer = Math.round(correctAnswer * 100) / 100;
     
     const options = [displayCorrectAnswer];
@@ -45,29 +45,24 @@ export default function Home() {
     } else {
       return options.sort(() => Math.random() - 0.5);
     }
-  };
+  }, [testParameters.numberOfResults, testParameters.sortResults]);
 
-  const generateNewProblem = () => {
+  const generateNewProblem = useCallback(() => {
     let num1, num2;
     
     switch (operation) {
       case 'addition':
+      case 'multiplication':
         num1 = Math.floor(Math.random() * (testParameters.firstOperandMax - testParameters.firstOperandMin + 1)) + testParameters.firstOperandMin;
         num2 = Math.floor(Math.random() * (testParameters.secondOperandMax - testParameters.secondOperandMin + 1)) + testParameters.secondOperandMin;
         break;
         
       case 'subtraction':
         num1 = Math.floor(Math.random() * (testParameters.firstOperandMax - testParameters.firstOperandMin + 1)) + testParameters.firstOperandMin;
-        const maxSecond = Math.min(num1, testParameters.secondOperandMax);
-        num2 = Math.floor(Math.random() * (maxSecond - testParameters.secondOperandMin + 1)) + testParameters.secondOperandMin;
+        num2 = Math.floor(Math.random() * (Math.min(num1, testParameters.secondOperandMax) - testParameters.secondOperandMin + 1)) + testParameters.secondOperandMin;
         break;
         
-      case 'multiplication':
-        num1 = Math.floor(Math.random() * (testParameters.firstOperandMax - testParameters.firstOperandMin + 1)) + testParameters.firstOperandMin;
-        num2 = Math.floor(Math.random() * (testParameters.secondOperandMax - testParameters.secondOperandMin + 1)) + testParameters.secondOperandMin;
-        break;
-        
-      case 'division':
+      case 'division': {
         const secondMin = Math.max(1, testParameters.secondOperandMin);
         const secondMax = testParameters.secondOperandMax;
         
@@ -122,6 +117,7 @@ export default function Home() {
           }
         }
         break;
+      }
         
       default:
         num1 = 0;
@@ -141,27 +137,30 @@ export default function Home() {
                           
     setCorrectAnswer(newCorrectAnswer);
     setAnswerOptions(generateAnswerOptions(newCorrectAnswer));
-  };
+  }, [operation, testParameters, generateAnswerOptions]);
 
   useEffect(() => {
     if (!testParameters.operations.includes(operation)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setOperation(testParameters.operations[0]);
     } else {
       generateNewProblem();
     }
-  }, [operation, testParameters]);
+  }, [operation, testParameters, generateNewProblem]);
 
   useEffect(() => {
     if (correctAnswer !== 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setAnswerOptions(generateAnswerOptions(correctAnswer));
     }
-  }, [testParameters.numberOfResults]);
+  }, [testParameters.numberOfResults, correctAnswer, generateAnswerOptions]);
 
   useEffect(() => {
     if (firstNumber !== 0 || secondNumber !== 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setAnswerOptions(generateAnswerOptions(correctAnswer));
     }
-  }, [testParameters.sortResults]);
+  }, [testParameters.sortResults, firstNumber, secondNumber, correctAnswer, generateAnswerOptions]);
 
   const checkAnswer = () => {
     const isCorrect = parseFloat(userAnswer) === correctAnswer || 
