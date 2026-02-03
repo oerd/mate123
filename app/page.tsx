@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { useLanguage } from './LanguageContext';
 import { useTestParameters, operationLookup, Operation } from './TestParametersContext';
@@ -8,11 +8,13 @@ import { translations } from './translations';
 import { SettingsIcon } from './components/SettingsIcon';
 import { OperationToggle } from './components/OperationToggle';
 import { LanguageSelector } from './components/LanguageSelector';
+import { generateProblem } from './utils/mathLogic';
 
 export default function Home() {
   const { language, setLanguage } = useLanguage();
   const { testParameters } = useTestParameters();
   const t = translations[language];
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const [firstNumber, setFirstNumber] = useState<number>(0);
   const [secondNumber, setSecondNumber] = useState<number>(0);
@@ -48,95 +50,25 @@ export default function Home() {
   }, [testParameters.numberOfResults, testParameters.sortResults]);
 
   const generateNewProblem = useCallback(() => {
-    let num1, num2;
+    // Use the robust utility function from mathLogic.ts
+    const problem = generateProblem(testParameters, operation);
     
-    switch (operation) {
-      case 'addition':
-      case 'multiplication':
-        num1 = Math.floor(Math.random() * (testParameters.firstOperandMax - testParameters.firstOperandMin + 1)) + testParameters.firstOperandMin;
-        num2 = Math.floor(Math.random() * (testParameters.secondOperandMax - testParameters.secondOperandMin + 1)) + testParameters.secondOperandMin;
-        break;
-        
-      case 'subtraction':
-        num1 = Math.floor(Math.random() * (testParameters.firstOperandMax - testParameters.firstOperandMin + 1)) + testParameters.firstOperandMin;
-        num2 = Math.floor(Math.random() * (Math.min(num1, testParameters.secondOperandMax) - testParameters.secondOperandMin + 1)) + testParameters.secondOperandMin;
-        break;
-        
-      case 'division': {
-        const secondMin = Math.max(1, testParameters.secondOperandMin);
-        const secondMax = testParameters.secondOperandMax;
-        
-        if (secondMin <= secondMax) {
-          num2 = Math.floor(Math.random() * (secondMax - secondMin + 1)) + secondMin;
-        } else {
-          num2 = secondMin;
-        }
-        
-        if (num2 === 0) num2 = 1;
-        
-        const maxQuotient = Math.floor(testParameters.firstOperandMax / num2);
-        const minQuotient = Math.max(1, Math.ceil(testParameters.firstOperandMin / num2));
-        
-        let quotient;
-        if (maxQuotient >= minQuotient) {
-          quotient = Math.floor(Math.random() * (maxQuotient - minQuotient + 1)) + minQuotient;
-        } else {
-          quotient = Math.floor(Math.random() * 10) + 1;
-        }
-        
-        num1 = quotient * num2;
-        
-        if (num1 < testParameters.firstOperandMin || num1 > testParameters.firstOperandMax) {
-          if (num1 < testParameters.firstOperandMin) {
-            num1 = Math.floor(testParameters.firstOperandMin / num2) * num2;
-            if (num1 < testParameters.firstOperandMin) {
-              num1 += num2;
-            }
-          } else if (num1 > testParameters.firstOperandMax) {
-            num1 = Math.floor(testParameters.firstOperandMax / num2) * num2;
-          }
-        }
-        
-        if (Math.random() < 0.2) {
-          num2 = Math.floor(Math.random() * (secondMax - secondMin + 1)) + secondMin;
-          if (num2 === 0) num2 = 1;
-          
-          const possibleMultiples = [];
-          for (let i = testParameters.firstOperandMin; i <= testParameters.firstOperandMax; i++) {
-            if (i % num2 === 0) {
-              possibleMultiples.push(i);
-            }
-          }
-          
-          if (possibleMultiples.length > 0) {
-            num1 = possibleMultiples[Math.floor(Math.random() * possibleMultiples.length)];
-          } else {
-            num1 = Math.floor((testParameters.firstOperandMin + testParameters.firstOperandMax) / 2 / num2) * num2;
-            if (num1 < testParameters.firstOperandMin) num1 += num2;
-            if (num1 > testParameters.firstOperandMax) num1 -= num2;
-          }
-        }
-        break;
-      }
-        
-      default:
-        num1 = 0;
-        num2 = 0;
-    }
+    setFirstNumber(problem.num1);
+    setSecondNumber(problem.num2);
+    setCorrectAnswer(problem.answer);
     
-    setFirstNumber(num1);
-    setSecondNumber(num2);
     setUserAnswer('');
     setFeedback(null);
     setSelectedOptionIndex(null);
     
-    const newCorrectAnswer = operation === 'division' ? num1 / num2 : 
-                          operation === 'multiplication' ? num1 * num2 : 
-                          operation === 'subtraction' ? num1 - num2 : 
-                          num1 + num2;
-                          
-    setCorrectAnswer(newCorrectAnswer);
-    setAnswerOptions(generateAnswerOptions(newCorrectAnswer));
+    // We need to generate options AFTER setting the correct answer.
+    // However, since state updates are async, we can pass the answer directly.
+    setAnswerOptions(generateAnswerOptions(problem.answer));
+
+    // Focus input for better UX (kids often lose focus after clicking buttons)
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 100);
   }, [operation, testParameters, generateAnswerOptions]);
 
   useEffect(() => {
@@ -173,6 +105,9 @@ export default function Home() {
       setIsAnimating(false);
       if (isCorrect) {
         generateNewProblem();
+      } else {
+        // Refocus input on error so they can try again immediately
+        inputRef.current?.focus();
       }
     }, 1500);
   };
@@ -198,6 +133,8 @@ export default function Home() {
           generateNewProblem();
         } else {
           setSelectedOptionIndex(null);
+          // Refocus input
+          inputRef.current?.focus();
         }
       }, 1500);
     }, 300);
@@ -300,6 +237,7 @@ export default function Home() {
         
         <form onSubmit={handleSubmit} className="flex flex-col items-center">
           <input
+            ref={inputRef}
             type="number"
             value={userAnswer}
             onChange={(e) => setUserAnswer(e.target.value)}
