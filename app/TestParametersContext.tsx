@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from 'react';
 
 export type Operation = 'addition' | 'subtraction' | 'multiplication' | 'division';
 // Define all possible operations
@@ -96,15 +96,21 @@ export function TestParametersProvider({ children }: Readonly<{ children: ReactN
     }
   }, []);
 
-  const setTestParameters = (newParams: TestParameters) => {
+  const setTestParameters = useCallback((newParams: TestParameters) => {
     setTestParametersState(newParams);
     setLoadedFromUrl(false); // Reset the flag when user manually saves settings
     // Save to localStorage for persistence
     localStorage.setItem('testParameters', JSON.stringify(newParams));
-  };
+  }, []);
+
+  const contextValue = useMemo(() => ({
+    testParameters,
+    setTestParameters,
+    loadedFromUrl
+  }), [testParameters, setTestParameters, loadedFromUrl]);
 
   return (
-    <TestParametersContext.Provider value={{ testParameters, setTestParameters, loadedFromUrl }}>
+    <TestParametersContext.Provider value={contextValue}>
       {children}
     </TestParametersContext.Provider>
   );

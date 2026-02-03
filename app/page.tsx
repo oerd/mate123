@@ -16,6 +16,7 @@ export default function Home() {
   const { testParameters } = useTestParameters();
   const t = translations[language];
   const inputRef = useRef<HTMLInputElement>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const [firstNumber, setFirstNumber] = useState<number>(0);
   const [secondNumber, setSecondNumber] = useState<number>(0);
@@ -67,7 +68,8 @@ export default function Home() {
     setAnswerOptions(generateAnswerOptions(problem.answer));
 
     // Focus input for better UX (kids often lose focus after clicking buttons)
-    setTimeout(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
       inputRef.current?.focus();
     }, 100);
   }, [operation, testParameters, generateAnswerOptions]);
@@ -102,7 +104,8 @@ export default function Home() {
     setFeedback(isCorrect ? 'correct' : 'incorrect');
     setIsAnimating(true);
     
-    setTimeout(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
       setIsAnimating(false);
       if (isCorrect) {
         generateNewProblem();
@@ -122,13 +125,20 @@ export default function Home() {
     setUserAnswer(option.toString());
     setSelectedOptionIndex(index);
     
+    // We don't track the short animation timer (300ms) with the global ref
+    // because it might overlap with the main 1500ms transition if clicked rapidly
+    // But for safety, we should really just track one main flow.
+    // Let's use a local variable or just risk the small overlap, 
+    // BUT we must protect the inner timeout which does state updates.
+    
     setTimeout(() => {
       const isCorrect = option === Math.round(correctAnswer * 100) / 100;
       
       setFeedback(isCorrect ? 'correct' : 'incorrect');
       setIsAnimating(true);
       
-      setTimeout(() => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => {
         setIsAnimating(false);
         if (isCorrect) {
           generateNewProblem();
@@ -158,6 +168,15 @@ export default function Home() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [showLanguageSelector]);
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-8 bg-ctp-base">
