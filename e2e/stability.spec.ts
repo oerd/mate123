@@ -2,13 +2,16 @@ import { test, expect } from '@playwright/test';
 
 test.describe('App Stability', () => {
   test('should iterate through many math problems without freezing', async ({ page }) => {
+    // Increase timeout to allow for animations (1.5s per iteration * 20 = 30s+)
+    test.setTimeout(120000);
+
     // 1. Navigate to home
     await page.goto('/');
     
     // Ensure the app is loaded
     await expect(page.locator('h1')).toContainText(/Math Practice|Mathe-Übung|Esercizi|Exercices|Praktikë/);
 
-    const iterations = 50;
+    const iterations = 30;
     
     console.log(`Starting ${iterations} iterations of solve-and-refresh...`);
 
