@@ -29,6 +29,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     // Load saved theme preference from localStorage
     const savedTheme = localStorage.getItem('themeMode') as ThemeMode | null;
     if (savedTheme && ['dark', 'light', 'system'].includes(savedTheme)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setThemeModeState(savedTheme);
     }
 

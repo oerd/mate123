@@ -71,6 +71,7 @@ export function TestParametersProvider({ children }: Readonly<{ children: ReactN
         };
         
         // Apply settings
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setTestParametersState(mergedSettings);
         setLoadedFromUrl(true);
         
