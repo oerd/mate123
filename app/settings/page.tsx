@@ -2,9 +2,10 @@
 
 import { useLanguage } from '../LanguageContext';
 import { useTheme } from '../ThemeContext';
-import { useTestParameters, Operation, operationLookup } from '../TestParametersContext';
+import { useTestParameters, Operation } from '../TestParametersContext';
 import { translations } from '../translations';
 import Link from 'next/link';
+import { OperationToggle } from '../components/OperationToggle';
 import { LightIcon, DarkIcon, SystemIcon } from '../components/ThemeIcons';
 import { LanguageSelector } from '../components/LanguageSelector';
 import { useState, useEffect } from 'react';
@@ -273,59 +274,19 @@ export default function Settings() {
         <div className="mb-6">
           <h3 className="text-xl font-semibold mb-4 text-ctp-text">{t.operationSettings}</h3>
           
-          <div className="flex gap-4 mb-4">
-            <button
-              onClick={() => handleOperationToggle('addition')}
-              className={`p-3 rounded-lg transition-all flex items-center justify-center flex-1 ${
-                selectedOperations.includes('addition')
-                  ? 'bg-ctp-surface1 border-2 border-ctp-blue'
-                  : 'bg-ctp-surface0 hover:bg-ctp-surface1'
-              }`}
-              aria-label={t.addition}
-            >
-              <span className="text-xl font-bold"> { operationLookup('addition') } </span>
-              {/*<span className="ml-2">{t.addition}</span>*/}
-            </button>
-            
-            <button
-              onClick={() => handleOperationToggle('subtraction')}
-              className={`p-2 rounded-lg transition-all flex items-center justify-center flex-1 ${
-                selectedOperations.includes('subtraction')
-                  ? 'bg-ctp-surface1 border-2 border-ctp-blue'
-                  : 'bg-ctp-surface0 hover:bg-ctp-surface1'
-              }`}
-              aria-label={t.subtraction}
-            >
-              <span className="text-xl font-bold"> { operationLookup('subtraction') } </span>
-              {/*<span className="ml-2">{t.subtraction}</span>*/}
-            </button>
-
-            <button
-              onClick={() => handleOperationToggle('multiplication')}
-              className={`p-2 rounded-lg transition-all flex items-center justify-center flex-1 ${
-                selectedOperations.includes('multiplication')
-                  ? 'bg-ctp-surface1 border-2 border-ctp-blue'
-                  : 'bg-ctp-surface0 hover:bg-ctp-surface1'
-              }`}
-              aria-label={t.multiplication}
-            >
-              <span className="text-xl font-bold"> { operationLookup('multiplication') } </span>
-              {/*<span className="ml-2">{t.multiplication}</span>*/}
-            </button>
-
-            <button
-              onClick={() => handleOperationToggle('division')}
-              className={`p-2 rounded-lg transition-all flex items-center justify-center flex-1 ${
-                selectedOperations.includes('division')
-                  ? 'bg-ctp-surface1 border-2 border-ctp-blue'
-                  : 'bg-ctp-surface0 hover:bg-ctp-surface1'
-              }`}
-              aria-label={t.division}
-            >
-              <span className="text-xl font-bold"> { operationLookup('division') } </span>
-              {/*<span className="ml-2">{t.division}</span>*/}
-            </button>
-          </div>
+          <OperationToggle 
+          options={['addition', 'subtraction', 'multiplication', 'division']}
+          selected={selectedOperations}
+          onToggle={handleOperationToggle}
+          className="flex gap-4 mb-4"
+          renderButtonClass={(op, active) => 
+            `p-3 rounded-lg transition-all flex items-center justify-center flex-1 ${
+              active
+                ? 'bg-ctp-surface1 border-2 border-ctp-blue'
+                : 'bg-ctp-surface0 hover:bg-ctp-surface1'
+            }`
+          }
+        />
         </div>
         
         <div className="mb-6">

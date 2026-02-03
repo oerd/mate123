@@ -217,9 +217,9 @@ export default function Home() {
       
       {testParameters.operations.length > 1 && (
         <OperationToggle 
-          operation={operation} 
-          setOperation={setOperation}
-          availableOperations={testParameters.operations}
+          selected={operation} 
+          onToggle={setOperation}
+          options={testParameters.operations}
         />
       )}
       
