@@ -1,46 +1,17 @@
 import { renderHook, act } from '@testing-library/react';
 import { TestParametersProvider, useTestParameters } from './TestParametersContext';
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 
-// Mock localStorage
-const localStorageMock = (() => {
-  let store: Record<string, string> = {};
-  return {
-    getItem: vi.fn((key: string) => store[key] || null),
-    setItem: vi.fn((key: string, value: string) => {
-      store[key] = value.toString();
-    }),
-    clear: vi.fn(() => {
-      store = {};
-    }),
-    removeItem: vi.fn((key: string) => {
-      delete store[key];
-    }),
-  };
-})();
-
-Object.defineProperty(window, 'localStorage', {
-  value: localStorageMock,
-});
-
-// Mock window.location and history
-const originalLocation = window.location;
-// const originalHistory = window.history;
+// We use the real JSDOM environment, so no manual mocks of localStorage or window.location.
+// However, JSDOM's window.location.href/search are read-only-ish or hard to change via assignment in some setups,
+// but window.history.pushState works.
 
 describe('TestParametersContext', () => {
   beforeEach(() => {
-    localStorageMock.clear();
-    // Reset window mocks
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    delete (window as any).location;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    window.location = { ...originalLocation, search: '' } as any;
-    
-    window.history.replaceState = vi.fn();
-  });
-
-  afterEach(() => {
-    vi.clearAllMocks();
+    // Clear real localStorage
+    window.localStorage.clear();
+    // Reset URL
+    window.history.pushState({}, '', '/');
   });
 
   it('provides default parameters initially', () => {
@@ -68,10 +39,10 @@ describe('TestParametersContext', () => {
     });
 
     expect(result.current.testParameters.numberOfResults).toBe(8);
-    expect(localStorageMock.setItem).toHaveBeenCalledWith(
-      'testParameters',
-      JSON.stringify(newParams)
-    );
+    // Check real localStorage
+    const stored = window.localStorage.getItem('testParameters');
+    expect(stored).toBeDefined();
+    expect(JSON.parse(stored!)).toEqual(newParams);
   });
 
   it('loads parameters from localStorage on mount', () => {
@@ -85,7 +56,8 @@ describe('TestParametersContext', () => {
       sortResults: true,
     };
 
-    localStorageMock.getItem.mockReturnValue(JSON.stringify(savedParams));
+    // Set real localStorage
+    window.localStorage.setItem('testParameters', JSON.stringify(savedParams));
 
     const { result } = renderHook(() => useTestParameters(), {
       wrapper: TestParametersProvider,
@@ -95,8 +67,8 @@ describe('TestParametersContext', () => {
   });
 
   it('prioritizes URL parameters over defaults/localStorage', () => {
-    // Simulate URL with params: ?nr=5&op=division
-    window.location.search = '?nr=5&op=division';
+    // Use real history API to simulate URL
+    window.history.pushState({}, '', '/?nr=5&op=division');
 
     const { result } = renderHook(() => useTestParameters(), {
       wrapper: TestParametersProvider,
@@ -106,7 +78,10 @@ describe('TestParametersContext', () => {
     expect(result.current.testParameters.operations).toEqual(['division']);
     expect(result.current.loadedFromUrl).toBe(true);
     
-    // Should clean URL
-    expect(window.history.replaceState).toHaveBeenCalled();
+    // Check if URL was cleaned (app calls window.history.replaceState)
+    // Note: Since we are in JSDOM, we can check if the current location.search is empty?
+    // The implementation calls: window.history.replaceState({}, document.title, window.location.pathname);
+    // So we expect window.location.search to be empty now.
+    expect(window.location.search).toBe('');
   });
 });
