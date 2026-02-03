@@ -8,6 +8,7 @@ import { translations } from './translations';
 import { SettingsIcon } from './components/SettingsIcon';
 import { OperationToggle } from './components/OperationToggle';
 import { LanguageSelector } from './components/LanguageSelector';
+import { AnswerButton } from './components/AnswerButton';
 import { generateProblem } from './utils/mathLogic';
 
 export default function Home() {
@@ -117,7 +118,7 @@ export default function Home() {
     checkAnswer();
   };
 
-  const handleOptionClick = (option: number, index: number) => {
+  const handleOptionClick = useCallback((option: number, index: number) => {
     setUserAnswer(option.toString());
     setSelectedOptionIndex(index);
     
@@ -138,7 +139,7 @@ export default function Home() {
         }
       }, 1500);
     }, 300);
-  };
+  }, [correctAnswer, generateNewProblem]);
 
   const toggleLanguageSelector = () => {
     setShowLanguageSelector(!showLanguageSelector);
@@ -266,22 +267,14 @@ export default function Home() {
       <div className="mt-8 w-full max-w-xl">
         <div className="flex flex-wrap justify-center gap-3">
           {answerOptions.map((option, index) => (
-            <button
+            <AnswerButton
               key={index}
-              onClick={() => handleOptionClick(option, index)}
-              aria-label={`Choose answer ${option}`}
-              disabled={selectedOptionIndex !== null && selectedOptionIndex !== index}
-              className={`h-16 w-20 min-w-20 text-5xl font-bold bg-ctp-surface0 text-ctp-text rounded-lg 
-                hover:bg-ctp-surface1 hover:scale-105 
-                active:scale-95 
-                transition-all duration-150 shadow-md 
-                flex items-center justify-center
-                ${selectedOptionIndex === index ? 'ring-2 ring-ctp-blue bg-ctp-surface1' : ''}
-                ${selectedOptionIndex !== null && selectedOptionIndex !== index ? 'opacity-60' : ''}
-              `}
-            >
-              {option}
-            </button>
+              value={option}
+              index={index}
+              isSelected={selectedOptionIndex === index}
+              isDisabled={selectedOptionIndex !== null && selectedOptionIndex !== index}
+              onClick={handleOptionClick}
+            />
           ))}
         </div>
       </div>
