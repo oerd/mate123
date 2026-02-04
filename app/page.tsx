@@ -109,7 +109,7 @@ export default function Home() {
       } else {
         inputRef.current?.focus();
       }
-    }, 1500);
+    }, 800);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -136,7 +136,7 @@ export default function Home() {
           setSelectedOptionIndex(null);
           inputRef.current?.focus();
         }
-      }, 1500);
+      }, 800);
     }, 300);
   }, [correctAnswer, generateNewProblem]);
 
