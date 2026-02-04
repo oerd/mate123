@@ -11,7 +11,7 @@ test.describe('App Stability', () => {
     // Ensure the app is loaded
     await expect(page.locator('h1')).toContainText(/Math Practice|Mathe-Übung|Esercizi|Exercices|Praktikë/);
 
-    const iterations = 30;
+    const iterations = 50;
     
     console.log(`Starting ${iterations} iterations of solve-and-refresh...`);
 
