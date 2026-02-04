@@ -61,14 +61,16 @@ export const ProblemDisplay = ({
         </button>
       </form>
       
-      {feedback && (
-        <div className={`mt-6 text-2xl font-bold text-center ${
+      <div 
+        className={`mt-6 text-2xl font-bold text-center min-h-[2rem] transition-opacity duration-200 ${
+          feedback ? 'opacity-100' : 'opacity-0'
+        } ${
           feedback === 'correct' ? 'text-ctp-green' : 'text-ctp-red'
-        }`} role="alert"> 
-          {/* Added role="alert" for screen readers */}
-          {feedback === 'correct' ? t.correct : t.tryAgain}
-        </div>
-      )}
+        }`} 
+        role="alert"
+      > 
+        {feedback === 'correct' ? t.correct : (feedback === 'incorrect' ? t.tryAgain : t.correct)}
+      </div>
     </div>
   );
 };

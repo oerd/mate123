@@ -60,11 +60,10 @@ test.describe('App Stability', () => {
       // 4. Wait for the "Correct!" feedback
       await expect(container).toContainText(/Correct|Richtig|Corretto|Saktë/);
       
-      // 5. Wait for the new problem to appear (animation takes 1.5s)
-      // We can wait for the feedback to disappear OR for the numbers to change
-      // Simplest is to wait for the feedback to disappear
-      // The "Correct" text is removed when generateNewProblem is called
-      await expect(container).not.toContainText(/Correct|Richtig|Corretto|Saktë/, { timeout: 3000 });
+      // 5. Wait for the new problem to appear
+      // We check that the feedback element has the opacity-0 class, meaning it's invisible
+      const feedbackElement = container.getByText(/Correct|Richtig|Corretto|Saktë/);
+      await expect(feedbackElement).toHaveClass(/opacity-0/, { timeout: 3000 });
       
       // Optional: Verify the numbers changed (unless by chance they are the same, which is rare but possible)
       // For stability test, just reaching this point implies the app didn't freeze.
