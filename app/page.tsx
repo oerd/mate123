@@ -139,9 +139,17 @@ export default function Home() {
       }
     };
 
+    const handleEscape = (event: KeyboardEvent) => {
+      if (showLanguageSelector && event.key === 'Escape') {
+        setShowLanguageSelector(false);
+      }
+    };
+
     document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
     };
   }, [showLanguageSelector]);
 
