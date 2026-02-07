@@ -9,7 +9,7 @@ describe('ResultGrid', () => {
     render(
       <ResultGrid
         answerOptions={options}
-        selectedOptionIndex={null}
+        selectedOptionValue={null}
         onOptionClick={() => {}}
       />
     );
@@ -26,14 +26,13 @@ describe('ResultGrid', () => {
     render(
       <ResultGrid
         answerOptions={options}
-        selectedOptionIndex={null}
+        selectedOptionValue={null}
         onOptionClick={onOptionClick}
       />
     );
 
     fireEvent.click(screen.getByText('10'));
-    // index of 10 is 1
-    expect(onOptionClick).toHaveBeenCalledWith(10, 1);
+    expect(onOptionClick).toHaveBeenCalledWith(10);
   });
 
   it('disables other buttons when one is selected', () => {
@@ -42,7 +41,7 @@ describe('ResultGrid', () => {
     render(
       <ResultGrid
         answerOptions={options}
-        selectedOptionIndex={1} // Select '2' (index 1)
+        selectedOptionValue={2}
         onOptionClick={() => {}}
       />
     );
@@ -52,7 +51,7 @@ describe('ResultGrid', () => {
     const btn3 = screen.getByText('3').closest('button') as HTMLButtonElement;
 
     expect(btn1.disabled).toBe(true);
-    expect(btn2.disabled).toBe(false); // Selected one should not be disabled
+    expect(btn2.disabled).toBe(false);
     expect(btn3.disabled).toBe(true);
   });
 });

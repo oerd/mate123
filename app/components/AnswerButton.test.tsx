@@ -7,7 +7,6 @@ describe('AnswerButton', () => {
     render(
       <AnswerButton
         value={42}
-        index={0}
         isSelected={false}
         isDisabled={false}
         onClick={() => {}}
@@ -16,26 +15,24 @@ describe('AnswerButton', () => {
     expect(screen.getByText('42')).toBeDefined();
   });
 
-  it('calls onClick with value and index', () => {
+  it('calls onClick with value', () => {
     const mockClick = vi.fn();
     render(
       <AnswerButton
         value={42}
-        index={5}
         isSelected={false}
         isDisabled={false}
         onClick={mockClick}
       />
     );
     fireEvent.click(screen.getByText('42'));
-    expect(mockClick).toHaveBeenCalledWith(42, 5);
+    expect(mockClick).toHaveBeenCalledWith(42);
   });
 
   it('applies selected styling', () => {
     render(
       <AnswerButton
         value={42}
-        index={0}
         isSelected={true}
         isDisabled={false}
         onClick={() => {}}
@@ -50,7 +47,6 @@ describe('AnswerButton', () => {
     render(
       <AnswerButton
         value={42}
-        index={0}
         isSelected={false}
         isDisabled={true}
         onClick={() => {}}

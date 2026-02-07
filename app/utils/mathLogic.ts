@@ -1,5 +1,50 @@
 import { TestParameters, Operation } from '../TestParametersContext';
 
+export const round2 = (n: number) => Math.round(n * 100) / 100;
+
+export function isAnswerCorrect(answer: number, correctAnswer: number): boolean {
+  if (!Number.isFinite(answer)) return false;
+  return round2(answer) === round2(correctAnswer);
+}
+
+export interface GenerateOptionsConfig {
+  numberOfResults: number;
+  sortResults: boolean;
+}
+
+export function generateAnswerOptions(correct: number, config: GenerateOptionsConfig): number[] {
+  const targetCount = config.numberOfResults;
+  const correctRounded = round2(correct);
+
+  const opts = new Set<number>([correctRounded]);
+
+  let range = Math.max(5, Math.ceil(Math.abs(correctRounded) / 2));
+  let attempts = 0;
+  const MAX_ATTEMPTS = 500;
+
+  while (opts.size < targetCount && attempts < MAX_ATTEMPTS) {
+    const delta = Math.floor(Math.random() * range * 2) - range;
+    const candidate = Math.max(0, correctRounded + delta);
+
+    if (candidate !== correctRounded) {
+      opts.add(candidate);
+    }
+
+    attempts++;
+    if (attempts % 50 === 0) range *= 2;
+  }
+
+  for (let i = 1; opts.size < targetCount; i++) {
+    opts.add(correctRounded + range + i);
+  }
+
+  const arr = Array.from(opts);
+
+  return config.sortResults
+    ? arr.sort((a, b) => a - b)
+    : arr.sort(() => Math.random() - 0.5);
+}
+
 export interface MathProblem {
   num1: number;
   num2: number;

@@ -2,23 +2,21 @@ import React from 'react';
 
 interface AnswerButtonProps {
   value: number;
-  index: number;
   isSelected: boolean;
   isDisabled: boolean;
-  onClick: (value: number, index: number) => void;
+  onClick: (value: number) => void;
 }
 
 export const AnswerButton = React.memo(({
   value,
-  index,
   isSelected,
   isDisabled,
   onClick
 }: AnswerButtonProps) => {
   return (
     <button
-      onClick={() => onClick(value, index)}
-      aria-label={`Choose answer ${value}`}
+      onClick={() => onClick(value)}
+      aria-label={`${value}`}
       disabled={isDisabled}
       className={`h-16 w-20 min-w-20 text-5xl font-bold bg-ctp-surface0 text-ctp-text rounded-lg 
         hover:bg-ctp-surface1 hover:scale-105 

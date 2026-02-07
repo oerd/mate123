@@ -61,16 +61,19 @@ export const ProblemDisplay = ({
         </button>
       </form>
       
-      <div 
-        className={`mt-6 text-2xl font-bold text-center min-h-[2rem] transition-opacity duration-200 ${
-          feedback ? 'opacity-100' : 'opacity-0'
-        } ${
-          feedback === 'correct' ? 'text-ctp-green' : 'text-ctp-red'
-        }`} 
-        role="alert"
-      > 
-        {feedback === 'correct' ? t.correct : (feedback === 'incorrect' ? t.tryAgain : t.correct)}
-      </div>
+      {feedback && (
+        <div 
+          className={`mt-6 text-2xl font-bold text-center min-h-[2rem] ${
+            feedback === 'correct' ? 'text-ctp-green' : 'text-ctp-red'
+          }`} 
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+        > 
+          {feedback === 'correct' ? t.correct : t.tryAgain}
+        </div>
+      )}
+      {!feedback && <div className="mt-6 min-h-[2rem]" />}
     </div>
   );
 };

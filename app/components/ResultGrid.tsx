@@ -3,25 +3,24 @@ import { AnswerButton } from './AnswerButton';
 
 interface ResultGridProps {
   answerOptions: number[];
-  selectedOptionIndex: number | null;
-  onOptionClick: (option: number, index: number) => void;
+  selectedOptionValue: number | null;
+  onOptionClick: (option: number) => void;
 }
 
 export const ResultGrid = ({
   answerOptions,
-  selectedOptionIndex,
+  selectedOptionValue,
   onOptionClick
 }: ResultGridProps) => {
   return (
     <div className="mt-8 w-full max-w-xl">
       <div className="flex flex-wrap justify-center gap-3">
-        {answerOptions.map((option, index) => (
+        {answerOptions.map((option) => (
           <AnswerButton
-            key={index}
+            key={option}
             value={option}
-            index={index}
-            isSelected={selectedOptionIndex === index}
-            isDisabled={selectedOptionIndex !== null && selectedOptionIndex !== index}
+            isSelected={selectedOptionValue === option}
+            isDisabled={selectedOptionValue !== null && selectedOptionValue !== option}
             onClick={onOptionClick}
           />
         ))}

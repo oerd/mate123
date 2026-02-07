@@ -7,74 +7,64 @@ type ThemeMode = 'light' | 'dark' | 'system';
 interface ThemeContextType {
   themeMode: ThemeMode;
   setThemeMode: (theme: ThemeMode) => void;
-  currentTheme: 'light' | 'dark'; // Actual applied theme
+  currentTheme: 'light' | 'dark';
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+function resolveTheme(mode: ThemeMode): 'light' | 'dark' {
+  if (mode === 'system') {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  return mode;
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [themeMode, setThemeModeState] = useState<ThemeMode>('dark'); // Default to dark
+  const [themeMode, setThemeModeState] = useState<ThemeMode>('dark');
   const [currentTheme, setCurrentTheme] = useState<'light' | 'dark'>('dark');
 
-  // Function to determine current theme based on system preference
-  const determineTheme = useCallback((): 'light' | 'dark' => {
-    if (themeMode === 'system') {
-      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    }
-    return themeMode as 'light' | 'dark';
-  }, [themeMode]);
-
-  // Update theme when themeMode changes or when system preference changes
   useEffect(() => {
-    // Load saved theme preference from localStorage
     const savedTheme = localStorage.getItem('themeMode') as ThemeMode | null;
     if (savedTheme && ['dark', 'light', 'system'].includes(savedTheme)) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setThemeModeState(savedTheme);
     }
+  }, []);
 
-    // Set up system preference change listener
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = () => {
-      if (themeMode === 'system') {
-        setCurrentTheme(mediaQuery.matches ? 'dark' : 'light');
-        document.documentElement.setAttribute('data-theme', mediaQuery.matches ? 'dark' : 'light');
-      }
-    };
-
-    // Apply theme based on current mode
-    const theme = determineTheme();
+  useEffect(() => {
+    const theme = resolveTheme(themeMode);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentTheme(theme);
     document.documentElement.setAttribute('data-theme', theme);
 
-    // Listen for system preference changes
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = () => {
+      if (themeMode === 'system') {
+        const resolved = mediaQuery.matches ? 'dark' : 'light';
+        setCurrentTheme(resolved);
+        document.documentElement.setAttribute('data-theme', resolved);
+      }
+    };
+
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
-  }, [themeMode, determineTheme]);
+  }, [themeMode]);
 
-  const setThemeMode = (newThemeMode: ThemeMode) => {
+  const setThemeMode = useCallback((newThemeMode: ThemeMode) => {
     setThemeModeState(newThemeMode);
-    
-    // If not system theme, apply directly
-    if (newThemeMode !== 'system') {
-      document.documentElement.setAttribute('data-theme', newThemeMode);
-      setCurrentTheme(newThemeMode as 'light' | 'dark');
-    } else {
-      // If system theme, check system preference
-      const theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      document.documentElement.setAttribute('data-theme', theme);
-      setCurrentTheme(theme);
-    }
-    
-    // Save to localStorage
+
+    const theme = resolveTheme(newThemeMode);
+    document.documentElement.setAttribute('data-theme', theme);
+    setCurrentTheme(theme);
+
     localStorage.setItem('themeMode', newThemeMode);
-  };
+  }, []);
     
   const contextValue = useMemo(() => ({
     themeMode,
     setThemeMode,
     currentTheme
-  }), [themeMode, currentTheme]);
+  }), [themeMode, setThemeMode, currentTheme]);
 
   return (
     <ThemeContext.Provider value={contextValue}>

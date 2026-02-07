@@ -114,6 +114,78 @@ describe('ProblemDisplay', () => {
     // Note: 'animate-success' class is applied based on isAnimating prop, which is false here
   });
 
+  it('does not render feedback text in DOM when feedback is null', () => {
+    const inputRef = React.createRef<HTMLInputElement>();
+
+    render(
+      <ProblemDisplay
+        firstNumber={1}
+        secondNumber={1}
+        operation="addition"
+        userAnswer=""
+        setUserAnswer={() => {}}
+        onSubmit={() => {}}
+        feedback={null}
+        isAnimating={false}
+        language="en"
+        inputRef={inputRef}
+        t={t}
+      />
+    );
+
+    expect(screen.queryByText(t.correct)).toBeNull();
+    expect(screen.queryByText(t.tryAgain)).toBeNull();
+    expect(screen.queryByRole('status')).toBeNull();
+  });
+
+  it('renders feedback with aria-live for screen readers when feedback is present', () => {
+    const inputRef = React.createRef<HTMLInputElement>();
+
+    render(
+      <ProblemDisplay
+        firstNumber={1}
+        secondNumber={1}
+        operation="addition"
+        userAnswer="2"
+        setUserAnswer={() => {}}
+        onSubmit={() => {}}
+        feedback="correct"
+        isAnimating={false}
+        language="en"
+        inputRef={inputRef}
+        t={t}
+      />
+    );
+
+    const status = screen.getByRole('status');
+    expect(status).toBeDefined();
+    expect(status.getAttribute('aria-live')).toBe('polite');
+    expect(status.textContent).toContain(t.correct);
+  });
+
+  it('renders try-again feedback for incorrect answers', () => {
+    const inputRef = React.createRef<HTMLInputElement>();
+
+    render(
+      <ProblemDisplay
+        firstNumber={1}
+        secondNumber={1}
+        operation="addition"
+        userAnswer="5"
+        setUserAnswer={() => {}}
+        onSubmit={() => {}}
+        feedback="incorrect"
+        isAnimating={false}
+        language="en"
+        inputRef={inputRef}
+        t={t}
+      />
+    );
+
+    const status = screen.getByRole('status');
+    expect(status.textContent).toContain(t.tryAgain);
+  });
+
   it('applies animation classes when animating', () => {
     const inputRef = React.createRef<HTMLInputElement>();
     const { container } = render(

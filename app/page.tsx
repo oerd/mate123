@@ -8,7 +8,7 @@ import { translations } from './translations';
 import { SettingsIcon } from './components/SettingsIcon';
 import { OperationToggle } from './components/OperationToggle';
 import { LanguageSelector } from './components/LanguageSelector';
-import { generateProblem } from './utils/mathLogic';
+import { generateProblem, generateAnswerOptions, isAnswerCorrect } from './utils/mathLogic';
 import { ProblemDisplay } from './components/ProblemDisplay';
 import { ResultGrid } from './components/ResultGrid';
 
@@ -17,7 +17,8 @@ export default function Home() {
   const { testParameters } = useTestParameters();
   const t = translations[language];
   const inputRef = useRef<HTMLInputElement>(null);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const focusTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const feedbackTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const [firstNumber, setFirstNumber] = useState<number>(0);
   const [secondNumber, setSecondNumber] = useState<number>(0);
@@ -30,29 +31,29 @@ export default function Home() {
   const [correctAnswer, setCorrectAnswer] = useState<number>(0);
   const [showLanguageSelector, setShowLanguageSelector] = useState<boolean>(false);
   const [languageTooltip, setLanguageTooltip] = useState<string | null>(null);
-  const [selectedOptionIndex, setSelectedOptionIndex] = useState<number | null>(null);
+  const [selectedOptionValue, setSelectedOptionValue] = useState<number | null>(null);
 
-  const generateAnswerOptions = useCallback((correctAnswer: number) => {
-    const displayCorrectAnswer = Math.round(correctAnswer * 100) / 100;
-    
-    const options = [displayCorrectAnswer];
-    
-    while (options.length < testParameters.numberOfResults) {
-      const range = Math.max(5, Math.abs(displayCorrectAnswer) / 2);
-      const randomOption = Math.max(0, Math.floor(displayCorrectAnswer + Math.floor(Math.random() * range * 2) - range));
-      if (!options.includes(randomOption) && randomOption !== displayCorrectAnswer) {
-        options.push(randomOption);
-      }
+  const clearAllTimers = useCallback(() => {
+    if (focusTimerRef.current) {
+      clearTimeout(focusTimerRef.current);
+      focusTimerRef.current = null;
     }
-    
-    if (testParameters.sortResults) {
-      return options.sort((a, b) => a - b);
-    } else {
-      return options.sort(() => Math.random() - 0.5);
+    if (feedbackTimerRef.current) {
+      clearTimeout(feedbackTimerRef.current);
+      feedbackTimerRef.current = null;
     }
+  }, []);
+
+  const genOptions = useCallback((correct: number) => {
+    return generateAnswerOptions(correct, {
+      numberOfResults: testParameters.numberOfResults,
+      sortResults: testParameters.sortResults,
+    });
   }, [testParameters.numberOfResults, testParameters.sortResults]);
 
   const generateNewProblem = useCallback(() => {
+    clearAllTimers();
+
     const problem = generateProblem(testParameters, operation);
     
     setFirstNumber(problem.num1);
@@ -61,15 +62,15 @@ export default function Home() {
     
     setUserAnswer('');
     setFeedback(null);
-    setSelectedOptionIndex(null);
+    setIsAnimating(false);
+    setSelectedOptionValue(null);
     
-    setAnswerOptions(generateAnswerOptions(problem.answer));
+    setAnswerOptions(genOptions(problem.answer));
 
-    if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => {
+    focusTimerRef.current = setTimeout(() => {
       inputRef.current?.focus();
     }, 100);
-  }, [operation, testParameters, generateAnswerOptions]);
+  }, [operation, testParameters, genOptions, clearAllTimers]);
 
   useEffect(() => {
     if (!testParameters.operations.includes(operation)) {
@@ -81,64 +82,50 @@ export default function Home() {
   }, [operation, testParameters, generateNewProblem]);
 
   useEffect(() => {
-    if (correctAnswer !== 0) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setAnswerOptions(generateAnswerOptions(correctAnswer));
-    }
-  }, [testParameters.numberOfResults, correctAnswer, generateAnswerOptions]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setAnswerOptions(genOptions(correctAnswer));
+  }, [testParameters.numberOfResults, correctAnswer, genOptions]);
 
   useEffect(() => {
-    if (firstNumber !== 0 || secondNumber !== 0) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setAnswerOptions(generateAnswerOptions(correctAnswer));
-    }
-  }, [testParameters.sortResults, firstNumber, secondNumber, correctAnswer, generateAnswerOptions]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setAnswerOptions(genOptions(correctAnswer));
+  }, [testParameters.sortResults, correctAnswer, genOptions]);
 
-  const checkAnswer = () => {
-    const isCorrect = parseFloat(userAnswer) === correctAnswer || 
-                     Math.round(parseFloat(userAnswer) * 100) / 100 === Math.round(correctAnswer * 100) / 100;
-    
-    setFeedback(isCorrect ? 'correct' : 'incorrect');
+  const checkAnswer = useCallback((answer: number) => {
+    return isAnswerCorrect(answer, correctAnswer);
+  }, [correctAnswer]);
+
+  const commitAnswer = useCallback((answer: number) => {
+    if (isAnimating) return;
+
+    const ok = checkAnswer(answer);
+    setFeedback(ok ? 'correct' : 'incorrect');
     setIsAnimating(true);
-    
-    if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => {
+
+    if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
+    feedbackTimerRef.current = setTimeout(() => {
       setIsAnimating(false);
-      if (isCorrect) {
+      if (ok) {
         generateNewProblem();
       } else {
+        setSelectedOptionValue(null);
         inputRef.current?.focus();
       }
     }, 800);
-  };
+  }, [checkAnswer, isAnimating, generateNewProblem]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    checkAnswer();
+    if (userAnswer.trim() === '') return;
+    commitAnswer(parseFloat(userAnswer));
   };
 
-  const handleOptionClick = useCallback((option: number, index: number) => {
+  const handleOptionClick = useCallback((option: number) => {
+    if (isAnimating) return;
     setUserAnswer(option.toString());
-    setSelectedOptionIndex(index);
-    
-    setTimeout(() => {
-      const isCorrect = option === Math.round(correctAnswer * 100) / 100;
-      
-      setFeedback(isCorrect ? 'correct' : 'incorrect');
-      setIsAnimating(true);
-      
-      if (timerRef.current) clearTimeout(timerRef.current);
-      timerRef.current = setTimeout(() => {
-        setIsAnimating(false);
-        if (isCorrect) {
-          generateNewProblem();
-        } else {
-          setSelectedOptionIndex(null);
-          inputRef.current?.focus();
-        }
-      }, 800);
-    }, 300);
-  }, [correctAnswer, generateNewProblem]);
+    setSelectedOptionValue(option);
+    commitAnswer(option);
+  }, [commitAnswer, isAnimating]);
 
   const toggleLanguageSelector = () => {
     setShowLanguageSelector(!showLanguageSelector);
@@ -160,11 +147,9 @@ export default function Home() {
 
   useEffect(() => {
     return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-      }
+      clearAllTimers();
     };
-  }, []);
+  }, [clearAllTimers]);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-8 bg-ctp-base">
@@ -174,6 +159,7 @@ export default function Home() {
             onClick={toggleLanguageSelector}
             className="p-2 bg-ctp-surface0 text-ctp-text rounded-lg hover:bg-ctp-surface1 transition-colors flex items-center justify-center"
             aria-label={t.selectLanguage}
+            aria-expanded={showLanguageSelector}
           >
             <span className="text-2xl leading-none">
               {language === 'en' ? '🇬🇧' : 
@@ -207,6 +193,8 @@ export default function Home() {
             className="p-2 bg-ctp-surface0 text-ctp-text rounded-lg hover:bg-ctp-surface1 transition-colors flex items-center justify-center"
             onMouseEnter={() => setShowTooltip(true)}
             onMouseLeave={() => setShowTooltip(false)}
+            onFocus={() => setShowTooltip(true)}
+            onBlur={() => setShowTooltip(false)}
             aria-label={t.settings}
           >
             <SettingsIcon />
@@ -247,7 +235,7 @@ export default function Home() {
       
       <ResultGrid
         answerOptions={answerOptions}
-        selectedOptionIndex={selectedOptionIndex}
+        selectedOptionValue={selectedOptionValue}
         onOptionClick={handleOptionClick}
       />
       
