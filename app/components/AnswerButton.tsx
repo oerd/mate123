@@ -16,7 +16,6 @@ export const AnswerButton = React.memo(({
   return (
     <button
       onClick={() => onClick(value)}
-      aria-label={`${value}`}
       disabled={isDisabled}
       className={`h-16 w-20 min-w-20 text-5xl font-bold bg-ctp-surface0 text-ctp-text rounded-lg 
         hover:bg-ctp-surface1 hover:scale-105 
