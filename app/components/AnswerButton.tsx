@@ -7,6 +7,13 @@ interface AnswerButtonProps {
   onClick: (value: number) => void;
 }
 
+function getSizeClasses(value: number): string {
+  const digits = String(value).length;
+  if (digits <= 2) return 'h-16 w-20 min-w-20 text-5xl';
+  if (digits === 3) return 'h-16 w-24 min-w-24 text-4xl';
+  return 'h-16 w-28 min-w-28 text-3xl';
+}
+
 export const AnswerButton = React.memo(({
   value,
   isSelected,
@@ -17,7 +24,7 @@ export const AnswerButton = React.memo(({
     <button
       onClick={() => onClick(value)}
       disabled={isDisabled}
-      className={`h-16 w-20 min-w-20 text-5xl font-bold bg-ctp-surface0 text-ctp-text rounded-lg 
+      className={`${getSizeClasses(value)} font-bold bg-ctp-surface0 text-ctp-text rounded-lg 
         hover:bg-ctp-surface1 hover:scale-105 
         active:scale-95 
         transition-all duration-150 shadow-md 

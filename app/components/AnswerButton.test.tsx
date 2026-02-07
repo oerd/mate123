@@ -43,6 +43,34 @@ describe('AnswerButton', () => {
     expect(btn.className).toContain('ring-ctp-blue');
   });
 
+  it('uses smaller text for 3-digit values', () => {
+    render(
+      <AnswerButton
+        value={100}
+        isSelected={false}
+        isDisabled={false}
+        onClick={() => {}}
+      />
+    );
+    const btn = screen.getByRole('button');
+    expect(btn.className).toContain('text-4xl');
+    expect(btn.className).toContain('w-24');
+  });
+
+  it('uses even smaller text for 4+ digit values', () => {
+    render(
+      <AnswerButton
+        value={10000}
+        isSelected={false}
+        isDisabled={false}
+        onClick={() => {}}
+      />
+    );
+    const btn = screen.getByRole('button');
+    expect(btn.className).toContain('text-3xl');
+    expect(btn.className).toContain('w-28');
+  });
+
   it('applies disabled styling', () => {
     render(
       <AnswerButton
