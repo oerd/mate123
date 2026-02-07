@@ -215,7 +215,7 @@ export default function Home() {
         </div>
       </div>
 
-      <h1 className="text-4xl font-bold mb-8 text-ctp-blue">
+      <h1 className="text-4xl font-bold mb-8 text-ctp-blue text-center">
         {t.title}
       </h1>
       
