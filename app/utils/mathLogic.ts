@@ -140,38 +140,27 @@ export function generateProblem(params: TestParameters, operation: Operation): M
       break;
     }
     case 'division': {
-        // Logic ported and cleaned up
         const secondMin = Math.max(1, params.secondOperandMin);
-        const secondMax = params.secondOperandMax;
-        
-        // Ensure num2 is not 0
-        if (secondMin <= secondMax) {
-          num2 = getRandomInt(secondMin, secondMax);
-        } else {
-          num2 = secondMin;
-        }
-        if (num2 === 0) num2 = 1;
+        const secondMax = Math.max(secondMin, params.secondOperandMax);
 
-        // We want num1 / num2 = integer.
-        // So num1 must be a multiple of num2.
-        // And num1 must be in [firstMin, firstMax].
-        
-        const minQuotient = Math.ceil(params.firstOperandMin / num2);
-        const maxQuotient = Math.floor(params.firstOperandMax / num2);
-        
-        if (minQuotient <= maxQuotient) {
-          const quotient = getRandomInt(minQuotient, maxQuotient);
-          num1 = quotient * num2;
-        } else {
-          // Impossible to find a multiple of num2 in [firstMin, firstMax].
-          // e.g. First=[1,2], num2=5. Multiples of 5: 5, 10... none in [1,2].
-          // Fallback: Pick a num1 close to range that IS a multiple?
-          // Or generate quotient first?
-          
-          // Original logic fallback:
-          const quotient = getRandomInt(1, 10); // arbitrary small quotient
-          num1 = quotient * num2;
-          // Note: This explicitly violates firstOperandRange, but ensures valid division.
+        const candidates = buildCandidateList(secondMin, secondMax);
+
+        let found = false;
+        for (const candidate of candidates) {
+          const minQ = Math.ceil(params.firstOperandMin / candidate);
+          const maxQ = Math.floor(params.firstOperandMax / candidate);
+          if (minQ <= maxQ) {
+            num2 = candidate;
+            num1 = getRandomInt(minQ, maxQ) * candidate;
+            found = true;
+            break;
+          }
+        }
+
+        if (!found) {
+          num2 = candidates[0];
+          const closestQuotient = Math.max(1, Math.round(params.firstOperandMin / num2));
+          num1 = closestQuotient * num2;
         }
       break;
     }
@@ -196,4 +185,26 @@ function calculateAnswer(n1: number, n2: number, op: Operation): number {
 
 function getRandomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function buildCandidateList(min: number, max: number): number[] {
+  const range = max - min + 1;
+  const candidates: number[] = [];
+  if (range <= 20) {
+    for (let i = min; i <= max; i++) candidates.push(i);
+    for (let i = candidates.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+    }
+  } else {
+    const tried = new Set<number>();
+    while (tried.size < 20) {
+      const v = getRandomInt(min, max);
+      if (!tried.has(v)) {
+        tried.add(v);
+        candidates.push(v);
+      }
+    }
+  }
+  return candidates;
 }

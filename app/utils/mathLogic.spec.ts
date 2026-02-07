@@ -70,15 +70,36 @@ describe('mathLogic', () => {
     });
 
     it('should handle cases where no multiple exists in range (fallback)', () => {
-      // First [1, 2], Second [5, 5]. No multiple of 5 exists in [1, 2].
-      // Logic should fallback to producing a valid division problem, possibly outside first range.
       const params = { ...baseParams, firstOperandMin: 1, firstOperandMax: 2, secondOperandMin: 5, secondOperandMax: 5 };
       
       const p = generateProblem(params, 'division');
       expect(Number.isInteger(p.answer)).toBe(true);
       expect(p.num2).toBe(5);
-      // We expect num1 to be a multiple of 5 (e.g., 5, 10, etc.)
       expect(p.num1 % 5).toBe(0);
+    });
+
+    it('should try different divisors to stay within firstOperand range', () => {
+      // First [10, 20], Second [1, 10].
+      // num2=7 has no multiple in [10,20], but num2=2,5,10 do.
+      const params = { ...baseParams, firstOperandMin: 10, firstOperandMax: 20, secondOperandMin: 1, secondOperandMax: 10 };
+      
+      for (let i = 0; i < 50; i++) {
+        const p = generateProblem(params, 'division');
+        expect(Number.isInteger(p.answer)).toBe(true);
+        expect(p.num1).toBeGreaterThanOrEqual(10);
+        expect(p.num1).toBeLessThanOrEqual(20);
+        expect(p.num2).toBeGreaterThanOrEqual(1);
+        expect(p.num2).toBeLessThanOrEqual(10);
+      }
+    });
+
+    it('should never divide by zero', () => {
+      const params = { ...baseParams, secondOperandMin: 0, secondOperandMax: 0 };
+      for (let i = 0; i < 20; i++) {
+        const p = generateProblem(params, 'division');
+        expect(p.num2).not.toBe(0);
+        expect(Number.isFinite(p.answer)).toBe(true);
+      }
     });
   });
 });
