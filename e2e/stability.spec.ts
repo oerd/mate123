@@ -61,9 +61,8 @@ test.describe('App Stability', () => {
       await expect(container).toContainText(/Correct|Richtig|Corretto|Saktë/);
       
       // 5. Wait for the new problem to appear
-      // We check that the feedback element has the opacity-0 class, meaning it's invisible
-      const feedbackElement = container.getByText(/Correct|Richtig|Corretto|Saktë/);
-      await expect(feedbackElement).toHaveClass(/opacity-0/, { timeout: 3000 });
+      // The feedback element is removed from the DOM when the next problem loads
+      await expect(container.getByRole('status')).not.toBeVisible({ timeout: 3000 });
       
       // Optional: Verify the numbers changed (unless by chance they are the same, which is rare but possible)
       // For stability test, just reaching this point implies the app didn't freeze.
