@@ -41,6 +41,7 @@ interface Translations {
   shareSettingsTooltip: string;
   copied: string;
   loadedFromUrl: string;
+  answerLabel: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -84,7 +85,8 @@ export const translations: Record<Language, Translations> = {
     shareSettings: 'Share Settings',
     shareSettingsTooltip: 'Copy settings URL to clipboard',
     copied: 'Copied!',
-    loadedFromUrl: 'Settings loaded from shared link'
+    loadedFromUrl: 'Settings loaded from shared link',
+    answerLabel: 'Your answer'
   },
   de: {
     title: 'Mathe-Übung',
@@ -126,7 +128,8 @@ export const translations: Record<Language, Translations> = {
     shareSettings: 'Einstellungen teilen',
     shareSettingsTooltip: 'Einstellungs-URL in die Zwischenablage kopieren',
     copied: 'Kopiert!',
-    loadedFromUrl: 'Einstellungen aus geteiltem Link geladen'
+    loadedFromUrl: 'Einstellungen aus geteiltem Link geladen',
+    answerLabel: 'Deine Antwort'
   },
   it: {
     title: 'Esercizi di Matematica',
@@ -168,7 +171,8 @@ export const translations: Record<Language, Translations> = {
     shareSettings: 'Condividi Impostazioni',
     shareSettingsTooltip: 'Copia URL delle impostazioni negli appunti',
     copied: 'Copiato!',
-    loadedFromUrl: 'Impostazioni caricate da link condiviso'
+    loadedFromUrl: 'Impostazioni caricate da link condiviso',
+    answerLabel: 'La tua risposta'
   },
   fr: {
     title: 'Exercices de Mathématiques',
@@ -210,7 +214,8 @@ export const translations: Record<Language, Translations> = {
     shareSettings: 'Partager les Paramètres',
     shareSettingsTooltip: 'Copier l\'URL des paramètres dans le presse-papiers',
     copied: 'Copié!',
-    loadedFromUrl: 'Paramètres chargés depuis un lien partagé'
+    loadedFromUrl: 'Paramètres chargés depuis un lien partagé',
+    answerLabel: 'Ta réponse'
   },
   sq: {
     title: 'Praktikë Matematike',
@@ -252,7 +257,8 @@ export const translations: Record<Language, Translations> = {
     shareSettings: 'Ndaj cilësimet',
     shareSettingsTooltip: 'Kopjo URL-në e cilësimeve',
     copied: 'U kopjua!',
-    loadedFromUrl: 'Cilësimet u ngarkuan nga lidhja e ndarë'
+    loadedFromUrl: 'Cilësimet u ngarkuan nga lidhja e ndarë',
+    answerLabel: 'Përgjigja jote'
   }
 };
 
