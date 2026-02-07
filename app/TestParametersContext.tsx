@@ -50,6 +50,7 @@ const TestParametersContext = createContext<TestParametersContextType | undefine
 
 // Import the utility functions
 import { deserializeSettings, hasSettingsParams } from './utils/settingsQueryString';
+import { sanitizeParameters } from './utils/mathLogic';
 
 export function TestParametersProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [testParameters, setTestParametersState] = useState<TestParameters>(defaultTestParameters);
@@ -64,13 +65,11 @@ export function TestParametersProvider({ children }: Readonly<{ children: ReactN
         // Parse settings from query string
         const querySettings = deserializeSettings(queryString);
         
-        // Merge with default settings
-        const mergedSettings = {
+        const mergedSettings = sanitizeParameters({
           ...defaultTestParameters,
           ...querySettings
-        };
+        });
         
-        // Apply settings
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setTestParametersState(mergedSettings);
         setLoadedFromUrl(true);
@@ -88,7 +87,7 @@ export function TestParametersProvider({ children }: Readonly<{ children: ReactN
     const savedParams = localStorage.getItem('testParameters');
     if (savedParams) {
       try {
-        const parsedParams = JSON.parse(savedParams);
+        const parsedParams = sanitizeParameters(JSON.parse(savedParams));
         setTestParametersState(parsedParams);
       } catch (error) {
         console.error('Failed to parse saved test parameters', error);

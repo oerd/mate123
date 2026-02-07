@@ -1,4 +1,4 @@
-import { TestParameters, Operation } from '../TestParametersContext';
+import { TestParameters, Operation, allOperations } from '../TestParametersContext';
 
 export const round2 = (n: number) => Math.round(n * 100) / 100;
 
@@ -43,6 +43,30 @@ export function generateAnswerOptions(correct: number, config: GenerateOptionsCo
   return config.sortResults
     ? arr.sort((a, b) => a - b)
     : arr.sort(() => Math.random() - 0.5);
+}
+
+export function sanitizeParameters(params: TestParameters): TestParameters {
+  const clamp = (val: number, min: number, max: number) =>
+    Number.isFinite(val) ? Math.max(min, Math.min(max, Math.round(val))) : min;
+
+  const firstMin = clamp(params.firstOperandMin, 0, 1000);
+  const firstMax = clamp(params.firstOperandMax, 0, 1000);
+  const secondMin = clamp(params.secondOperandMin, 0, 1000);
+  const secondMax = clamp(params.secondOperandMax, 0, 1000);
+
+  const validOps = (params.operations ?? []).filter(
+    (op): op is Operation => allOperations.includes(op as Operation)
+  );
+
+  return {
+    firstOperandMin: Math.min(firstMin, firstMax),
+    firstOperandMax: Math.max(firstMin, firstMax),
+    secondOperandMin: Math.min(secondMin, secondMax),
+    secondOperandMax: Math.max(secondMin, secondMax),
+    operations: validOps.length > 0 ? validOps : ['addition'],
+    numberOfResults: clamp(params.numberOfResults, 2, 8),
+    sortResults: Boolean(params.sortResults),
+  };
 }
 
 export interface MathProblem {
