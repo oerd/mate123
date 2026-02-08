@@ -45,6 +45,7 @@ export const ProblemDisplay = ({
         <input
           ref={inputRef}
           type="number"
+          inputMode="numeric"
           value={userAnswer}
           onChange={(e) => setUserAnswer(e.target.value)}
           className="text-4xl p-4 w-32 text-center border-2 border-ctp-surface2 rounded-lg bg-ctp-surface0 text-ctp-text focus:border-ctp-blue focus:outline-none"
