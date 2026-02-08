@@ -53,6 +53,7 @@ export const OperationToggle: React.FC<OperationToggleProps> = ({
             onClick={() => onToggle(op)}
             className={getButtonClass(op, isSelected(op))}
             aria-label={t[op]}
+            aria-pressed={isSelected(op)}
             title={t[op]}
             type="button"
           >

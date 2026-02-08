@@ -106,3 +106,10 @@ input[type=number]::-webkit-outer-spin-button {
 input[type=number] {
   -moz-appearance: textfield;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-success,
+  .animate-error {
+    animation: none;
+  }
+}

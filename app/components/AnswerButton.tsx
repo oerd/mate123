@@ -24,6 +24,7 @@ export const AnswerButton = React.memo(({
     <button
       onClick={() => onClick(value)}
       disabled={isDisabled}
+      aria-pressed={isSelected}
       className={`${getSizeClasses(value)} font-bold bg-ctp-surface0 text-ctp-text rounded-lg 
         hover:bg-ctp-surface1 hover:scale-105 
         active:scale-95 
