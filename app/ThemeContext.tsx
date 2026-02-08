@@ -10,6 +10,8 @@ interface ThemeContextType {
   currentTheme: 'light' | 'dark';
 }
 
+const VALID_THEMES: ThemeMode[] = ['dark', 'light', 'system'];
+
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 function resolveTheme(mode: ThemeMode): 'light' | 'dark' {
@@ -19,33 +21,33 @@ function resolveTheme(mode: ThemeMode): 'light' | 'dark' {
   return mode;
 }
 
+function getInitialThemeMode(): ThemeMode {
+  if (typeof window === 'undefined') return 'dark';
+  const saved = localStorage.getItem('themeMode') as ThemeMode | null;
+  return saved && VALID_THEMES.includes(saved) ? saved : 'dark';
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [themeMode, setThemeModeState] = useState<ThemeMode>('dark');
-  const [currentTheme, setCurrentTheme] = useState<'light' | 'dark'>('dark');
+  const [themeMode, setThemeModeState] = useState<ThemeMode>(getInitialThemeMode);
+  const [currentTheme, setCurrentTheme] = useState<'light' | 'dark'>(() => {
+    if (typeof window === 'undefined') return 'dark';
+    return resolveTheme(getInitialThemeMode());
+  });
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('themeMode') as ThemeMode | null;
-    if (savedTheme && ['dark', 'light', 'system'].includes(savedTheme)) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setThemeModeState(savedTheme);
-    }
-  }, []);
+    document.documentElement.setAttribute('data-theme', currentTheme);
+  }, [currentTheme]);
 
   useEffect(() => {
-    const theme = resolveTheme(themeMode);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setCurrentTheme(theme);
-    document.documentElement.setAttribute('data-theme', theme);
+    if (themeMode !== 'system') return;
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleChange = () => {
-      if (themeMode === 'system') {
-        const resolved = mediaQuery.matches ? 'dark' : 'light';
-        setCurrentTheme(resolved);
-        document.documentElement.setAttribute('data-theme', resolved);
-      }
+      const resolved = mediaQuery.matches ? 'dark' : 'light';
+      setCurrentTheme(resolved);
     };
 
+    handleChange();
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, [themeMode]);

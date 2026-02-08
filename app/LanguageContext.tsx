@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
+import { createContext, useContext, useState, ReactNode, useMemo, useCallback } from 'react';
 import { Language } from './translations';
 
 interface LanguageContextType {
@@ -8,28 +8,23 @@ interface LanguageContextType {
   setLanguage: (language: Language) => void;
 }
 
+const VALID_LANGUAGES: Language[] = ['en', 'de', 'it', 'fr', 'sq'];
+
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: Readonly<{ children: ReactNode }>) {
-  // Initialize with English, but check localStorage if available
-  const [language, setLanguageState] = useState<Language>('en');
+  const [language, setLanguageState] = useState<Language>(() => {
+    if (typeof window === 'undefined') return 'en';
+    const saved = localStorage.getItem('language') as Language | null;
+    return saved && VALID_LANGUAGES.includes(saved) ? saved : 'en';
+  });
 
-  useEffect(() => {
-    // Load saved language preference from localStorage if available
-    const savedLanguage = localStorage.getItem('language') as Language | null;
-    if (savedLanguage && ['en', 'de', 'it', 'fr', 'sq'].includes(savedLanguage)) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setLanguageState(savedLanguage);
-    }
+  const setLanguage = useCallback((newLanguage: Language) => {
+    setLanguageState(newLanguage);
+    localStorage.setItem('language', newLanguage);
   }, []);
 
-  const setLanguage = (newLanguage: Language) => {
-    setLanguageState(newLanguage);
-    // Save to localStorage for persistence
-    localStorage.setItem('language', newLanguage);
-  };
-
-  const contextValue = useMemo(() => ({ language, setLanguage }), [language]);
+  const contextValue = useMemo(() => ({ language, setLanguage }), [language, setLanguage]);
 
   return (
     <LanguageContext.Provider value={contextValue}>

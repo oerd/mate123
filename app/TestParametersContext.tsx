@@ -52,48 +52,38 @@ const TestParametersContext = createContext<TestParametersContextType | undefine
 import { deserializeSettings, hasSettingsParams } from './utils/settingsQueryString';
 import { sanitizeParameters } from './utils/mathLogic';
 
+function getInitialTestParameters(): { params: TestParameters; fromUrl: boolean } {
+  if (typeof window === 'undefined') return { params: defaultTestParameters, fromUrl: false };
+
+  const queryString = window.location.search;
+  if (hasSettingsParams(queryString)) {
+    const querySettings = deserializeSettings(queryString);
+    const merged = sanitizeParameters({ ...defaultTestParameters, ...querySettings });
+    localStorage.setItem('testParameters', JSON.stringify(merged));
+    return { params: merged, fromUrl: true };
+  }
+
+  const savedParams = localStorage.getItem('testParameters');
+  if (savedParams) {
+    try {
+      return { params: sanitizeParameters(JSON.parse(savedParams)), fromUrl: false };
+    } catch {
+      // ignore corrupt data
+    }
+  }
+  return { params: defaultTestParameters, fromUrl: false };
+}
+
 export function TestParametersProvider({ children }: Readonly<{ children: ReactNode }>) {
-  const [testParameters, setTestParametersState] = useState<TestParameters>(defaultTestParameters);
-  const [loadedFromUrl, setLoadedFromUrl] = useState<boolean>(false);
+  const [initial] = useState(getInitialTestParameters);
+  const [testParameters, setTestParametersState] = useState<TestParameters>(initial.params);
+  const [loadedFromUrl, setLoadedFromUrl] = useState<boolean>(initial.fromUrl);
 
   useEffect(() => {
-    // First check if we have settings in the URL
-    if (typeof window !== 'undefined') {
-      const queryString = window.location.search;
-      
-      if (hasSettingsParams(queryString)) {
-        // Parse settings from query string
-        const querySettings = deserializeSettings(queryString);
-        
-        const mergedSettings = sanitizeParameters({
-          ...defaultTestParameters,
-          ...querySettings
-        });
-        
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setTestParametersState(mergedSettings);
-        setLoadedFromUrl(true);
-        
-        // Also save to localStorage for persistence
-        localStorage.setItem('testParameters', JSON.stringify(mergedSettings));
-        
-        // Remove parameters from URL to keep it clean
-        window.history.replaceState({}, document.title, window.location.pathname);
-        return;
-      }
+    if (initial.fromUrl) {
+      window.history.replaceState({}, document.title, window.location.pathname);
     }
-    
-    // If no URL parameters, load from localStorage as before
-    const savedParams = localStorage.getItem('testParameters');
-    if (savedParams) {
-      try {
-        const parsedParams = sanitizeParameters(JSON.parse(savedParams));
-        setTestParametersState(parsedParams);
-      } catch (error) {
-        console.error('Failed to parse saved test parameters', error);
-      }
-    }
-  }, []);
+  }, [initial.fromUrl]);
 
   const setTestParameters = useCallback((newParams: TestParameters) => {
     setTestParametersState(newParams);
