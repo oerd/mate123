@@ -20,24 +20,33 @@ export default function Home() {
   const focusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const feedbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const [firstNumber, setFirstNumber] = useState<number>(0);
-  const [secondNumber, setSecondNumber] = useState<number>(0);
   const [userAnswer, setUserAnswer] = useState<string>('');
   const [feedback, setFeedback] = useState<'correct' | 'incorrect' | null>(null);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
   const [showTooltip, setShowTooltip] = useState<boolean>(false);
   const [operation, setOperation] = useState<Operation>(testParameters.operations[0] || 'addition');
-  const [correctAnswer, setCorrectAnswer] = useState<number>(0);
+  const [problemSeed, setProblemSeed] = useState<number>(0);
   const [showLanguageSelector, setShowLanguageSelector] = useState<boolean>(false);
   const [languageTooltip, setLanguageTooltip] = useState<string | null>(null);
   const [selectedOptionValue, setSelectedOptionValue] = useState<number | null>(null);
 
+  const activeOperation = testParameters.operations.includes(operation)
+    ? operation
+    : testParameters.operations[0] || 'addition';
+
+  if (activeOperation !== operation) {
+    setOperation(activeOperation);
+  }
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const currentProblem = useMemo(() => generateProblem(testParameters, activeOperation), [testParameters, activeOperation, problemSeed]);
+
   const answerOptions = useMemo(() => {
-    return generateAnswerOptions(correctAnswer, {
+    return generateAnswerOptions(currentProblem.answer, {
       numberOfResults: testParameters.numberOfResults,
       sortResults: testParameters.sortResults,
     });
-  }, [correctAnswer, testParameters.numberOfResults, testParameters.sortResults]);
+  }, [currentProblem.answer, testParameters.numberOfResults, testParameters.sortResults]);
 
   const clearAllTimers = useCallback(() => {
     if (focusTimerRef.current) {
@@ -52,13 +61,7 @@ export default function Home() {
 
   const generateNewProblem = useCallback(() => {
     clearAllTimers();
-
-    const problem = generateProblem(testParameters, operation);
-    
-    setFirstNumber(problem.num1);
-    setSecondNumber(problem.num2);
-    setCorrectAnswer(problem.answer);
-    
+    setProblemSeed(s => s + 1);
     setUserAnswer('');
     setFeedback(null);
     setIsAnimating(false);
@@ -67,19 +70,11 @@ export default function Home() {
     focusTimerRef.current = setTimeout(() => {
       inputRef.current?.focus();
     }, 100);
-  }, [operation, testParameters, clearAllTimers]);
-
-  useEffect(() => {
-    if (!testParameters.operations.includes(operation)) {
-      setOperation(testParameters.operations[0] || 'addition');
-    } else {
-      generateNewProblem();
-    }
-  }, [operation, testParameters, generateNewProblem]);
+  }, [clearAllTimers]);
 
   const checkAnswer = useCallback((answer: number) => {
-    return isAnswerCorrect(answer, correctAnswer);
-  }, [correctAnswer]);
+    return isAnswerCorrect(answer, currentProblem.answer);
+  }, [currentProblem.answer]);
 
   const commitAnswer = useCallback((answer: number) => {
     if (isAnimating) return;
@@ -207,16 +202,16 @@ export default function Home() {
       
       {testParameters.operations.length > 1 && (
         <OperationToggle 
-          selected={operation} 
+          selected={activeOperation} 
           onToggle={setOperation}
           options={testParameters.operations}
         />
       )}
       
       <ProblemDisplay
-        firstNumber={firstNumber}
-        secondNumber={secondNumber}
-        operation={operation}
+        firstNumber={currentProblem.num1}
+        secondNumber={currentProblem.num2}
+        operation={activeOperation}
         userAnswer={userAnswer}
         setUserAnswer={setUserAnswer}
         onSubmit={handleSubmit}

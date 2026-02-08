@@ -65,6 +65,23 @@ export default function Settings() {
     });
   };
 
+  const fallbackCopy = (text: string) => {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      document.execCommand('copy');
+      setShareSuccess(true);
+      setTimeout(() => setShareSuccess(false), 2000);
+    } catch {
+      window.prompt('Copy this URL:', text);
+    }
+    document.body.removeChild(textarea);
+  };
+
   const handleShareSettings = () => {
     const currentSettings = {
       firstOperandMin,
@@ -81,14 +98,18 @@ export default function Settings() {
     const baseUrl = window.location.origin;
     const shareUrl = `${baseUrl}/?${queryString}`;
     
-    navigator.clipboard.writeText(shareUrl)
-      .then(() => {
-        setShareSuccess(true);
-        setTimeout(() => setShareSuccess(false), 2000);
-      })
-      .catch(err => {
-        console.error('Failed to copy URL: ', err);
-      });
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(shareUrl)
+        .then(() => {
+          setShareSuccess(true);
+          setTimeout(() => setShareSuccess(false), 2000);
+        })
+        .catch(() => {
+          fallbackCopy(shareUrl);
+        });
+    } else {
+      fallbackCopy(shareUrl);
+    }
   };
 
   return (
