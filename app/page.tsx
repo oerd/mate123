@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import { useLanguage } from './LanguageContext';
 import { useTestParameters, Operation } from './TestParametersContext';
@@ -27,11 +27,17 @@ export default function Home() {
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
   const [showTooltip, setShowTooltip] = useState<boolean>(false);
   const [operation, setOperation] = useState<Operation>(testParameters.operations[0] || 'addition');
-  const [answerOptions, setAnswerOptions] = useState<number[]>([]);
   const [correctAnswer, setCorrectAnswer] = useState<number>(0);
   const [showLanguageSelector, setShowLanguageSelector] = useState<boolean>(false);
   const [languageTooltip, setLanguageTooltip] = useState<string | null>(null);
   const [selectedOptionValue, setSelectedOptionValue] = useState<number | null>(null);
+
+  const answerOptions = useMemo(() => {
+    return generateAnswerOptions(correctAnswer, {
+      numberOfResults: testParameters.numberOfResults,
+      sortResults: testParameters.sortResults,
+    });
+  }, [correctAnswer, testParameters.numberOfResults, testParameters.sortResults]);
 
   const clearAllTimers = useCallback(() => {
     if (focusTimerRef.current) {
@@ -43,13 +49,6 @@ export default function Home() {
       feedbackTimerRef.current = null;
     }
   }, []);
-
-  const genOptions = useCallback((correct: number) => {
-    return generateAnswerOptions(correct, {
-      numberOfResults: testParameters.numberOfResults,
-      sortResults: testParameters.sortResults,
-    });
-  }, [testParameters.numberOfResults, testParameters.sortResults]);
 
   const generateNewProblem = useCallback(() => {
     clearAllTimers();
@@ -64,32 +63,19 @@ export default function Home() {
     setFeedback(null);
     setIsAnimating(false);
     setSelectedOptionValue(null);
-    
-    setAnswerOptions(genOptions(problem.answer));
 
     focusTimerRef.current = setTimeout(() => {
       inputRef.current?.focus();
     }, 100);
-  }, [operation, testParameters, genOptions, clearAllTimers]);
+  }, [operation, testParameters, clearAllTimers]);
 
   useEffect(() => {
     if (!testParameters.operations.includes(operation)) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setOperation(testParameters.operations[0] || 'addition');
     } else {
       generateNewProblem();
     }
   }, [operation, testParameters, generateNewProblem]);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setAnswerOptions(genOptions(correctAnswer));
-  }, [testParameters.numberOfResults, correctAnswer, genOptions]);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setAnswerOptions(genOptions(correctAnswer));
-  }, [testParameters.sortResults, correctAnswer, genOptions]);
 
   const checkAnswer = useCallback((answer: number) => {
     return isAnswerCorrect(answer, correctAnswer);
