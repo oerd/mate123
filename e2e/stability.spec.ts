@@ -12,7 +12,8 @@ test.describe('App Stability', () => {
     await expect(page.locator('h1')).toContainText(/Math Practice|Mathe-Übung|Esercizi|Exercices|Praktikë/);
 
     const iterations = 50;
-    
+
+    // eslint-disable-next-line no-console
     console.log(`Starting ${iterations} iterations of solve-and-refresh...`);
 
     for (let i = 0; i < iterations; i++) {
@@ -67,7 +68,8 @@ test.describe('App Stability', () => {
       // Optional: Verify the numbers changed (unless by chance they are the same, which is rare but possible)
       // For stability test, just reaching this point implies the app didn't freeze.
     }
-    
+
+    // eslint-disable-next-line no-console
     console.log('Stability test completed successfully.');
   });
 
