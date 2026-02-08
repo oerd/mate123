@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, ReactNode, useMemo, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, useMemo, useCallback } from 'react';
 import { Language } from './translations';
 
 interface LanguageContextType {
@@ -18,6 +18,10 @@ export function LanguageProvider({ children }: Readonly<{ children: ReactNode }>
     const saved = localStorage.getItem('language') as Language | null;
     return saved && VALID_LANGUAGES.includes(saved) ? saved : 'en';
   });
+
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
 
   const setLanguage = useCallback((newLanguage: Language) => {
     setLanguageState(newLanguage);
