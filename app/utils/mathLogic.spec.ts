@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { generateProblem } from './mathLogic';
+import { generateProblem, generateAnswerOptions } from './mathLogic';
 import { TestParameters, Operation } from '../TestParametersContext';
 
 describe('mathLogic', () => {
@@ -99,6 +99,113 @@ describe('mathLogic', () => {
         const p = generateProblem(params, 'division');
         expect(p.num2).not.toBe(0);
         expect(Number.isFinite(p.answer)).toBe(true);
+      }
+    });
+  });
+
+  describe('generateProblem invariants', () => {
+    const paramRanges: TestParameters[] = [
+      { ...baseParams, firstOperandMin: 1, firstOperandMax: 100, secondOperandMin: 1, secondOperandMax: 50 },
+      { ...baseParams, firstOperandMin: 0, firstOperandMax: 20, secondOperandMin: 0, secondOperandMax: 20 },
+      { ...baseParams, firstOperandMin: 10, firstOperandMax: 50, secondOperandMin: 5, secondOperandMax: 30 },
+      { ...baseParams, firstOperandMin: 1, firstOperandMax: 5, secondOperandMin: 10, secondOperandMax: 20 },
+    ];
+
+    it('subtraction never produces negative results', () => {
+      for (const params of paramRanges) {
+        for (let i = 0; i < 100; i++) {
+          const p = generateProblem(params, 'subtraction');
+          expect(p.answer).toBeGreaterThanOrEqual(0);
+        }
+      }
+    });
+
+    it('division never divides by zero', () => {
+      const divParams: TestParameters[] = [
+        { ...baseParams, firstOperandMin: 1, firstOperandMax: 100, secondOperandMin: 0, secondOperandMax: 10 },
+        { ...baseParams, firstOperandMin: 1, firstOperandMax: 50, secondOperandMin: 0, secondOperandMax: 0 },
+        { ...baseParams, firstOperandMin: 10, firstOperandMax: 100, secondOperandMin: 1, secondOperandMax: 10 },
+      ];
+      for (const params of divParams) {
+        for (let i = 0; i < 100; i++) {
+          const p = generateProblem(params, 'division');
+          expect(p.num2).not.toBe(0);
+          expect(Number.isFinite(p.answer)).toBe(true);
+        }
+      }
+    });
+
+    it('division produces integer answers with reasonable ranges', () => {
+      const params: TestParameters = {
+        ...baseParams,
+        firstOperandMin: 1,
+        firstOperandMax: 100,
+        secondOperandMin: 1,
+        secondOperandMax: 10,
+      };
+      for (let i = 0; i < 100; i++) {
+        const p = generateProblem(params, 'division');
+        expect(p.answer).toBe(Math.floor(p.answer));
+      }
+    });
+
+    it('generated numbers stay within operand ranges for addition', () => {
+      const params: TestParameters = {
+        ...baseParams,
+        firstOperandMin: 5,
+        firstOperandMax: 50,
+        secondOperandMin: 3,
+        secondOperandMax: 25,
+      };
+      for (let i = 0; i < 100; i++) {
+        const p = generateProblem(params, 'addition');
+        expect(p.num1).toBeGreaterThanOrEqual(params.firstOperandMin);
+        expect(p.num1).toBeLessThanOrEqual(params.firstOperandMax);
+        expect(p.num2).toBeGreaterThanOrEqual(params.secondOperandMin);
+        expect(p.num2).toBeLessThanOrEqual(params.secondOperandMax);
+      }
+    });
+
+    it('generated numbers stay within operand ranges for multiplication', () => {
+      const params: TestParameters = {
+        ...baseParams,
+        firstOperandMin: 2,
+        firstOperandMax: 12,
+        secondOperandMin: 1,
+        secondOperandMax: 10,
+      };
+      for (let i = 0; i < 100; i++) {
+        const p = generateProblem(params, 'multiplication');
+        expect(p.num1).toBeGreaterThanOrEqual(params.firstOperandMin);
+        expect(p.num1).toBeLessThanOrEqual(params.firstOperandMax);
+        expect(p.num2).toBeGreaterThanOrEqual(params.secondOperandMin);
+        expect(p.num2).toBeLessThanOrEqual(params.secondOperandMax);
+      }
+    });
+  });
+
+  describe('generateAnswerOptions invariants', () => {
+    it('always contains the correct answer', () => {
+      for (let i = 0; i < 50; i++) {
+        const correct = Math.floor(Math.random() * 200);
+        const options = generateAnswerOptions(correct, { numberOfResults: 4, sortResults: false });
+        expect(options).toContain(correct);
+      }
+    });
+
+    it('returns the requested number of options', () => {
+      for (const count of [2, 3, 4, 5, 6, 8]) {
+        const options = generateAnswerOptions(42, { numberOfResults: count, sortResults: false });
+        expect(options).toHaveLength(count);
+      }
+    });
+
+    it('returns unique values', () => {
+      for (let i = 0; i < 50; i++) {
+        const correct = Math.floor(Math.random() * 100);
+        const options = generateAnswerOptions(correct, { numberOfResults: 4, sortResults: false });
+        const unique = new Set(options);
+        expect(unique.size).toBe(options.length);
       }
     });
   });
