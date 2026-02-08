@@ -40,7 +40,7 @@ describe('TestParametersContext', () => {
 
     expect(result.current.testParameters.numberOfResults).toBe(8);
     // Check real localStorage
-    const stored = window.localStorage.getItem('testParameters');
+    const stored = window.localStorage.getItem('math-practice:testParameters');
     expect(stored).toBeDefined();
     expect(JSON.parse(stored!)).toEqual(newParams);
   });
@@ -57,7 +57,7 @@ describe('TestParametersContext', () => {
     };
 
     // Set real localStorage
-    window.localStorage.setItem('testParameters', JSON.stringify(savedParams));
+    window.localStorage.setItem('math-practice:testParameters', JSON.stringify(savedParams));
 
     const { result } = renderHook(() => useTestParameters(), {
       wrapper: TestParametersProvider,

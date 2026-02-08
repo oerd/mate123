@@ -59,11 +59,11 @@ function getInitialTestParameters(): { params: TestParameters; fromUrl: boolean 
   if (hasSettingsParams(queryString)) {
     const querySettings = deserializeSettings(queryString);
     const merged = sanitizeParameters({ ...defaultTestParameters, ...querySettings });
-    localStorage.setItem('testParameters', JSON.stringify(merged));
+    localStorage.setItem('math-practice:testParameters', JSON.stringify(merged));
     return { params: merged, fromUrl: true };
   }
 
-  const savedParams = localStorage.getItem('testParameters');
+  const savedParams = localStorage.getItem('math-practice:testParameters');
   if (savedParams) {
     try {
       return { params: sanitizeParameters(JSON.parse(savedParams)), fromUrl: false };
@@ -89,7 +89,7 @@ export function TestParametersProvider({ children }: Readonly<{ children: ReactN
     setTestParametersState(newParams);
     setLoadedFromUrl(false); // Reset the flag when user manually saves settings
     // Save to localStorage for persistence
-    localStorage.setItem('testParameters', JSON.stringify(newParams));
+    localStorage.setItem('math-practice:testParameters', JSON.stringify(newParams));
   }, []);
 
   const contextValue = useMemo(() => ({

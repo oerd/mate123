@@ -15,7 +15,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export function LanguageProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [language, setLanguageState] = useState<Language>(() => {
     if (typeof window === 'undefined') return 'en';
-    const saved = localStorage.getItem('language') as Language | null;
+    const saved = localStorage.getItem('math-practice:language') as Language | null;
     return saved && VALID_LANGUAGES.includes(saved) ? saved : 'en';
   });
 
@@ -25,7 +25,7 @@ export function LanguageProvider({ children }: Readonly<{ children: ReactNode }>
 
   const setLanguage = useCallback((newLanguage: Language) => {
     setLanguageState(newLanguage);
-    localStorage.setItem('language', newLanguage);
+    localStorage.setItem('math-practice:language', newLanguage);
   }, []);
 
   const contextValue = useMemo(() => ({ language, setLanguage }), [language, setLanguage]);

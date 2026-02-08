@@ -23,7 +23,7 @@ function resolveTheme(mode: ThemeMode): 'light' | 'dark' {
 
 function getInitialThemeMode(): ThemeMode {
   if (typeof window === 'undefined') return 'dark';
-  const saved = localStorage.getItem('themeMode') as ThemeMode | null;
+  const saved = localStorage.getItem('math-practice:themeMode') as ThemeMode | null;
   return saved && VALID_THEMES.includes(saved) ? saved : 'dark';
 }
 
@@ -59,7 +59,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     document.documentElement.setAttribute('data-theme', theme);
     setCurrentTheme(theme);
 
-    localStorage.setItem('themeMode', newThemeMode);
+    localStorage.setItem('math-practice:themeMode', newThemeMode);
   }, []);
     
   const contextValue = useMemo(() => ({
