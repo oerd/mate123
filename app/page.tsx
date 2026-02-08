@@ -17,8 +17,8 @@ export default function Home() {
   const { testParameters } = useTestParameters();
   const t = translations[language];
   const inputRef = useRef<HTMLInputElement>(null);
-  const focusTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const feedbackTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const focusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const feedbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [firstNumber, setFirstNumber] = useState<number>(0);
   const [secondNumber, setSecondNumber] = useState<number>(0);
@@ -103,7 +103,7 @@ export default function Home() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (userAnswer.trim() === '') return;
-    commitAnswer(parseFloat(userAnswer));
+    commitAnswer(Number(userAnswer));
   };
 
   const handleOptionClick = useCallback((option: number) => {
