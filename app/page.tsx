@@ -29,6 +29,11 @@ export default function Home() {
   const [showLanguageSelector, setShowLanguageSelector] = useState<boolean>(false);
   const [languageTooltip, setLanguageTooltip] = useState<string | null>(null);
   const [selectedOptionValue, setSelectedOptionValue] = useState<number | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const activeOperation = testParameters.operations.includes(operation)
     ? operation
@@ -140,6 +145,10 @@ export default function Home() {
     };
   }, [clearAllTimers]);
 
+  if (!isMounted) {
+    return <div className="flex min-h-screen flex-col items-center justify-center p-8 bg-ctp-base" />;
+  }
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-8 bg-ctp-base">
       <div className="absolute top-4 left-4">
@@ -151,17 +160,17 @@ export default function Home() {
             aria-expanded={showLanguageSelector}
           >
             <span className="text-2xl leading-none">
-              {language === 'en' ? '🇬🇧' : 
-               language === 'de' ? '🇩🇪' : 
-               language === 'it' ? '🇮🇹' : 
-               language === 'fr' ? '🇫🇷' : 
-               language === 'sq' ? '🇦🇱' : '🌐'}
+              {language === 'en' ? '🇬🇧' :
+                language === 'de' ? '🇩🇪' :
+                  language === 'it' ? '🇮🇹' :
+                    language === 'fr' ? '🇫🇷' :
+                      language === 'sq' ? '🇦🇱' : '🌐'}
             </span>
           </button>
-          
+
           {showLanguageSelector && (
             <div className="absolute left-0 top-full mt-2 p-3 bg-ctp-surface0 rounded-lg shadow-lg z-10 language-selector-dropdown">
-              <LanguageSelector 
+              <LanguageSelector
                 language={language}
                 setLanguage={(lang) => {
                   setLanguage(lang);
@@ -177,7 +186,7 @@ export default function Home() {
 
       <div className="absolute top-4 right-4">
         <div className="relative">
-          <Link 
+          <Link
             href="/settings"
             className="p-2 bg-ctp-surface0 text-ctp-text rounded-lg hover:bg-ctp-surface1 transition-colors flex items-center justify-center"
             onMouseEnter={() => setShowTooltip(true)}
@@ -199,15 +208,15 @@ export default function Home() {
       <h1 className="text-4xl font-bold mb-8 text-ctp-blue text-center">
         {t.title}
       </h1>
-      
+
       {testParameters.operations.length > 1 && (
-        <OperationToggle 
-          selected={activeOperation} 
+        <OperationToggle
+          selected={activeOperation}
           onToggle={setOperation}
           options={testParameters.operations}
         />
       )}
-      
+
       <ProblemDisplay
         firstNumber={currentProblem.num1}
         secondNumber={currentProblem.num2}
@@ -221,13 +230,13 @@ export default function Home() {
         inputRef={inputRef}
         t={t}
       />
-      
+
       <ResultGrid
         answerOptions={answerOptions}
         selectedOptionValue={selectedOptionValue}
         onOptionClick={handleOptionClick}
       />
-      
+
       <button
         onClick={generateNewProblem}
         className="mt-8 px-4 py-2 bg-ctp-surface0 text-ctp-text font-medium rounded-lg hover:bg-ctp-surface1 transition-colors"
