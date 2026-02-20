@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { useLanguage } from './LanguageContext';
 import { useTestParameters, Operation } from './TestParametersContext';
@@ -11,16 +11,14 @@ import { LanguageSelector } from './components/LanguageSelector';
 import { generateProblem, generateAnswerOptions, isAnswerCorrect } from './utils/mathLogic';
 import { ProblemDisplay } from './components/ProblemDisplay';
 import { ResultGrid } from './components/ResultGrid';
+import confetti from 'canvas-confetti';
 
 export default function Home() {
   const { language, setLanguage } = useLanguage();
   const { testParameters } = useTestParameters();
   const t = translations[language];
-  const inputRef = useRef<HTMLInputElement>(null);
-  const focusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const feedbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const [userAnswer, setUserAnswer] = useState<string>('');
   const [feedback, setFeedback] = useState<'correct' | 'incorrect' | null>(null);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
   const [showTooltip, setShowTooltip] = useState<boolean>(false);
@@ -54,10 +52,6 @@ export default function Home() {
   }, [currentProblem.answer, testParameters.numberOfResults, testParameters.sortResults]);
 
   const clearAllTimers = useCallback(() => {
-    if (focusTimerRef.current) {
-      clearTimeout(focusTimerRef.current);
-      focusTimerRef.current = null;
-    }
     if (feedbackTimerRef.current) {
       clearTimeout(feedbackTimerRef.current);
       feedbackTimerRef.current = null;
@@ -67,51 +61,44 @@ export default function Home() {
   const generateNewProblem = useCallback(() => {
     clearAllTimers();
     setProblemSeed(s => s + 1);
-    setUserAnswer('');
     setFeedback(null);
     setIsAnimating(false);
     setSelectedOptionValue(null);
-
-    focusTimerRef.current = setTimeout(() => {
-      inputRef.current?.focus();
-    }, 100);
   }, [clearAllTimers]);
-
-  const checkAnswer = useCallback((answer: number) => {
-    return isAnswerCorrect(answer, currentProblem.answer);
-  }, [currentProblem.answer]);
 
   const commitAnswer = useCallback((answer: number) => {
     if (isAnimating) return;
 
-    const ok = checkAnswer(answer);
+    const ok = isAnswerCorrect(answer, currentProblem.answer);
     setFeedback(ok ? 'correct' : 'incorrect');
     setIsAnimating(true);
+
+    if (ok) {
+      confetti({
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#FFDE00', '#38BDF8', '#F472B6', '#4ADE80', '#FB923C']
+      });
+    }
 
     if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
     feedbackTimerRef.current = setTimeout(() => {
       setIsAnimating(false);
       if (ok) {
-        generateNewProblem();
+        // We do not auto-advance immediately anymore, let them enjoy the confetti and click "Next"
+        // Or we can auto-advance after 2 seconds. Let's let them click next to control pacing.
       } else {
         setSelectedOptionValue(null);
-        inputRef.current?.focus();
       }
-    }, 800);
-  }, [checkAnswer, isAnimating, generateNewProblem]);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (userAnswer.trim() === '') return;
-    commitAnswer(Number(userAnswer));
-  };
+    }, ok ? 2000 : 800); // Wait longer on success for confetti
+  }, [isAnimating, currentProblem.answer]);
 
   const handleOptionClick = useCallback((option: number) => {
-    if (isAnimating) return;
-    setUserAnswer(option.toString());
+    if (isAnimating && feedback === 'correct') return; // prevent clicking once correct
     setSelectedOptionValue(option);
     commitAnswer(option);
-  }, [commitAnswer, isAnimating]);
+  }, [commitAnswer, isAnimating, feedback]);
 
   const toggleLanguageSelector = () => {
     setShowLanguageSelector(!showLanguageSelector);
@@ -146,20 +133,23 @@ export default function Home() {
   }, [clearAllTimers]);
 
   if (!isMounted) {
-    return <div className="flex min-h-screen flex-col items-center justify-center p-8 bg-ctp-base" />;
+    return <div className="flex min-h-screen flex-col items-center justify-center p-8 bg-neo-yellow" />;
   }
 
+  // Dim secondary controls when answering
+  const peripheralOpacity = (isAnimating || feedback === 'correct') ? 'opacity-30 pointer-events-none' : 'opacity-100';
+
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-8 bg-ctp-base">
-      <div className="absolute top-4 left-4">
+    <div className="flex min-h-screen flex-col items-center justify-center p-8 bg-neo-yellow transition-colors duration-500">
+      <div className={`absolute top-4 left-4 transition-opacity duration-300 ${peripheralOpacity}`}>
         <div className="relative language-selector-container">
           <button
             onClick={toggleLanguageSelector}
-            className="p-2 bg-ctp-surface0 text-ctp-text rounded-lg hover:bg-ctp-surface1 transition-colors flex items-center justify-center"
+            className="p-3 bg-white text-black border-4 border-black box-shadow-hard rounded-2xl hover:bg-gray-100 flex items-center justify-center"
             aria-label={t.selectLanguage}
             aria-expanded={showLanguageSelector}
           >
-            <span className="text-2xl leading-none">
+            <span className="text-3xl leading-none">
               {language === 'en' ? '🇬🇧' :
                 language === 'de' ? '🇩🇪' :
                   language === 'it' ? '🇮🇹' :
@@ -169,7 +159,7 @@ export default function Home() {
           </button>
 
           {showLanguageSelector && (
-            <div className="absolute left-0 top-full mt-2 p-3 bg-ctp-surface0 rounded-lg shadow-lg z-10 language-selector-dropdown">
+            <div className="absolute left-0 top-full mt-2 p-3 bg-white border-4 border-black box-shadow-hard rounded-2xl z-20 language-selector-dropdown">
               <LanguageSelector
                 language={language}
                 setLanguage={(lang) => {
@@ -184,11 +174,11 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="absolute top-4 right-4">
+      <div className={`absolute top-4 right-4 transition-opacity duration-300 ${peripheralOpacity}`}>
         <div className="relative">
           <Link
             href="/settings"
-            className="p-2 bg-ctp-surface0 text-ctp-text rounded-lg hover:bg-ctp-surface1 transition-colors flex items-center justify-center"
+            className="p-3 bg-white text-black border-4 border-black box-shadow-hard rounded-2xl hover:bg-gray-100 flex items-center justify-center"
             onMouseEnter={() => setShowTooltip(true)}
             onMouseLeave={() => setShowTooltip(false)}
             onFocus={() => setShowTooltip(true)}
@@ -198,36 +188,33 @@ export default function Home() {
             <SettingsIcon />
           </Link>
           {showTooltip && (
-            <div className="absolute right-0 top-full mt-2 bg-ctp-surface2 text-ctp-text px-3 py-1 rounded text-sm whitespace-nowrap">
+            <div className="absolute right-0 top-full mt-2 bg-black text-white px-4 py-2 rounded-xl text-lg font-bold whitespace-nowrap z-20">
               {t.settings}
             </div>
           )}
         </div>
       </div>
 
-      <h1 className="text-4xl font-bold mb-8 text-ctp-blue text-center">
+      <h1 className="text-6xl font-black mb-10 text-black tracking-tight text-center drop-shadow-md">
         {t.title}
       </h1>
 
-      {testParameters.operations.length > 1 && (
-        <OperationToggle
-          selected={activeOperation}
-          onToggle={setOperation}
-          options={testParameters.operations}
-        />
-      )}
+      <div className={`mb-8 transition-opacity duration-300 ${peripheralOpacity}`}>
+        {testParameters.operations.length > 1 && (
+          <OperationToggle
+            selected={activeOperation}
+            onToggle={setOperation}
+            options={testParameters.operations}
+          />
+        )}
+      </div>
 
       <ProblemDisplay
         firstNumber={currentProblem.num1}
         secondNumber={currentProblem.num2}
         operation={activeOperation}
-        userAnswer={userAnswer}
-        setUserAnswer={setUserAnswer}
-        onSubmit={handleSubmit}
         feedback={feedback}
         isAnimating={isAnimating}
-        language={language}
-        inputRef={inputRef}
         t={t}
       />
 
@@ -237,12 +224,15 @@ export default function Home() {
         onOptionClick={handleOptionClick}
       />
 
-      <button
-        onClick={generateNewProblem}
-        className="mt-8 px-4 py-2 bg-ctp-surface0 text-ctp-text font-medium rounded-lg hover:bg-ctp-surface1 transition-colors"
-      >
-        {t.newProblem}
-      </button>
+      {/* Only show "New Problem" button explicitly when they get it right, or let them click anywhere? */}
+      <div className={`mt-12 transition-all duration-300 ${feedback === 'correct' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
+        <button
+          onClick={generateNewProblem}
+          className="px-10 py-5 bg-neo-green font-black text-3xl text-black border-4 border-black box-shadow-hard rounded-full hover:bg-green-400 active:translate-y-2 active:translate-x-2 active:shadow-none transition-all"
+        >
+          {t.newProblem}
+        </button>
+      </div>
     </div>
   );
 }
