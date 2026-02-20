@@ -58,23 +58,21 @@ export const ProblemDisplay = ({
             <span>?</span>
           </div>
 
-          {feedback && (
-            <div
-              className={`mt-6 text-3xl font-bold text-center min-h-[3rem] transform rotate-2 ${feedback === 'correct' ? 'text-green-600' : 'text-red-500'
-                }`}
-              role="status"
-              aria-live="polite"
-              aria-atomic="true"
-            >
-              {feedback === 'correct' ? t.correct : t.tryAgain}
-            </div>
-          )}
-          {!feedback && <div className="mt-6 min-h-[3rem]" />}
         </motion.div>
       </div>
 
+      {feedback && (
+        <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+          {feedback === 'correct' ? t.correct : t.tryAgain}
+        </div>
+      )}
+
       {/* The Mascot peeking from the side */}
-      <Mascot className="absolute -right-12 sm:-right-24 top-1/2 -translate-y-1/2 w-64 h-64 sm:w-80 sm:h-80 z-20 pointer-events-none drop-shadow-2xl" />
+      <Mascot
+        className="absolute -right-8 sm:-right-16 top-1/2 -translate-y-1/2 w-48 h-48 sm:w-64 sm:h-64 z-20 pointer-events-none drop-shadow-2xl"
+        isAnimating={isAnimating}
+        feedback={feedback}
+      />
     </div>
   );
 };
