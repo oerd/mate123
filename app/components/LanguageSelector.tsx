@@ -37,17 +37,16 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
             onClick={() => setLanguage(option.code)}
             onMouseEnter={() => setTooltip(option.code)}
             onMouseLeave={() => setTooltip(null)}
-            className={`p-2 rounded-lg transition-all ${
-              language === option.code
-                ? 'bg-ctp-surface1 border-2 border-ctp-blue scale-110'
-                : 'bg-ctp-surface0 hover:bg-ctp-surface1'
-            }`}
+            className={`p-3 rounded-2xl transition-all border-4 box-shadow-hard ${language === option.code
+                ? 'bg-neo-blue border-black -translate-y-1'
+                : 'bg-white border-black hover:bg-gray-100 hover:-translate-y-1'
+              }`}
             aria-label={option.name}
           >
             <span className="text-4xl leading-none">{option.flag}</span>
           </button>
           {tooltip === option.code && (
-            <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 bg-ctp-surface2 text-ctp-text px-3 py-1 rounded text-sm whitespace-nowrap z-20">
+            <div className="absolute -bottom-14 left-1/2 transform -translate-x-1/2 bg-black text-white font-bold px-4 py-2 rounded-xl text-lg whitespace-nowrap z-20">
               {option.name}
             </div>
           )}
