@@ -1,0 +1,25 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <path d="M100 20C70 20 50 50 50 100L50 180C50 180 80 190 100 190C120 190 150 180 150 180L150 100C150 50 130 20 100 20Z" fill="#a020f0" stroke="#000000" stroke-width="4"/>
+  <path d="M70 190C70 160 80 140 100 140C120 140 130 160 130 190" fill="#ff8c00" stroke="#000000" stroke-width="4"/>
+  <path d="M85 35L95 10L105 35L115 10L125 35L110 50Z" fill="#ff8c00" stroke="#000000" stroke-width="4"/>
+  <path d="M45 70L25 80L45 90L25 100L45 110Z" fill="#ff8c00" stroke="#000000" stroke-width="4"/>
+  <path d="M155 70L175 80L155 90L175 100L155 110Z" fill="#ff8c00" stroke="#000000" stroke-width="4"/>
+  <path d="M80 45L75 20L60 35L75 45" fill="#ff8c00" stroke="#000000" stroke-width="4"/>
+  <path d="M70 25L75 40" fill="none" stroke="#00ff00" stroke-width="3"/>
+  <path d="M65 30L70 45" fill="none" stroke="#00ff00" stroke-width="3"/>
+  <path d="M120 45L125 20L140 35L125 45" fill="#ff8c00" stroke="#000000" stroke-width="4"/>
+  <path d="M130 25L125 40" fill="none" stroke="#00ff00" stroke-width="3"/>
+  <path d="M135 30L130 45" fill="none" stroke="#00ff00" stroke-width="3"/>
+  <circle cx="85" cy="75" r="15" fill="#ffffff" stroke="#000000" stroke-width="3"/>
+  <circle cx="85" cy="75" r="5" fill="#000000"/>
+  <circle cx="115" cy="75" r="15" fill="#ffffff" stroke="#000000" stroke-width="3"/>
+  <circle cx="115" cy="75" r="5" fill="#000000"/>
+  <path d="M75 105Q100 125 125 105" fill="none" stroke="#000000" stroke-width="4"/>
+  <path d="M85 115L90 125L95 115" fill="#ffffff" stroke="#000000" stroke-width="3"/>
+  <path d="M105 115L110 125L115 115" fill="#ffffff" stroke="#000000" stroke-width="3"/>
+  <path d="M90 125Q100 135 110 125" fill="#ff0000"/>
+  <path d="M50 130L30 120L20 130L40 140Z" fill="#a020f0" stroke="#000000" stroke-width="4"/>
+  <path d="M150 130L170 120L180 130L160 140Z" fill="#a020f0" stroke="#000000" stroke-width="4"/>
+  <path d="M20 130L10 110L25 120L20 130" fill="#ff8c00" stroke="#000000" stroke-width="4"/>
+  <path d="M180 130L190 110L175 120L180 130" fill="#00ff00" stroke="#000000" stroke-width="4"/>
+</svg>
