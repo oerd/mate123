@@ -53,8 +53,21 @@ describe('AnswerButton', () => {
       />
     );
     const btn = screen.getByRole('button');
-    expect(btn.className).toContain('text-5xl');
-    expect(btn.className).toContain('w-28');
+    expect(btn.className).toContain('sm:text-4xl');
+    expect(btn.className).toContain('sm:w-24');
+  });
+
+  it('uses blue background for all buttons', () => {
+    const { unmount } = render(
+      <AnswerButton value={1} isSelected={false} isDisabled={false} onClick={() => { }} />
+    );
+    expect(screen.getByRole('button').className).toContain('bg-neo-blue');
+    unmount();
+
+    render(
+      <AnswerButton value={42} isSelected={false} isDisabled={false} onClick={() => { }} />
+    );
+    expect(screen.getByRole('button').className).toContain('bg-neo-blue');
   });
 
   it('applies disabled styling', () => {

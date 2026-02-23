@@ -14,7 +14,7 @@ export const ResultGrid = ({
 }: ResultGridProps) => {
   return (
     <div className="mt-4 sm:mt-6 md:mt-8 w-full max-w-xl">
-      <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
+      <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:justify-center sm:gap-3">
         {answerOptions.map((option) => (
           <AnswerButton
             key={option}
