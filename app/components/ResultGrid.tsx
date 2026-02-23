@@ -13,8 +13,8 @@ export const ResultGrid = ({
   onOptionClick
 }: ResultGridProps) => {
   return (
-    <div className="mt-8 w-full max-w-xl">
-      <div className="flex flex-wrap justify-center gap-3">
+    <div className="mt-4 sm:mt-6 md:mt-8 w-full max-w-xl">
+      <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
         {answerOptions.map((option) => (
           <AnswerButton
             key={option}
