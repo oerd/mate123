@@ -9,9 +9,9 @@ interface AnswerButtonProps {
 
 function getSizeClasses(value: number): string {
   const digits = String(value).length;
-  if (digits <= 2) return 'h-14 w-full text-4xl sm:h-16 sm:w-20 sm:text-5xl md:h-20 md:w-24 md:text-6xl';
-  if (digits === 3) return 'h-14 w-full text-3xl sm:h-16 sm:w-24 sm:text-4xl md:h-20 md:w-28 md:text-5xl';
-  return 'h-14 w-full text-2xl sm:h-16 sm:w-28 sm:text-3xl md:h-20 md:w-32 md:text-4xl';
+  if (digits <= 2) return 'h-14 sm:h-16 md:h-20 w-full text-4xl sm:text-5xl md:text-6xl';
+  if (digits === 3) return 'h-14 sm:h-16 md:h-20 w-full text-3xl sm:text-4xl md:text-5xl';
+  return 'h-14 sm:h-16 md:h-20 w-full text-2xl sm:text-3xl md:text-4xl';
 }
 
 

@@ -54,7 +54,7 @@ describe('AnswerButton', () => {
     );
     const btn = screen.getByRole('button');
     expect(btn.className).toContain('sm:text-4xl');
-    expect(btn.className).toContain('sm:w-24');
+    expect(btn.className).toContain('w-full');
   });
 
   it('uses blue background for all buttons', () => {
