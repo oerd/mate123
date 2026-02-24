@@ -21,9 +21,6 @@ export const ProblemDisplay = ({
   isAnimating,
   t
 }: ProblemDisplayProps) => {
-  // Use framer-motion for the animations.
-  // We'll create a simple shake for error, and a bounce for success.
-
   const getAnimationVariants = () => {
     if (!isAnimating) return { x: 0, y: 0 };
     if (feedback === 'incorrect') {
@@ -42,11 +39,11 @@ export const ProblemDisplay = ({
   };
 
   return (
-    <div className="relative mb-4 sm:mb-6 md:mb-8 w-full max-w-xl flex justify-center mt-4 sm:mt-6 md:mt-8">
-      <div className="relative w-full max-w-md transform -rotate-2">
+    <div className="relative w-full max-w-xl flex justify-center">
+      <div className="relative w-full max-w-md lg:max-w-xl transform -rotate-2">
         <motion.div
           animate={getAnimationVariants()}
-          className={`math-problem-container flex flex-col items-center justify-center p-6 sm:p-8 md:p-12 rounded-2xl bg-white border-4 border-black box-shadow-hard w-full ${isAnimating && feedback === 'correct' ? 'animate-success' :
+          className={`math-problem-container flex flex-col lg:flex-row items-center justify-center p-6 sm:p-8 rounded-2xl bg-white border-4 border-black box-shadow-hard w-full ${isAnimating && feedback === 'correct' ? 'animate-success' :
             isAnimating && feedback === 'incorrect' ? 'animate-error' : ''
             }`}
         >
@@ -58,9 +55,9 @@ export const ProblemDisplay = ({
             <span>?</span>
           </div>
 
-          {/* The Mascot moved INSIDE the operation box */}
+          {/* Mascot: below text on mobile, inline right on wide screens */}
           <Mascot
-            className="absolute -right-2 sm:-right-4 md:-right-8 -bottom-2 sm:-bottom-4 md:-bottom-8 w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 z-20 pointer-events-none drop-shadow-xl"
+            className="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 pointer-events-none drop-shadow-xl lg:ml-4 mt-2 lg:mt-0 flex-shrink-0"
             isAnimating={isAnimating}
             feedback={feedback}
           />
