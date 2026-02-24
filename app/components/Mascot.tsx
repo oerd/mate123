@@ -31,7 +31,7 @@ export const Mascot = ({ className = '', isAnimating = false, feedback = null }:
             aria-hidden="true"
             animate={getAnimationVariants()}
         >
-            {/* Cute Purple Monster SVG (Preferred Variant) */}
+            {/* Cute Purple Monster SVG */}
             <svg
                 viewBox="0 0 200 200"
                 fill="none"

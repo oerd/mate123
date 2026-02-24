@@ -7,14 +7,13 @@ import { useTestParameters, Operation } from './TestParametersContext';
 import { translations } from './translations';
 import { SettingsIcon } from './components/SettingsIcon';
 import { OperationToggle } from './components/OperationToggle';
-import { LanguageSelector } from './components/LanguageSelector';
 import { generateProblem, generateAnswerOptions, isAnswerCorrect } from './utils/mathLogic';
 import { ProblemDisplay } from './components/ProblemDisplay';
 import { ResultGrid } from './components/ResultGrid';
 import confetti from 'canvas-confetti';
 
 export default function Home() {
-  const { language, setLanguage } = useLanguage();
+  const { language } = useLanguage();
   const { testParameters } = useTestParameters();
   const t = translations[language];
   const feedbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -24,8 +23,7 @@ export default function Home() {
   const [showTooltip, setShowTooltip] = useState<boolean>(false);
   const [operation, setOperation] = useState<Operation>(testParameters.operations[0] || 'addition');
   const [problemSeed, setProblemSeed] = useState<number>(0);
-  const [showLanguageSelector, setShowLanguageSelector] = useState<boolean>(false);
-  const [languageTooltip, setLanguageTooltip] = useState<string | null>(null);
+
   const [selectedOptionValue, setSelectedOptionValue] = useState<number | null>(null);
   const [isMounted, setIsMounted] = useState(false);
 
@@ -100,31 +98,7 @@ export default function Home() {
     commitAnswer(option);
   }, [commitAnswer, isAnimating, feedback]);
 
-  const toggleLanguageSelector = () => {
-    setShowLanguageSelector(!showLanguageSelector);
-  };
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (showLanguageSelector && !target.closest('.language-selector-container')) {
-        setShowLanguageSelector(false);
-      }
-    };
-
-    const handleEscape = (event: KeyboardEvent) => {
-      if (showLanguageSelector && event.key === 'Escape') {
-        setShowLanguageSelector(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleEscape);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleEscape);
-    };
-  }, [showLanguageSelector]);
 
   useEffect(() => {
     return () => {
@@ -141,38 +115,6 @@ export default function Home() {
 
   return (
     <div className="flex h-dvh flex-col items-center justify-center gap-2 sm:gap-4 p-4 sm:p-6 md:p-8 overflow-hidden bg-neo-yellow transition-colors duration-500">
-      <div className={`absolute top-4 left-4 transition-opacity duration-300 ${peripheralOpacity}`}>
-        <div className="relative language-selector-container">
-          <button
-            onClick={toggleLanguageSelector}
-            className="p-3 bg-white text-black border-4 border-black box-shadow-hard rounded-2xl hover:bg-gray-100 flex items-center justify-center"
-            aria-label={t.selectLanguage}
-            aria-expanded={showLanguageSelector}
-          >
-            <span className="text-3xl leading-none">
-              {language === 'en' ? '🇬🇧' :
-                language === 'de' ? '🇩🇪' :
-                  language === 'it' ? '🇮🇹' :
-                    language === 'fr' ? '🇫🇷' :
-                      language === 'sq' ? '🇦🇱' : '🌐'}
-            </span>
-          </button>
-
-          {showLanguageSelector && (
-            <div className="absolute left-0 top-full mt-2 p-3 bg-white border-4 border-black box-shadow-hard rounded-2xl z-20 language-selector-dropdown">
-              <LanguageSelector
-                language={language}
-                setLanguage={(lang) => {
-                  setLanguage(lang);
-                  setShowLanguageSelector(false);
-                }}
-                tooltip={languageTooltip}
-                setTooltip={setLanguageTooltip}
-              />
-            </div>
-          )}
-        </div>
-      </div>
 
       <div className={`absolute top-4 right-4 transition-opacity duration-300 ${peripheralOpacity}`}>
         <div className="relative">
