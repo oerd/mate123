@@ -10,6 +10,7 @@ interface OperationToggleProps {
   onToggle: (operation: Operation) => void;
   className?: string;
   renderButtonClass?: (op: Operation, isSelected: boolean) => string;
+  activeOverlayClass?: string;
 }
 
 export const OperationToggle: React.FC<OperationToggleProps> = ({
@@ -17,7 +18,8 @@ export const OperationToggle: React.FC<OperationToggleProps> = ({
   selected,
   onToggle,
   className = "flex bg-white border-4 border-black box-shadow-hard rounded-full p-1 sm:p-2 mb-4 sm:mb-6 gap-1 sm:gap-2",
-  renderButtonClass
+  renderButtonClass,
+  activeOverlayClass = "absolute inset-0 bg-neo-pink border-4 border-black box-shadow-hard rounded-full -z-10"
 }) => {
   const { language } = useLanguage();
   const t = translations[language];
@@ -53,7 +55,7 @@ export const OperationToggle: React.FC<OperationToggleProps> = ({
             {isSelected(op) && (
               <motion.div
                 layoutId="activeOperation"
-                className="absolute inset-0 bg-neo-pink border-4 border-black box-shadow-hard rounded-full -z-10"
+                className={activeOverlayClass}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
               />
             )}

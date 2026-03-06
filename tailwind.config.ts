@@ -25,6 +25,9 @@ export default {
         'hard': '4px 4px 0px 0px rgba(0,0,0,1)',
         'hard-lg': '8px 8px 0px 0px rgba(0,0,0,1)',
       },
+      borderRadius: {
+        neo: '56px',
+      },
       fontFamily: {
         sans: ['var(--font-fredoka)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       }
