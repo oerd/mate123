@@ -15,8 +15,17 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export function LanguageProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [language, setLanguageState] = useState<Language>(() => {
     if (typeof window === 'undefined') return 'en';
+
+    // If user has explicitly chosen a language, use that
     const saved = localStorage.getItem('math-practice:language') as Language | null;
-    return saved && VALID_LANGUAGES.includes(saved) ? saved : 'en';
+    if (saved && VALID_LANGUAGES.includes(saved)) return saved;
+
+    // Otherwise, detect from browser's accepted languages
+    for (const browserLang of navigator.languages ?? []) {
+      const code = browserLang.split('-')[0] as Language;
+      if (VALID_LANGUAGES.includes(code)) return code;
+    }
+    return 'en';
   });
 
   useEffect(() => {

@@ -9,49 +9,28 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Catppuccin Mocha theme
-        ctp: {
-          // Base
-          base: "var(--ctp-base)",
-          mantle: "var(--ctp-mantle)",
-          crust: "var(--ctp-crust)",
-          
-          // Text
-          text: "var(--ctp-text)",
-          subtext1: "var(--ctp-subtext1)",
-          subtext0: "var(--ctp-subtext0)",
-          
-          // Overlay
-          overlay2: "var(--ctp-overlay2)",
-          overlay1: "var(--ctp-overlay1)",
-          overlay0: "var(--ctp-overlay0)",
-          
-          // Surface
-          surface2: "var(--ctp-surface2)",
-          surface1: "var(--ctp-surface1)",
-          surface0: "var(--ctp-surface0)",
-          
-          // Accents
-          blue: "var(--ctp-blue)",
-          lavender: "var(--ctp-lavender)",
-          sapphire: "var(--ctp-sapphire)",
-          sky: "var(--ctp-sky)",
-          teal: "var(--ctp-teal)",
-          green: "var(--ctp-green)",
-          yellow: "var(--ctp-yellow)",
-          peach: "var(--ctp-peach)",
-          maroon: "var(--ctp-maroon)",
-          red: "var(--ctp-red)",
-          mauve: "var(--ctp-mauve)",
-          pink: "var(--ctp-pink)",
-          flamingo: "var(--ctp-flamingo)",
-          rosewater: "var(--ctp-rosewater)",
+        neo: {
+          yellow: '#FFDE00', // Nano Banana
+          blue: '#38BDF8',
+          pink: '#F472B6',
+          green: '#4ADE80',
+          orange: '#FB923C',
+          white: '#FFFFFF',
+          black: '#000000'
         },
-        
-        // Map theme colors to functional names
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      boxShadow: {
+        'hard': '4px 4px 0px 0px rgba(0,0,0,1)',
+        'hard-lg': '8px 8px 0px 0px rgba(0,0,0,1)',
+      },
+      borderRadius: {
+        neo: '56px',
+      },
+      fontFamily: {
+        sans: ['var(--font-fredoka)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      }
     },
   },
   plugins: [],

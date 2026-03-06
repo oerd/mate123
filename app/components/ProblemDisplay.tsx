@@ -1,18 +1,15 @@
 import React from 'react';
 import { operationLookup, Operation } from '../TestParametersContext';
-import { translations, Language } from '../translations';
+import { translations } from '../translations';
+import { motion } from 'framer-motion';
+import { Mascot } from './Mascot';
 
 interface ProblemDisplayProps {
   firstNumber: number;
   secondNumber: number;
   operation: Operation;
-  userAnswer: string;
-  setUserAnswer: (value: string) => void;
-  onSubmit: (e: React.FormEvent) => void;
   feedback: 'correct' | 'incorrect' | null;
   isAnimating: boolean;
-  language: Language;
-  inputRef: React.RefObject<HTMLInputElement | null>;
   t: typeof translations['en'];
 }
 
@@ -20,61 +17,58 @@ export const ProblemDisplay = ({
   firstNumber,
   secondNumber,
   operation,
-  userAnswer,
-  setUserAnswer,
-  onSubmit,
   feedback,
   isAnimating,
-  inputRef,
   t
 }: ProblemDisplayProps) => {
+  const getAnimationVariants = () => {
+    if (!isAnimating) return { x: 0, y: 0 };
+    if (feedback === 'incorrect') {
+      return {
+        x: [-10, 10, -10, 10, 0],
+        transition: { duration: 0.4 }
+      };
+    }
+    if (feedback === 'correct') {
+      return {
+        y: [0, -20, 0, -10, 0],
+        transition: { duration: 0.5 }
+      };
+    }
+    return { x: 0, y: 0 };
+  };
+
   return (
-    <div className={`math-problem-container p-8 rounded-xl shadow-lg bg-ctp-mantle border border-ctp-surface0 transition-all duration-300 ${
-      isAnimating && feedback === 'correct' ? 'animate-success' : 
-      isAnimating && feedback === 'incorrect' ? 'animate-error' : ''
-    }`}>
-      <div className="text-5xl font-bold flex items-center justify-center gap-4 mb-8 text-ctp-text">
-        <span>{firstNumber}</span>
-        <span>{operationLookup(operation)}</span>
-        <span>{secondNumber}</span>
-        <span>=</span>
-        <span>?</span>
-      </div>
-      
-      <form onSubmit={onSubmit} className="flex flex-col items-center">
-        <input
-          ref={inputRef}
-          type="number"
-          inputMode="numeric"
-          value={userAnswer}
-          onChange={(e) => setUserAnswer(e.target.value)}
-          className="text-4xl p-4 w-32 text-center border-2 border-ctp-surface2 rounded-lg bg-ctp-surface0 text-ctp-text focus:border-ctp-blue focus:outline-none"
-          placeholder="?"
-          aria-label={t.answerLabel}
-          autoFocus
-        />
-        
-        <button 
-          type="submit"
-          className="mt-6 px-6 py-3 bg-ctp-blue text-ctp-base font-bold rounded-lg hover:bg-ctp-lavender transition-colors"
+    <div className="relative w-full max-w-xl flex justify-center">
+      <div className="relative w-full max-w-md lg:max-w-xl transform -rotate-2">
+        <motion.div
+          animate={getAnimationVariants()}
+          className={`math-problem-container flex flex-col lg:flex-row items-center justify-center p-6 sm:p-8 rounded-2xl bg-white border-4 border-black box-shadow-hard w-full ${isAnimating && feedback === 'correct' ? 'animate-success' :
+            isAnimating && feedback === 'incorrect' ? 'animate-error' : ''
+            }`}
         >
-          {t.checkAnswer}
-        </button>
-      </form>
-      
+          <div className="text-5xl sm:text-7xl md:text-8xl font-black flex items-center justify-center gap-2 sm:gap-4 text-black transform rotate-2">
+            <span>{firstNumber}</span>
+            <span>{operationLookup(operation)}</span>
+            <span>{secondNumber}</span>
+            <span>=</span>
+            <span>?</span>
+          </div>
+
+          {/* Mascot: below text on mobile, inline right on wide screens */}
+          <Mascot
+            className="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 pointer-events-none drop-shadow-xl lg:ml-4 mt-2 lg:mt-0 flex-shrink-0"
+            isAnimating={isAnimating}
+            feedback={feedback}
+          />
+        </motion.div>
+      </div>
+
       {feedback && (
-        <div 
-          className={`mt-6 text-2xl font-bold text-center min-h-[2rem] ${
-            feedback === 'correct' ? 'text-ctp-green' : 'text-ctp-red'
-          }`} 
-          role="status"
-          aria-live="polite"
-          aria-atomic="true"
-        > 
+        <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
           {feedback === 'correct' ? t.correct : t.tryAgain}
         </div>
       )}
-      {!feedback && <div className="mt-6 min-h-[2rem]" />}
     </div>
   );
 };

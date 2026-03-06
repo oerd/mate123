@@ -9,7 +9,7 @@ describe('AnswerButton', () => {
         value={42}
         isSelected={false}
         isDisabled={false}
-        onClick={() => {}}
+        onClick={() => { }}
       />
     );
     expect(screen.getByText('42')).toBeDefined();
@@ -35,12 +35,12 @@ describe('AnswerButton', () => {
         value={42}
         isSelected={true}
         isDisabled={false}
-        onClick={() => {}}
+        onClick={() => { }}
       />
     );
     const btn = screen.getByRole('button');
-    expect(btn.className).toContain('ring-2');
-    expect(btn.className).toContain('ring-ctp-blue');
+    expect(btn.className).toContain('ring-4');
+    expect(btn.className).toContain('ring-black');
   });
 
   it('uses smaller text for 3-digit values', () => {
@@ -49,26 +49,25 @@ describe('AnswerButton', () => {
         value={100}
         isSelected={false}
         isDisabled={false}
-        onClick={() => {}}
+        onClick={() => { }}
       />
     );
     const btn = screen.getByRole('button');
-    expect(btn.className).toContain('text-4xl');
-    expect(btn.className).toContain('w-24');
+    expect(btn.className).toContain('sm:text-4xl');
+    expect(btn.className).toContain('w-full');
   });
 
-  it('uses even smaller text for 4+ digit values', () => {
-    render(
-      <AnswerButton
-        value={10000}
-        isSelected={false}
-        isDisabled={false}
-        onClick={() => {}}
-      />
+  it('uses blue background for all buttons', () => {
+    const { unmount } = render(
+      <AnswerButton value={1} isSelected={false} isDisabled={false} onClick={() => { }} />
     );
-    const btn = screen.getByRole('button');
-    expect(btn.className).toContain('text-3xl');
-    expect(btn.className).toContain('w-28');
+    expect(screen.getByRole('button').className).toContain('bg-neo-blue');
+    unmount();
+
+    render(
+      <AnswerButton value={42} isSelected={false} isDisabled={false} onClick={() => { }} />
+    );
+    expect(screen.getByRole('button').className).toContain('bg-neo-blue');
   });
 
   it('applies disabled styling', () => {
@@ -77,11 +76,11 @@ describe('AnswerButton', () => {
         value={42}
         isSelected={false}
         isDisabled={true}
-        onClick={() => {}}
+        onClick={() => { }}
       />
     );
     const btn = screen.getByRole('button') as HTMLButtonElement;
     expect(btn.disabled).toBe(true);
-    expect(btn.className).toContain('opacity-60');
+    expect(btn.className).toContain('opacity-50');
   });
 });

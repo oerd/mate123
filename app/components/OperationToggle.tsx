@@ -2,28 +2,24 @@ import React from 'react';
 import { useLanguage } from '../LanguageContext';
 import { translations } from '../translations';
 import { Operation, operationLookup, allOperations } from '../TestParametersContext';
+import { motion } from 'framer-motion';
 
 interface OperationToggleProps {
-  // Operations to display
-  options?: Operation[]; 
-  
-  // Selection state (single or multiple)
+  options?: Operation[];
   selected: Operation | Operation[];
-  
-  // Callback
   onToggle: (operation: Operation) => void;
-  
-  // Styling
   className?: string;
   renderButtonClass?: (op: Operation, isSelected: boolean) => string;
+  activeOverlayClass?: string;
 }
 
-export const OperationToggle: React.FC<OperationToggleProps> = ({ 
+export const OperationToggle: React.FC<OperationToggleProps> = ({
   options = allOperations,
   selected,
   onToggle,
-  className = "flex gap-2 mb-6",
-  renderButtonClass
+  className = "flex bg-white border-4 border-black box-shadow-hard rounded-full p-1 sm:p-2 mb-4 sm:mb-6 gap-1 sm:gap-2",
+  renderButtonClass,
+  activeOverlayClass = "absolute inset-0 bg-neo-pink border-4 border-black box-shadow-hard rounded-full -z-10"
 }) => {
   const { language } = useLanguage();
   const t = translations[language];
@@ -35,18 +31,17 @@ export const OperationToggle: React.FC<OperationToggleProps> = ({
     return selected === op;
   };
 
-  const defaultButtonClass = (op: Operation, active: boolean) => 
-    `p-3 rounded-lg transition-all flex items-center justify-center w-12 h-12 text-xl font-bold ${
-      active
-        ? 'bg-ctp-surface1 border-2 border-ctp-blue scale-110'
-        : 'bg-ctp-surface0 hover:bg-ctp-surface1'
+  const defaultButtonClass = (op: Operation, active: boolean) =>
+    `relative p-2 sm:p-3 flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 text-2xl sm:text-3xl md:text-4xl font-black rounded-full z-10 transition-colors ${active
+      ? 'text-black'
+      : 'text-gray-400 hover:text-black hover:bg-gray-100'
     }`;
 
   const getButtonClass = renderButtonClass || defaultButtonClass;
 
   return (
     <div className={className}>
-      {allOperations.map((op) => 
+      {allOperations.map((op) =>
         options.includes(op) && (
           <button
             key={op}
@@ -57,7 +52,14 @@ export const OperationToggle: React.FC<OperationToggleProps> = ({
             title={t[op]}
             type="button"
           >
-            {operationLookup(op)}
+            {isSelected(op) && (
+              <motion.div
+                layoutId="activeOperation"
+                className={activeOverlayClass}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              />
+            )}
+            <span className="relative z-10">{operationLookup(op)}</span>
           </button>
         )
       )}

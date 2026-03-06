@@ -3,6 +3,7 @@ import { OperationToggle } from './OperationToggle';
 import { describe, it, expect, vi } from 'vitest';
 import { TestParametersProvider } from '../TestParametersContext';
 import { LanguageProvider } from '../LanguageContext';
+import React from 'react';
 
 // Wrap with providers since it uses useLanguage
 const Wrapper = ({ children }: { children: React.ReactNode }) => (
@@ -17,14 +18,14 @@ describe('OperationToggle', () => {
   it('renders buttons for available operations', () => {
     render(
       <Wrapper>
-        <OperationToggle 
+        <OperationToggle
           selected="addition"
-          onToggle={() => {}}
+          onToggle={() => { }}
           options={['addition', 'subtraction']}
         />
       </Wrapper>
     );
-    
+
     expect(screen.getByTitle(/addition/i)).toBeDefined();
     expect(screen.getByTitle(/subtraction/i)).toBeDefined();
     expect(screen.queryByTitle(/multiplication/i)).toBeNull();
@@ -34,7 +35,7 @@ describe('OperationToggle', () => {
     const mockOnToggle = vi.fn();
     render(
       <Wrapper>
-        <OperationToggle 
+        <OperationToggle
           selected="addition"
           onToggle={mockOnToggle}
           options={['addition', 'subtraction']}
@@ -49,21 +50,21 @@ describe('OperationToggle', () => {
   it('supports multi-select highlighting', () => {
     render(
       <Wrapper>
-        <OperationToggle 
+        <OperationToggle
           selected={['addition', 'subtraction']}
-          onToggle={() => {}}
+          onToggle={() => { }}
           options={['addition', 'subtraction', 'multiplication']}
         />
       </Wrapper>
     );
-    
+
     const addBtn = screen.getByTitle(/addition/i);
     const subBtn = screen.getByTitle(/subtraction/i);
     const mulBtn = screen.getByTitle(/multiplication/i);
 
-    // Default active class contains border-ctp-blue
-    expect(addBtn.className).toContain('border-ctp-blue');
-    expect(subBtn.className).toContain('border-ctp-blue');
-    expect(mulBtn.className).not.toContain('border-ctp-blue');
+    // Active button gets text-black, inactive is text-gray-400
+    expect(addBtn.className).toContain('text-black');
+    expect(subBtn.className).toContain('text-black');
+    expect(mulBtn.className).toContain('text-gray-400');
   });
 });
