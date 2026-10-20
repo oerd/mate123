@@ -127,6 +127,22 @@ describe('Settings Page', () => {
     expect(stored.roundingNearest).toBe(100);
     expect(stored.roundingAnswers).toBe(4);
     expect(stored.roundingNumberLine).toBe(true);
-    expect(stored.comparisonMode).toBe('sums');
+    expect(stored.comparisonModes).toEqual(['numbers', 'sums']);
+  });
+
+  it('keeps at least one comparison mode selected', () => {
+    render(<Settings />, { wrapper: Wrapper });
+
+    fireEvent.click(screen.getByTitle('Comparison'));
+    const numbers = screen.getByRole('button', { name: 'Numbers' });
+    expect(numbers.getAttribute('aria-pressed')).toBe('true');
+
+    fireEvent.click(numbers);
+    expect(numbers.getAttribute('aria-pressed')).toBe('true');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Sums' }));
+    fireEvent.click(numbers);
+    expect(numbers.getAttribute('aria-pressed')).toBe('false');
+    expect(screen.getByRole('button', { name: 'Sums' }).getAttribute('aria-pressed')).toBe('true');
   });
 });

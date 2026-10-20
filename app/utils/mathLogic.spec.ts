@@ -14,7 +14,7 @@ describe('mathLogic', () => {
     roundingNearest: 10,
     roundingAnswers: 2,
     roundingNumberLine: false,
-    comparisonMode: 'numbers',
+    comparisonModes: ['numbers'],
   };
 
   describe('addition', () => {
@@ -280,13 +280,23 @@ describe('mathLogic', () => {
 
     it('compares a sum against a number in sums mode', () => {
       for (let i = 0; i < 50; i++) {
-        const p = generateProblem({ ...baseParams, comparisonMode: 'sums' }, 'comparison');
+        const p = generateProblem({ ...baseParams, comparisonModes: ['sums'] }, 'comparison');
         expect(p.addends).toBeDefined();
         const [a, b] = p.addends!;
         expect(a + b).toBe(p.num1);
         expect(p.num2).toBeGreaterThanOrEqual(0);
         expect(p.answer).toBe(Math.sign(p.num1 - p.num2));
       }
+    });
+
+    it('mixes numbers and sums when both modes are selected', () => {
+      let withSums = 0, plain = 0;
+      for (let i = 0; i < 200; i++) {
+        const p = generateProblem({ ...baseParams, comparisonModes: ['numbers', 'sums'] }, 'comparison');
+        if (p.addends) withSums++; else plain++;
+      }
+      expect(withSums).toBeGreaterThan(0);
+      expect(plain).toBeGreaterThan(0);
     });
 
     it('always offers the three signs in order', () => {

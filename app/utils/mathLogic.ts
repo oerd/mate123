@@ -84,9 +84,7 @@ export function sanitizeParameters(params: TestParameters): TestParameters {
   const roundingAnswers = roundingAnswersOptions.includes(params.roundingAnswers)
     ? params.roundingAnswers
     : 2;
-  const comparisonMode = comparisonModeOptions.includes(params.comparisonMode)
-    ? params.comparisonMode
-    : 'numbers';
+  const comparisonModes = comparisonModeOptions.filter((mode) => (params.comparisonModes ?? []).includes(mode));
 
   return {
     firstOperandMin: Math.min(firstMin, firstMax),
@@ -99,7 +97,7 @@ export function sanitizeParameters(params: TestParameters): TestParameters {
     roundingNearest,
     roundingAnswers,
     roundingNumberLine: Boolean(params.roundingNumberLine),
-    comparisonMode,
+    comparisonModes: comparisonModes.length > 0 ? comparisonModes : ['numbers'],
   };
 }
 
@@ -140,7 +138,9 @@ const EQUAL_COMPARISON_PROBABILITY = 0.2;
 
 function generateComparisonProblem(params: TestParameters): MathProblem {
   const equal = Math.random() < EQUAL_COMPARISON_PROBABILITY;
-  if (params.comparisonMode === 'sums') {
+  const modes = params.comparisonModes.length > 0 ? params.comparisonModes : ['numbers'];
+  const mode = modes[Math.floor(Math.random() * modes.length)];
+  if (mode === 'sums') {
     const a = getRandomInt(params.firstOperandMin, params.firstOperandMax);
     const b = getRandomInt(params.secondOperandMin, params.secondOperandMax);
     const num1 = a + b;
