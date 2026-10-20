@@ -21,11 +21,10 @@ describe('Settings Page', () => {
     window.history.pushState({}, '', '/');
   });
 
-  it('renders all sections (language, theme, teacher settings)', () => {
+  it('renders all sections (language, teacher settings)', () => {
     render(<Settings />, { wrapper: Wrapper });
 
     expect(screen.getByText('Language Settings')).toBeDefined();
-    expect(screen.getByText('Theme Settings')).toBeDefined();
     expect(screen.getByText('Teacher Settings')).toBeDefined();
   });
 
@@ -97,5 +96,37 @@ describe('Settings Page', () => {
     const stored = window.localStorage.getItem('math-practice:testParameters');
     const parsed = JSON.parse(stored!);
     expect(parsed.sortResults).toBe(true);
+  });
+
+  it('shows rounding and comparison settings only when those operations are selected', () => {
+    render(<Settings />, { wrapper: Wrapper });
+
+    expect(screen.queryByTestId('rounding-settings')).toBeNull();
+    expect(screen.queryByTestId('comparison-settings')).toBeNull();
+
+    fireEvent.click(screen.getByTitle('Rounding'));
+    expect(screen.getByTestId('rounding-settings')).toBeDefined();
+
+    fireEvent.click(screen.getByTitle('Comparison'));
+    expect(screen.getByTestId('comparison-settings')).toBeDefined();
+  });
+
+  it('saves rounding and comparison settings', () => {
+    render(<Settings />, { wrapper: Wrapper });
+
+    fireEvent.click(screen.getByTitle('Rounding'));
+    fireEvent.click(screen.getByTitle('Comparison'));
+    fireEvent.click(screen.getByRole('button', { name: '100' }));
+    fireEvent.click(screen.getByRole('button', { name: '4 · with distractors' }));
+    fireEvent.click(screen.getByLabelText('Show the number line'));
+    fireEvent.click(screen.getByRole('button', { name: 'Sums' }));
+    fireEvent.click(screen.getByText('Save Settings'));
+
+    const stored = JSON.parse(window.localStorage.getItem('math-practice:testParameters') ?? '{}');
+    expect(stored.operations).toEqual(['addition', 'subtraction', 'rounding', 'comparison']);
+    expect(stored.roundingNearest).toBe(100);
+    expect(stored.roundingAnswers).toBe(4);
+    expect(stored.roundingNumberLine).toBe(true);
+    expect(stored.comparisonMode).toBe('sums');
   });
 });

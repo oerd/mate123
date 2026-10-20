@@ -42,6 +42,20 @@ interface Translations {
   copied: string;
   loadedFromUrl: string;
   answerLabel: string;
+  rounding: string;
+  comparison: string;
+  roundingSettings: string;
+  roundToNearest: string;
+  roundToNearestTask: string;
+  roundingAnswers: string;
+  roundingAnswersTwo: string;
+  roundingAnswersFour: string;
+  showNumberLine: string;
+  comparisonSettings: string;
+  compareWhat: string;
+  compareNumbers: string;
+  compareSums: string;
+  whichSignFits: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -86,7 +100,21 @@ export const translations: Record<Language, Translations> = {
     shareSettingsTooltip: 'Copy settings URL to clipboard',
     copied: 'Copied!',
     loadedFromUrl: 'Settings loaded from shared link',
-    answerLabel: 'Your answer'
+    answerLabel: 'Your answer',
+    rounding: 'Rounding',
+    comparison: 'Comparison',
+    roundingSettings: 'Rounding',
+    roundToNearest: 'Round to the nearest',
+    roundToNearestTask: 'Round to the nearest {n}',
+    roundingAnswers: 'Answers to choose from',
+    roundingAnswersTwo: '2 · the two neighbours',
+    roundingAnswersFour: '4 · with distractors',
+    showNumberLine: 'Show the number line',
+    comparisonSettings: 'Comparison',
+    compareWhat: 'Compare',
+    compareNumbers: 'Numbers',
+    compareSums: 'Sums',
+    whichSignFits: 'Which sign fits?'
   },
   de: {
     title: 'Mathe-Übung',
@@ -129,7 +157,21 @@ export const translations: Record<Language, Translations> = {
     shareSettingsTooltip: 'Einstellungs-URL in die Zwischenablage kopieren',
     copied: 'Kopiert!',
     loadedFromUrl: 'Einstellungen aus geteiltem Link geladen',
-    answerLabel: 'Deine Antwort'
+    answerLabel: 'Deine Antwort',
+    rounding: 'Runden',
+    comparison: 'Vergleichen',
+    roundingSettings: 'Runden',
+    roundToNearest: 'Runden auf',
+    roundToNearestTask: 'Runde auf {n}er',
+    roundingAnswers: 'Antworten zur Auswahl',
+    roundingAnswersTwo: '2 · die beiden Nachbarn',
+    roundingAnswersFour: '4 · mit Ablenkern',
+    showNumberLine: 'Zahlenstrahl anzeigen',
+    comparisonSettings: 'Vergleichen',
+    compareWhat: 'Vergleiche',
+    compareNumbers: 'Zahlen',
+    compareSums: 'Summen',
+    whichSignFits: 'Welches Zeichen passt?'
   },
   it: {
     title: 'Esercizi di Matematica',
@@ -172,7 +214,21 @@ export const translations: Record<Language, Translations> = {
     shareSettingsTooltip: 'Copia URL delle impostazioni negli appunti',
     copied: 'Copiato!',
     loadedFromUrl: 'Impostazioni caricate da link condiviso',
-    answerLabel: 'La tua risposta'
+    answerLabel: 'La tua risposta',
+    rounding: 'Arrotondamento',
+    comparison: 'Confronto',
+    roundingSettings: 'Arrotondamento',
+    roundToNearest: 'Arrotonda alle',
+    roundToNearestTask: 'Arrotonda alle {n}',
+    roundingAnswers: 'Risposte tra cui scegliere',
+    roundingAnswersTwo: '2 · i due vicini',
+    roundingAnswersFour: '4 · con distrattori',
+    showNumberLine: 'Mostra la linea dei numeri',
+    comparisonSettings: 'Confronto',
+    compareWhat: 'Confronta',
+    compareNumbers: 'Numeri',
+    compareSums: 'Somme',
+    whichSignFits: 'Quale segno ci va?'
   },
   fr: {
     title: 'Exercices de Mathématiques',
@@ -215,7 +271,21 @@ export const translations: Record<Language, Translations> = {
     shareSettingsTooltip: 'Copier l\'URL des paramètres dans le presse-papiers',
     copied: 'Copié!',
     loadedFromUrl: 'Paramètres chargés depuis un lien partagé',
-    answerLabel: 'Ta réponse'
+    answerLabel: 'Ta réponse',
+    rounding: 'Arrondi',
+    comparison: 'Comparaison',
+    roundingSettings: 'Arrondi',
+    roundToNearest: 'Arrondir à',
+    roundToNearestTask: 'Arrondis à la {n} près',
+    roundingAnswers: 'Réponses proposées',
+    roundingAnswersTwo: '2 · les deux voisins',
+    roundingAnswersFour: '4 · avec distracteurs',
+    showNumberLine: 'Afficher la droite numérique',
+    comparisonSettings: 'Comparaison',
+    compareWhat: 'Comparer',
+    compareNumbers: 'Nombres',
+    compareSums: 'Sommes',
+    whichSignFits: 'Quel signe convient ?'
   },
   sq: {
     title: 'Praktikë Matematike',
@@ -258,7 +328,21 @@ export const translations: Record<Language, Translations> = {
     shareSettingsTooltip: 'Kopjo URL-në e cilësimeve',
     copied: 'U kopjua!',
     loadedFromUrl: 'Cilësimet u ngarkuan nga lidhja e ndarë',
-    answerLabel: 'Përgjigja jote'
+    answerLabel: 'Përgjigja jote',
+    rounding: 'Rrumbullakim',
+    comparison: 'Krahasim',
+    roundingSettings: 'Rrumbullakimi',
+    roundToNearest: 'Rrumbullako në',
+    roundToNearestTask: 'Rrumbullako në {n}-shen më të afërt',
+    roundingAnswers: 'Përgjigjet për të zgjedhur',
+    roundingAnswersTwo: '2 · dy fqinjët',
+    roundingAnswersFour: '4 · me shpërqendrues',
+    showNumberLine: 'Shfaq boshtin numerik',
+    comparisonSettings: 'Krahasimi',
+    compareWhat: 'Krahaso',
+    compareNumbers: 'Numra',
+    compareSums: 'Shuma',
+    whichSignFits: 'Cila shenjë përshtatet?'
   }
 };
 

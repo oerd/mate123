@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { generateProblem, generateAnswerOptions } from './mathLogic';
+import { generateProblem, generateAnswerOptions, generateRoundingOptions, generateOptionsForProblem, roundToNearest, roundingRange, comparisonSymbol, comparisonAnswers } from './mathLogic';
 import { TestParameters, Operation } from '../TestParametersContext';
 
 describe('mathLogic', () => {
@@ -10,7 +10,11 @@ describe('mathLogic', () => {
     secondOperandMax: 10,
     operations: ['addition'],
     numberOfResults: 4,
-    sortResults: false
+    sortResults: false,
+    roundingNearest: 10,
+    roundingAnswers: 2,
+    roundingNumberLine: false,
+    comparisonMode: 'numbers',
   };
 
   describe('addition', () => {
@@ -207,6 +211,88 @@ describe('mathLogic', () => {
         const unique = new Set(options);
         expect(unique.size).toBe(options.length);
       }
+    });
+  });
+
+  describe('rounding', () => {
+    it('rounds half up to the nearest target', () => {
+      expect(roundToNearest(325, 10)).toBe(330);
+      expect(roundToNearest(324, 10)).toBe(320);
+      expect(roundToNearest(1849, 100)).toBe(1800);
+      expect(roundToNearest(2500, 1000)).toBe(3000);
+    });
+
+    it('falls back to a sensible range when the operand range is too small for the target', () => {
+      expect(roundingRange({ ...baseParams, roundingNearest: 10 })).toEqual({ min: 11, max: 99 });
+      expect(roundingRange({ ...baseParams, roundingNearest: 100 })).toEqual({ min: 101, max: 999 });
+      expect(roundingRange({ ...baseParams, firstOperandMin: 0, firstOperandMax: 500, roundingNearest: 10 }))
+        .toEqual({ min: 0, max: 500 });
+    });
+
+    it('never asks to round an exact multiple and always carries the right answer', () => {
+      for (const nearest of [10, 100, 1000] as const) {
+        for (let i = 0; i < 50; i++) {
+          const p = generateProblem({ ...baseParams, roundingNearest: nearest }, 'rounding');
+          expect(p.operation).toBe('rounding');
+          expect(p.num2).toBe(nearest);
+          expect(p.num1 % nearest).not.toBe(0);
+          expect(p.answer).toBe(roundToNearest(p.num1, nearest));
+        }
+      }
+    });
+
+    it('offers the two neighbouring multiples by default', () => {
+      const options = generateRoundingOptions({ num1: 47, num2: 10, operation: 'rounding', answer: 50 }, 2, true);
+      expect(options).toEqual([40, 50]);
+    });
+
+    it('adds distractors when four answers are requested', () => {
+      const options = generateRoundingOptions({ num1: 47, num2: 10, operation: 'rounding', answer: 50 }, 4, true);
+      expect(options).toHaveLength(4);
+      expect(options).toContain(50);
+      expect(new Set(options).size).toBe(4);
+    });
+
+    it('respects the rounding answer count through generateOptionsForProblem', () => {
+      const problem = generateProblem({ ...baseParams, roundingNearest: 10 }, 'rounding');
+      expect(generateOptionsForProblem(problem, { ...baseParams, roundingAnswers: 2 })).toHaveLength(2);
+      expect(generateOptionsForProblem(problem, { ...baseParams, roundingAnswers: 4 })).toHaveLength(4);
+    });
+  });
+
+  describe('comparison', () => {
+    it('encodes the answer as the sign of the difference', () => {
+      for (let i = 0; i < 50; i++) {
+        const p = generateProblem(baseParams, 'comparison');
+        expect(p.operation).toBe('comparison');
+        expect(p.answer).toBe(Math.sign(p.num1 - p.num2));
+        expect(p.addends).toBeUndefined();
+      }
+    });
+
+    it('produces equal pairs some of the time', () => {
+      let equal = 0;
+      for (let i = 0; i < 300; i++) {
+        if (generateProblem(baseParams, 'comparison').answer === 0) equal++;
+      }
+      expect(equal).toBeGreaterThan(0);
+    });
+
+    it('compares a sum against a number in sums mode', () => {
+      for (let i = 0; i < 50; i++) {
+        const p = generateProblem({ ...baseParams, comparisonMode: 'sums' }, 'comparison');
+        expect(p.addends).toBeDefined();
+        const [a, b] = p.addends!;
+        expect(a + b).toBe(p.num1);
+        expect(p.num2).toBeGreaterThanOrEqual(0);
+        expect(p.answer).toBe(Math.sign(p.num1 - p.num2));
+      }
+    });
+
+    it('always offers the three signs in order', () => {
+      const problem = generateProblem(baseParams, 'comparison');
+      expect(generateOptionsForProblem(problem, { ...baseParams, sortResults: false })).toEqual(comparisonAnswers);
+      expect(comparisonAnswers.map(comparisonSymbol)).toEqual(['<', '=', '>']);
     });
   });
 });

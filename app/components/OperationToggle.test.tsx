@@ -67,4 +67,19 @@ describe('OperationToggle', () => {
     expect(subBtn.className).toContain('text-black');
     expect(mulBtn.className).toContain('text-gray-400');
   });
+
+  it('renders the rounding and comparison operations', () => {
+    render(
+      <Wrapper>
+        <OperationToggle
+          selected="rounding"
+          onToggle={() => { }}
+          options={['rounding', 'comparison']}
+        />
+      </Wrapper>
+    );
+
+    expect(screen.getByTitle(/rounding/i).textContent).toBe('≈');
+    expect(screen.getByTitle(/comparison/i).textContent).toBe('<=>');
+  });
 });

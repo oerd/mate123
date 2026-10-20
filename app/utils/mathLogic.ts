@@ -1,4 +1,24 @@
-import { TestParameters, Operation, allOperations } from '../TestParametersContext';
+import {
+  TestParameters,
+  Operation,
+  allOperations,
+  RoundingNearest,
+  roundingNearestOptions,
+  RoundingAnswers,
+  roundingAnswersOptions,
+  comparisonModeOptions,
+} from '../TestParametersContext';
+
+export const COMPARISON_LESS = -1;
+export const COMPARISON_EQUAL = 0;
+export const COMPARISON_GREATER = 1;
+export const comparisonAnswers = [COMPARISON_LESS, COMPARISON_EQUAL, COMPARISON_GREATER];
+
+export function comparisonSymbol(value: number): string {
+  if (value < 0) return '<';
+  if (value > 0) return '>';
+  return '=';
+}
 
 export const round2 = (n: number) => Math.round(n * 100) / 100;
 
@@ -58,6 +78,16 @@ export function sanitizeParameters(params: TestParameters): TestParameters {
     (op): op is Operation => allOperations.includes(op as Operation)
   );
 
+  const roundingNearest = roundingNearestOptions.includes(params.roundingNearest)
+    ? params.roundingNearest
+    : 10;
+  const roundingAnswers = roundingAnswersOptions.includes(params.roundingAnswers)
+    ? params.roundingAnswers
+    : 2;
+  const comparisonMode = comparisonModeOptions.includes(params.comparisonMode)
+    ? params.comparisonMode
+    : 'numbers';
+
   return {
     firstOperandMin: Math.min(firstMin, firstMax),
     firstOperandMax: Math.max(firstMin, firstMax),
@@ -66,6 +96,10 @@ export function sanitizeParameters(params: TestParameters): TestParameters {
     operations: validOps.length > 0 ? validOps : ['addition'],
     numberOfResults: clamp(params.numberOfResults, 2, 8),
     sortResults: Boolean(params.sortResults),
+    roundingNearest,
+    roundingAnswers,
+    roundingNumberLine: Boolean(params.roundingNumberLine),
+    comparisonMode,
   };
 }
 
@@ -74,9 +108,101 @@ export interface MathProblem {
   num2: number;
   operation: Operation;
   answer: number;
+  addends?: [number, number];
+}
+
+export function roundToNearest(value: number, nearest: RoundingNearest): number {
+  return Math.round(value / nearest) * nearest;
+}
+
+export function roundingRange(params: TestParameters): { min: number; max: number } {
+  const nearest = params.roundingNearest;
+  if (params.firstOperandMax > nearest) {
+    return { min: params.firstOperandMin, max: params.firstOperandMax };
+  }
+  return { min: nearest + 1, max: nearest * 10 - 1 };
+}
+
+function generateRoundingProblem(params: TestParameters): MathProblem {
+  const nearest = params.roundingNearest;
+  const { min, max } = roundingRange(params);
+  let num1 = getRandomInt(min, max);
+  for (let attempts = 0; num1 % nearest === 0 && attempts < 20; attempts++) {
+    num1 = getRandomInt(min, max);
+  }
+  if (num1 % nearest === 0) {
+    num1 = Math.min(max, num1 + 1);
+  }
+  return { num1, num2: nearest, operation: 'rounding', answer: roundToNearest(num1, nearest) };
+}
+
+const EQUAL_COMPARISON_PROBABILITY = 0.2;
+
+function generateComparisonProblem(params: TestParameters): MathProblem {
+  const equal = Math.random() < EQUAL_COMPARISON_PROBABILITY;
+  if (params.comparisonMode === 'sums') {
+    const a = getRandomInt(params.firstOperandMin, params.firstOperandMax);
+    const b = getRandomInt(params.secondOperandMin, params.secondOperandMax);
+    const num1 = a + b;
+    let num2 = num1;
+    if (!equal) {
+      const delta = getRandomInt(1, 4) * (Math.random() < 0.5 ? -1 : 1);
+      num2 = Math.max(0, num1 + delta);
+      if (num2 === num1) num2 = num1 + Math.abs(delta);
+    }
+    return { num1, num2, operation: 'comparison', answer: Math.sign(num1 - num2), addends: [a, b] };
+  }
+  const num1 = getRandomInt(params.firstOperandMin, params.firstOperandMax);
+  const num2 = equal ? num1 : getRandomInt(params.secondOperandMin, params.secondOperandMax);
+  return { num1, num2, operation: 'comparison', answer: Math.sign(num1 - num2) };
+}
+
+export function generateRoundingOptions(
+  problem: MathProblem,
+  count: RoundingAnswers,
+  sortResults: boolean
+): number[] {
+  const nearest = problem.num2;
+  const lower = Math.floor(problem.num1 / nearest) * nearest;
+  const upper = lower + nearest;
+  const options = [lower, upper];
+  if (count > 2) {
+    const extras = [lower - nearest, upper + nearest, problem.num1];
+    for (const candidate of extras) {
+      if (options.length >= count) break;
+      if (candidate >= 0 && !options.includes(candidate)) options.push(candidate);
+    }
+  }
+  return sortResults ? options.sort((a, b) => a - b) : shuffle(options);
+}
+
+export function generateOptionsForProblem(problem: MathProblem, params: TestParameters): number[] {
+  switch (problem.operation) {
+    case 'comparison':
+      return [...comparisonAnswers];
+    case 'rounding':
+      return generateRoundingOptions(problem, params.roundingAnswers, params.sortResults);
+    default:
+      return generateAnswerOptions(problem.answer, {
+        numberOfResults: params.numberOfResults,
+        sortResults: params.sortResults,
+      });
+  }
+}
+
+function shuffle<T>(items: T[]): T[] {
+  const arr = [...items];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
 }
 
 export function generateProblem(params: TestParameters, operation: Operation): MathProblem {
+  if (operation === 'rounding') return generateRoundingProblem(params);
+  if (operation === 'comparison') return generateComparisonProblem(params);
+
   let num1 = 0;
   let num2 = 0;
 
@@ -180,6 +306,8 @@ function calculateAnswer(n1: number, n2: number, op: Operation): number {
     case 'subtraction': return n1 - n2;
     case 'multiplication': return n1 * n2;
     case 'division': return n1 / n2;
+    case 'rounding': return roundToNearest(n1, n2 as RoundingNearest);
+    case 'comparison': return Math.sign(n1 - n2);
   }
 }
 

@@ -10,7 +10,11 @@ describe('settingsQueryString', () => {
     secondOperandMax: 10,
     operations: ['addition', 'subtraction'],
     numberOfResults: 6,
-    sortResults: false
+    sortResults: false,
+    roundingNearest: 10,
+    roundingAnswers: 2,
+    roundingNumberLine: false,
+    comparisonMode: 'numbers',
   };
 
   it('should serialize and deserialize settings correctly', () => {
@@ -25,7 +29,11 @@ describe('settingsQueryString', () => {
       ...defaultSettings,
       firstOperandMax: 100,
       operations: ['multiplication'],
-      sortResults: true
+      sortResults: true,
+      roundingNearest: 10,
+      roundingAnswers: 2,
+      roundingNumberLine: false,
+      comparisonMode: 'numbers',
     };
     
     const serialized = serializeSettings(customSettings);
@@ -56,7 +64,11 @@ describe('settingsQueryString', () => {
       secondOperandMax: 25,
       operations: ['addition', 'subtraction', 'multiplication', 'division'],
       numberOfResults: 4,
-      sortResults: true
+      sortResults: true,
+      roundingNearest: 10,
+      roundingAnswers: 2,
+      roundingNumberLine: false,
+      comparisonMode: 'numbers',
     };
 
     const result = deserializeSettings(serializeSettings(fullSettings));
@@ -126,5 +138,29 @@ describe('settingsQueryString', () => {
 
   it('hasSettingsParams returns false for unrelated query parameters', () => {
     expect(hasSettingsParams('foo=bar&baz=42&hello=world')).toBe(false);
+  });
+
+  it('round-trips rounding and comparison settings', () => {
+    const custom: TestParameters = {
+      ...defaultSettings,
+      operations: ['rounding', 'comparison'],
+      roundingNearest: 100,
+      roundingAnswers: 4,
+      roundingNumberLine: true,
+      comparisonMode: 'sums',
+    };
+    expect(deserializeSettings(serializeSettings(custom))).toEqual(custom);
+  });
+
+  it('ignores invalid rounding and comparison values', () => {
+    const result = deserializeSettings('rn=7&ra=9&cm=bogus');
+    expect(result.roundingNearest).toBeUndefined();
+    expect(result.roundingAnswers).toBeUndefined();
+    expect(result.comparisonMode).toBeUndefined();
+  });
+
+  it('treats the new parameters as settings params', () => {
+    expect(hasSettingsParams('?rn=10')).toBe(true);
+    expect(hasSettingsParams('?cm=sums')).toBe(true);
   });
 });

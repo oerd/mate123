@@ -7,7 +7,7 @@ import { useTestParameters, Operation } from './TestParametersContext';
 import { translations } from './translations';
 import { SettingsIcon } from './components/SettingsIcon';
 import { OperationToggle } from './components/OperationToggle';
-import { generateProblem, generateAnswerOptions, isAnswerCorrect } from './utils/mathLogic';
+import { generateProblem, generateOptionsForProblem, isAnswerCorrect, comparisonSymbol } from './utils/mathLogic';
 import { ProblemDisplay } from './components/ProblemDisplay';
 import { ResultGrid } from './components/ResultGrid';
 import confetti from 'canvas-confetti';
@@ -42,12 +42,10 @@ export default function Home() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const currentProblem = useMemo(() => generateProblem(testParameters, activeOperation), [testParameters, activeOperation, problemSeed]);
 
-  const answerOptions = useMemo(() => {
-    return generateAnswerOptions(currentProblem.answer, {
-      numberOfResults: testParameters.numberOfResults,
-      sortResults: testParameters.sortResults,
-    });
-  }, [currentProblem.answer, testParameters.numberOfResults, testParameters.sortResults]);
+  const answerOptions = useMemo(
+    () => generateOptionsForProblem(currentProblem, testParameters),
+    [currentProblem, testParameters]
+  );
 
   const clearAllTimers = useCallback(() => {
     if (feedbackTimerRef.current) {
@@ -158,12 +156,17 @@ export default function Home() {
         feedback={feedback}
         isAnimating={isAnimating}
         t={t}
+        answer={currentProblem.answer}
+        addends={currentProblem.addends}
+        showNumberLine={testParameters.roundingNumberLine}
       />
 
       <ResultGrid
         answerOptions={answerOptions}
         selectedOptionValue={selectedOptionValue}
         onOptionClick={handleOptionClick}
+        formatLabel={activeOperation === 'comparison' ? comparisonSymbol : undefined}
+        shape={activeOperation === 'comparison' ? 'square' : 'pill'}
       />
 
       {/* Only show "New Problem" button explicitly when they get it right, or let them click anywhere? */}

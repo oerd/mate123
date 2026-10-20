@@ -1,10 +1,12 @@
 import React from 'react';
-import { AnswerButton } from './AnswerButton';
+import { AnswerButton, AnswerShape } from './AnswerButton';
 
 interface ResultGridProps {
   answerOptions: number[];
   selectedOptionValue: number | null;
   onOptionClick: (option: number) => void;
+  formatLabel?: (option: number) => string;
+  shape?: AnswerShape;
 }
 
 // Tailwind classes must be literal strings for purge to work
@@ -23,7 +25,9 @@ function getGridColsClass(count: number): string {
 export const ResultGrid = ({
   answerOptions,
   selectedOptionValue,
-  onOptionClick
+  onOptionClick,
+  formatLabel,
+  shape = 'pill'
 }: ResultGridProps) => {
   return (
     <div className="mt-4 sm:mt-6 md:mt-8 w-full max-w-xl">
@@ -32,6 +36,8 @@ export const ResultGrid = ({
           <AnswerButton
             key={option}
             value={option}
+            label={formatLabel ? formatLabel(option) : undefined}
+            shape={shape}
             isSelected={selectedOptionValue === option}
             isDisabled={selectedOptionValue !== null && selectedOptionValue !== option}
             onClick={onOptionClick}

@@ -1,13 +1,29 @@
 'use client';
 
 import { useLanguage } from '../LanguageContext';
-import { useTestParameters, Operation } from '../TestParametersContext';
+import {
+  useTestParameters,
+  Operation,
+  allOperations,
+  RoundingNearest,
+  roundingNearestOptions,
+  RoundingAnswers,
+  roundingAnswersOptions,
+  ComparisonMode,
+  comparisonModeOptions,
+} from '../TestParametersContext';
 import { translations } from '../translations';
 import Link from 'next/link';
 import { OperationToggle } from '../components/OperationToggle';
 import { LanguageSelector } from '../components/LanguageSelector';
 import { useState, useEffect } from 'react';
 import { serializeSettings } from '../utils/settingsQueryString';
+
+const chipClass = (active: boolean) =>
+  `px-4 py-2 rounded-full border-[3px] border-black font-bold text-black transition-all ${active
+    ? 'bg-neo-orange box-shadow-hard'
+    : 'bg-white hover:bg-gray-100'
+  }`;
 
 export default function Settings() {
   const { language, setLanguage } = useLanguage();
@@ -22,6 +38,10 @@ export default function Settings() {
   const [selectedOperations, setSelectedOperations] = useState<Operation[]>(testParameters.operations);
   const [numberOfResults, setNumberOfResults] = useState<number>(testParameters.numberOfResults);
   const [sortResults, setSortResults] = useState<boolean>(testParameters.sortResults);
+  const [roundingNearest, setRoundingNearest] = useState<RoundingNearest>(testParameters.roundingNearest);
+  const [roundingAnswers, setRoundingAnswers] = useState<RoundingAnswers>(testParameters.roundingAnswers);
+  const [roundingNumberLine, setRoundingNumberLine] = useState<boolean>(testParameters.roundingNumberLine);
+  const [comparisonMode, setComparisonMode] = useState<ComparisonMode>(testParameters.comparisonMode);
   const [shareTooltip, setShareTooltip] = useState<boolean>(false);
   const [shareSuccess, setShareSuccess] = useState<boolean>(false);
 
@@ -33,6 +53,10 @@ export default function Settings() {
     setSelectedOperations(testParameters.operations);
     setNumberOfResults(testParameters.numberOfResults);
     setSortResults(testParameters.sortResults);
+    setRoundingNearest(testParameters.roundingNearest);
+    setRoundingAnswers(testParameters.roundingAnswers);
+    setRoundingNumberLine(testParameters.roundingNumberLine);
+    setComparisonMode(testParameters.comparisonMode);
   }, [testParameters]);
 
   const handleOperationToggle = (operation: Operation) => {
@@ -58,7 +82,11 @@ export default function Settings() {
       secondOperandMax: validSecondMax,
       operations: selectedOperations,
       numberOfResults: numberOfResults,
-      sortResults: sortResults
+      sortResults: sortResults,
+      roundingNearest,
+      roundingAnswers,
+      roundingNumberLine,
+      comparisonMode
     });
   };
 
@@ -87,7 +115,11 @@ export default function Settings() {
       secondOperandMax,
       operations: selectedOperations,
       numberOfResults,
-      sortResults
+      sortResults,
+      roundingNearest,
+      roundingAnswers,
+      roundingNumberLine,
+      comparisonMode
     };
 
     const queryString = serializeSettings(currentSettings);
@@ -243,10 +275,10 @@ export default function Settings() {
             <h3 className="text-xl font-semibold mb-4 text-ctp-text">{t.operationSettings}</h3>
 
             <OperationToggle
-              options={['addition', 'subtraction', 'multiplication', 'division']}
+              options={allOperations}
               selected={selectedOperations}
               onToggle={handleOperationToggle}
-              className="flex gap-4 mb-4"
+              className="flex flex-wrap gap-3 mb-4"
               renderButtonClass={(op, active) =>
                 `p-3 rounded-neo transition-all flex items-center justify-center flex-1 ${active
                   ? 'bg-ctp-surface1 border-2 border-ctp-blue'
@@ -255,6 +287,82 @@ export default function Settings() {
               }
             />
           </div>
+
+          {selectedOperations.includes('rounding') && (
+            <div className="mb-6" data-testid="rounding-settings">
+              <h3 className="text-xl font-semibold mb-4 text-ctp-text">{t.roundingSettings}</h3>
+
+              <div className="mb-4">
+                <label className="block text-ctp-text mb-2">{t.roundToNearest}</label>
+                <div className="flex flex-wrap gap-2" role="group" aria-label={t.roundToNearest}>
+                  {roundingNearestOptions.map((nearest) => (
+                    <button
+                      key={nearest}
+                      type="button"
+                      onClick={() => setRoundingNearest(nearest)}
+                      aria-pressed={roundingNearest === nearest}
+                      className={chipClass(roundingNearest === nearest)}
+                    >
+                      {nearest}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-ctp-text mb-2">{t.roundingAnswers}</label>
+                <div className="flex flex-wrap gap-2" role="group" aria-label={t.roundingAnswers}>
+                  {roundingAnswersOptions.map((count) => (
+                    <button
+                      key={count}
+                      type="button"
+                      onClick={() => setRoundingAnswers(count)}
+                      aria-pressed={roundingAnswers === count}
+                      className={chipClass(roundingAnswers === count)}
+                    >
+                      {count === 2 ? t.roundingAnswersTwo : t.roundingAnswersFour}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mb-4 flex items-center">
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={roundingNumberLine}
+                    onChange={() => setRoundingNumberLine(!roundingNumberLine)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-ctp-surface0 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-ctp-text after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-ctp-blue"></div>
+                  <span className="ml-3 text-ctp-text">{t.showNumberLine}</span>
+                </label>
+              </div>
+            </div>
+          )}
+
+          {selectedOperations.includes('comparison') && (
+            <div className="mb-6" data-testid="comparison-settings">
+              <h3 className="text-xl font-semibold mb-4 text-ctp-text">{t.comparisonSettings}</h3>
+
+              <div className="mb-4">
+                <label className="block text-ctp-text mb-2">{t.compareWhat}</label>
+                <div className="flex flex-wrap gap-2" role="group" aria-label={t.compareWhat}>
+                  {comparisonModeOptions.map((mode) => (
+                    <button
+                      key={mode}
+                      type="button"
+                      onClick={() => setComparisonMode(mode)}
+                      aria-pressed={comparisonMode === mode}
+                      className={chipClass(comparisonMode === mode)}
+                    >
+                      {mode === 'numbers' ? t.compareNumbers : t.compareSums}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="mb-6">
             <h3 className="text-xl font-semibold mb-4 text-ctp-text">{t.resultOptions}</h3>

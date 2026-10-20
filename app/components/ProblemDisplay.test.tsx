@@ -107,4 +107,107 @@ describe('ProblemDisplay', () => {
     const problemContainer = container.querySelector('.animate-error');
     expect(problemContainer).toBeDefined();
   });
+
+  describe('rounding', () => {
+    it('renders the task chip, the number and a question mark', () => {
+      render(
+        <ProblemDisplay
+          firstNumber={47}
+          secondNumber={10}
+          operation="rounding"
+          feedback={null}
+          isAnimating={false}
+          t={t}
+          answer={50}
+        />
+      );
+      expect(screen.getByText('Round to the nearest 10')).toBeDefined();
+      expect(screen.getByText('≈')).toBeDefined();
+      expect(screen.getByText('?')).toBeDefined();
+      expect(screen.queryByTestId('number-line')).toBeNull();
+    });
+
+    it('reveals the rounded answer once correct', () => {
+      render(
+        <ProblemDisplay
+          firstNumber={47}
+          secondNumber={10}
+          operation="rounding"
+          feedback="correct"
+          isAnimating={false}
+          t={t}
+          answer={50}
+        />
+      );
+      expect(screen.getByText('50')).toBeDefined();
+      expect(screen.queryByText('?')).toBeNull();
+    });
+
+    it('shows the number line when enabled', () => {
+      render(
+        <ProblemDisplay
+          firstNumber={47}
+          secondNumber={10}
+          operation="rounding"
+          feedback={null}
+          isAnimating={false}
+          t={t}
+          answer={50}
+          showNumberLine
+        />
+      );
+      expect(screen.getByTestId('number-line')).toBeDefined();
+    });
+  });
+
+  describe('comparison', () => {
+    it('renders both numbers around an empty box', () => {
+      render(
+        <ProblemDisplay
+          firstNumber={7}
+          secondNumber={9}
+          operation="comparison"
+          feedback={null}
+          isAnimating={false}
+          t={t}
+          answer={-1}
+        />
+      );
+      expect(screen.getByText('Which sign fits?')).toBeDefined();
+      expect(screen.getByText('7')).toBeDefined();
+      expect(screen.getByText('9')).toBeDefined();
+      expect(screen.getByTestId('comparison-box').textContent).toBe('?');
+    });
+
+    it('fills the box with the sign once correct', () => {
+      render(
+        <ProblemDisplay
+          firstNumber={7}
+          secondNumber={9}
+          operation="comparison"
+          feedback="correct"
+          isAnimating={false}
+          t={t}
+          answer={-1}
+        />
+      );
+      expect(screen.getByTestId('comparison-box').textContent).toBe('<');
+    });
+
+    it('renders the sum on the left in sums mode', () => {
+      render(
+        <ProblemDisplay
+          firstNumber={7}
+          secondNumber={9}
+          operation="comparison"
+          feedback={null}
+          isAnimating={false}
+          t={t}
+          answer={-1}
+          addends={[3, 4]}
+        />
+      );
+      expect(screen.getByText('3 + 4')).toBeDefined();
+    });
+  });
 });
