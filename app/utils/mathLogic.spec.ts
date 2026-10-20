@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { generateProblem, generateAnswerOptions, generateRoundingOptions, generateOptionsForProblem, roundToNearest, roundingRange, comparisonSymbol, comparisonAnswers } from './mathLogic';
+import { generateProblem, generateAnswerOptions, generateRoundingOptions, generateOptionsForProblem, roundToNearest, roundingRange, comparisonSymbol, comparisonAnswers, pickRandomOperation } from './mathLogic';
 import { TestParameters, Operation } from '../TestParametersContext';
 
 describe('mathLogic', () => {
@@ -16,6 +16,26 @@ describe('mathLogic', () => {
     roundingNumberLine: false,
     comparisonModes: ['numbers'],
   };
+
+  describe('pickRandomOperation', () => {
+    it('only picks from the given operations', () => {
+      const ops: Operation[] = ['subtraction', 'rounding'];
+      for (let i = 0; i < 50; i++) {
+        expect(ops).toContain(pickRandomOperation(ops));
+      }
+    });
+
+    it('eventually picks every given operation', () => {
+      const ops: Operation[] = ['addition', 'subtraction', 'comparison'];
+      const seen = new Set<Operation>();
+      for (let i = 0; i < 200; i++) seen.add(pickRandomOperation(ops));
+      expect(seen).toEqual(new Set(ops));
+    });
+
+    it('falls back to addition for an empty list', () => {
+      expect(pickRandomOperation([])).toBe('addition');
+    });
+  });
 
   describe('addition', () => {
     it('should generate numbers within range', () => {
