@@ -41,7 +41,7 @@ export default function Settings() {
   const [roundingNearest, setRoundingNearest] = useState<RoundingNearest>(testParameters.roundingNearest);
   const [roundingAnswers, setRoundingAnswers] = useState<RoundingAnswers>(testParameters.roundingAnswers);
   const [roundingNumberLine, setRoundingNumberLine] = useState<boolean>(testParameters.roundingNumberLine);
-  const [comparisonMode, setComparisonMode] = useState<ComparisonMode>(testParameters.comparisonMode);
+  const [comparisonModes, setComparisonModes] = useState<ComparisonMode[]>(testParameters.comparisonModes);
   const [shareTooltip, setShareTooltip] = useState<boolean>(false);
   const [shareSuccess, setShareSuccess] = useState<boolean>(false);
 
@@ -56,7 +56,7 @@ export default function Settings() {
     setRoundingNearest(testParameters.roundingNearest);
     setRoundingAnswers(testParameters.roundingAnswers);
     setRoundingNumberLine(testParameters.roundingNumberLine);
-    setComparisonMode(testParameters.comparisonMode);
+    setComparisonModes(testParameters.comparisonModes);
   }, [testParameters]);
 
   const handleOperationToggle = (operation: Operation) => {
@@ -66,6 +66,16 @@ export default function Settings() {
       }
     } else {
       setSelectedOperations([...selectedOperations, operation]);
+    }
+  };
+
+  const handleComparisonModeToggle = (mode: ComparisonMode) => {
+    if (comparisonModes.includes(mode)) {
+      if (comparisonModes.length > 1) {
+        setComparisonModes(comparisonModes.filter(m => m !== mode));
+      }
+    } else {
+      setComparisonModes([...comparisonModes, mode]);
     }
   };
 
@@ -86,7 +96,7 @@ export default function Settings() {
       roundingNearest,
       roundingAnswers,
       roundingNumberLine,
-      comparisonMode
+      comparisonModes
     });
   };
 
@@ -119,7 +129,7 @@ export default function Settings() {
       roundingNearest,
       roundingAnswers,
       roundingNumberLine,
-      comparisonMode
+      comparisonModes
     };
 
     const queryString = serializeSettings(currentSettings);
@@ -352,9 +362,9 @@ export default function Settings() {
                     <button
                       key={mode}
                       type="button"
-                      onClick={() => setComparisonMode(mode)}
-                      aria-pressed={comparisonMode === mode}
-                      className={chipClass(comparisonMode === mode)}
+                      onClick={() => handleComparisonModeToggle(mode)}
+                      aria-pressed={comparisonModes.includes(mode)}
+                      className={chipClass(comparisonModes.includes(mode))}
                     >
                       {mode === 'numbers' ? t.compareNumbers : t.compareSums}
                     </button>

@@ -65,7 +65,7 @@ describe('TestParametersContext', () => {
 
     expect(result.current.testParameters).toMatchObject(savedParams);
     expect(result.current.testParameters.roundingNearest).toBe(10);
-    expect(result.current.testParameters.comparisonMode).toBe('numbers');
+    expect(result.current.testParameters.comparisonModes).toEqual(['numbers']);
   });
 
   it('prioritizes URL parameters over defaults/localStorage', () => {
@@ -106,6 +106,6 @@ describe('TestParametersContext', () => {
     expect(result.current.testParameters.roundingNearest).toBe(10);
     expect(result.current.testParameters.roundingAnswers).toBe(2);
     expect(result.current.testParameters.roundingNumberLine).toBe(false);
-    expect(result.current.testParameters.comparisonMode).toBe('numbers');
+    expect(result.current.testParameters.comparisonModes).toEqual(['numbers']);
   });
 });

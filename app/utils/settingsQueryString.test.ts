@@ -14,7 +14,7 @@ describe('settingsQueryString', () => {
     roundingNearest: 10,
     roundingAnswers: 2,
     roundingNumberLine: false,
-    comparisonMode: 'numbers',
+    comparisonModes: ['numbers'],
   };
 
   it('should serialize and deserialize settings correctly', () => {
@@ -33,7 +33,7 @@ describe('settingsQueryString', () => {
       roundingNearest: 10,
       roundingAnswers: 2,
       roundingNumberLine: false,
-      comparisonMode: 'numbers',
+      comparisonModes: ['numbers'],
     };
     
     const serialized = serializeSettings(customSettings);
@@ -68,7 +68,7 @@ describe('settingsQueryString', () => {
       roundingNearest: 10,
       roundingAnswers: 2,
       roundingNumberLine: false,
-      comparisonMode: 'numbers',
+      comparisonModes: ['numbers'],
     };
 
     const result = deserializeSettings(serializeSettings(fullSettings));
@@ -147,7 +147,7 @@ describe('settingsQueryString', () => {
       roundingNearest: 100,
       roundingAnswers: 4,
       roundingNumberLine: true,
-      comparisonMode: 'sums',
+      comparisonModes: ['numbers', 'sums'],
     };
     expect(deserializeSettings(serializeSettings(custom))).toEqual(custom);
   });
@@ -156,7 +156,7 @@ describe('settingsQueryString', () => {
     const result = deserializeSettings('rn=7&ra=9&cm=bogus');
     expect(result.roundingNearest).toBeUndefined();
     expect(result.roundingAnswers).toBeUndefined();
-    expect(result.comparisonMode).toBeUndefined();
+    expect(result.comparisonModes).toBeUndefined();
   });
 
   it('treats the new parameters as settings params', () => {

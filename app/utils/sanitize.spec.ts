@@ -14,7 +14,7 @@ describe('sanitizeParameters', () => {
     roundingNearest: 10,
     roundingAnswers: 2,
     roundingNumberLine: false,
-    comparisonMode: 'numbers',
+    comparisonModes: ['numbers'],
   };
 
   it('passes through valid parameters unchanged', () => {
@@ -112,11 +112,11 @@ describe('sanitizeParameters', () => {
       ...validParams,
       roundingNearest: 7 as unknown as TestParameters['roundingNearest'],
       roundingAnswers: 3 as unknown as TestParameters['roundingAnswers'],
-      comparisonMode: 'nope' as unknown as TestParameters['comparisonMode'],
+      comparisonModes: ['nope'] as unknown as TestParameters['comparisonModes'],
     });
     expect(result.roundingNearest).toBe(10);
     expect(result.roundingAnswers).toBe(2);
-    expect(result.comparisonMode).toBe('numbers');
+    expect(result.comparisonModes).toEqual(['numbers']);
   });
 
   it('keeps valid rounding and comparison settings', () => {
@@ -125,11 +125,11 @@ describe('sanitizeParameters', () => {
       roundingNearest: 1000,
       roundingAnswers: 4,
       roundingNumberLine: true,
-      comparisonMode: 'sums',
+      comparisonModes: ['sums', 'numbers'],
     });
     expect(result.roundingNearest).toBe(1000);
     expect(result.roundingAnswers).toBe(4);
     expect(result.roundingNumberLine).toBe(true);
-    expect(result.comparisonMode).toBe('sums');
+    expect(result.comparisonModes).toEqual(['numbers', 'sums']);
   });
 });

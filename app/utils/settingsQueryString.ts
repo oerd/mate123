@@ -16,7 +16,7 @@ export function serializeSettings(settings: TestParameters): string {
   params.set('rn', settings.roundingNearest.toString());
   params.set('ra', settings.roundingAnswers.toString());
   params.set('rl', settings.roundingNumberLine ? '1' : '0');
-  params.set('cm', settings.comparisonMode);
+  params.set('cm', settings.comparisonModes.join(','));
   
   return params.toString();
 }
@@ -62,9 +62,10 @@ export function deserializeSettings(queryString: string): Partial<TestParameters
   }
   if (params.has('rl')) settings.roundingNumberLine = params.get('rl') === '1';
   if (params.has('cm')) {
-    const mode = params.get('cm') ?? 'numbers';
-    if (comparisonModeOptions.includes(mode as ComparisonMode)) {
-      settings.comparisonMode = mode as ComparisonMode;
+    const modes = (params.get('cm') ?? '').split(',') as ComparisonMode[];
+    const validModes = modes.filter(mode => comparisonModeOptions.includes(mode));
+    if (validModes.length > 0) {
+      settings.comparisonModes = validModes;
     }
   }
   

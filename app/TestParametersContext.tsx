@@ -42,7 +42,7 @@ export interface TestParameters {
   roundingNearest: RoundingNearest;
   roundingAnswers: RoundingAnswers;
   roundingNumberLine: boolean;
-  comparisonMode: ComparisonMode;
+  comparisonModes: ComparisonMode[];
 }
 
 interface TestParametersContextType {
@@ -62,7 +62,7 @@ export const defaultTestParameters: TestParameters = {
   roundingNearest: 10,
   roundingAnswers: 2,
   roundingNumberLine: false,
-  comparisonMode: 'numbers'
+  comparisonModes: ['numbers']
 };
 
 const TestParametersContext = createContext<TestParametersContextType | undefined>(undefined);
