@@ -199,6 +199,11 @@ function shuffle<T>(items: T[]): T[] {
   return arr;
 }
 
+export function pickRandomOperation(operations: Operation[]): Operation {
+  if (operations.length === 0) return 'addition';
+  return operations[Math.floor(Math.random() * operations.length)];
+}
+
 export function generateProblem(params: TestParameters, operation: Operation): MathProblem {
   if (operation === 'rounding') return generateRoundingProblem(params);
   if (operation === 'comparison') return generateComparisonProblem(params);

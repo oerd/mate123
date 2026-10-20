@@ -6,8 +6,7 @@ import { useLanguage } from './LanguageContext';
 import { useTestParameters, Operation } from './TestParametersContext';
 import { translations } from './translations';
 import { SettingsIcon } from './components/SettingsIcon';
-import { OperationToggle } from './components/OperationToggle';
-import { generateProblem, generateOptionsForProblem, isAnswerCorrect, comparisonSymbol } from './utils/mathLogic';
+import { generateProblem, generateOptionsForProblem, pickRandomOperation, isAnswerCorrect, comparisonSymbol } from './utils/mathLogic';
 import { ProblemDisplay } from './components/ProblemDisplay';
 import { ResultGrid } from './components/ResultGrid';
 import confetti from 'canvas-confetti';
@@ -21,7 +20,7 @@ export default function Home() {
   const [feedback, setFeedback] = useState<'correct' | 'incorrect' | null>(null);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
   const [showTooltip, setShowTooltip] = useState<boolean>(false);
-  const [operation, setOperation] = useState<Operation>(testParameters.operations[0] || 'addition');
+  const [operation, setOperation] = useState<Operation>(() => pickRandomOperation(testParameters.operations));
   const [problemSeed, setProblemSeed] = useState<number>(0);
 
   const [selectedOptionValue, setSelectedOptionValue] = useState<number | null>(null);
@@ -56,11 +55,12 @@ export default function Home() {
 
   const generateNewProblem = useCallback(() => {
     clearAllTimers();
+    setOperation(pickRandomOperation(testParameters.operations));
     setProblemSeed(s => s + 1);
     setFeedback(null);
     setIsAnimating(false);
     setSelectedOptionValue(null);
-  }, [clearAllTimers]);
+  }, [clearAllTimers, testParameters.operations]);
 
   const commitAnswer = useCallback((answer: number) => {
     if (isAnimating) return;
@@ -138,16 +138,6 @@ export default function Home() {
       <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-black tracking-tight text-center drop-shadow-md">
         {t.title}
       </h1>
-
-      <div className={`transition-opacity duration-300 ${peripheralOpacity}`}>
-        {testParameters.operations.length > 1 && (
-          <OperationToggle
-            selected={activeOperation}
-            onToggle={setOperation}
-            options={testParameters.operations}
-          />
-        )}
-      </div>
 
       <ProblemDisplay
         firstNumber={currentProblem.num1}
