@@ -2,9 +2,9 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from 'react';
 
-export type Operation = 'addition' | 'subtraction' | 'multiplication' | 'division';
+export type Operation = 'addition' | 'subtraction' | 'multiplication' | 'division' | 'rounding' | 'comparison';
 // Define all possible operations
-export const allOperations: Operation[] = ['addition', 'subtraction', 'multiplication', 'division'];
+export const allOperations: Operation[] = ['addition', 'subtraction', 'multiplication', 'division', 'rounding', 'comparison'];
 export function operationLookup(operation: Operation): string {
   switch (operation) {
     case 'addition':
@@ -15,10 +15,21 @@ export function operationLookup(operation: Operation): string {
       return '×';
     case 'division':
       return '÷';
+    case 'rounding':
+      return '≈';
+    case 'comparison':
+      return '<=>';
     default:
       return '+';
   }
 }
+
+export type RoundingNearest = 10 | 100 | 1000;
+export const roundingNearestOptions: RoundingNearest[] = [10, 100, 1000];
+export type RoundingAnswers = 2 | 4;
+export const roundingAnswersOptions: RoundingAnswers[] = [2, 4];
+export type ComparisonMode = 'numbers' | 'sums';
+export const comparisonModeOptions: ComparisonMode[] = ['numbers', 'sums'];
 
 export interface TestParameters {
   firstOperandMin: number;
@@ -28,6 +39,10 @@ export interface TestParameters {
   operations: Operation[];
   numberOfResults: number;
   sortResults: boolean;
+  roundingNearest: RoundingNearest;
+  roundingAnswers: RoundingAnswers;
+  roundingNumberLine: boolean;
+  comparisonMode: ComparisonMode;
 }
 
 interface TestParametersContextType {
@@ -36,14 +51,18 @@ interface TestParametersContextType {
   loadedFromUrl: boolean;
 }
 
-const defaultTestParameters: TestParameters = {
+export const defaultTestParameters: TestParameters = {
   firstOperandMin: 1,
   firstOperandMax: 10,
   secondOperandMin: 1,
   secondOperandMax: 10,
   operations: ['addition', 'subtraction'],
   numberOfResults: 6,
-  sortResults: false
+  sortResults: false,
+  roundingNearest: 10,
+  roundingAnswers: 2,
+  roundingNumberLine: false,
+  comparisonMode: 'numbers'
 };
 
 const TestParametersContext = createContext<TestParametersContextType | undefined>(undefined);
@@ -66,7 +85,7 @@ function getInitialTestParameters(): { params: TestParameters; fromUrl: boolean 
   const savedParams = localStorage.getItem('math-practice:testParameters');
   if (savedParams) {
     try {
-      return { params: sanitizeParameters(JSON.parse(savedParams)), fromUrl: false };
+      return { params: sanitizeParameters({ ...defaultTestParameters, ...JSON.parse(savedParams) }), fromUrl: false };
     } catch {
       // ignore corrupt data
     }

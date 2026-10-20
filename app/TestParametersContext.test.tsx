@@ -63,7 +63,9 @@ describe('TestParametersContext', () => {
       wrapper: TestParametersProvider,
     });
 
-    expect(result.current.testParameters).toEqual(savedParams);
+    expect(result.current.testParameters).toMatchObject(savedParams);
+    expect(result.current.testParameters.roundingNearest).toBe(10);
+    expect(result.current.testParameters.comparisonMode).toBe('numbers');
   });
 
   it('prioritizes URL parameters over defaults/localStorage', () => {
@@ -83,5 +85,27 @@ describe('TestParametersContext', () => {
     // The implementation calls: window.history.replaceState({}, document.title, window.location.pathname);
     // So we expect window.location.search to be empty now.
     expect(window.location.search).toBe('');
+  });
+
+  it('fills in defaults for settings saved before rounding and comparison existed', () => {
+    window.localStorage.setItem('math-practice:testParameters', JSON.stringify({
+      firstOperandMin: 2,
+      firstOperandMax: 20,
+      secondOperandMin: 1,
+      secondOperandMax: 10,
+      operations: ['multiplication'],
+      numberOfResults: 4,
+      sortResults: true,
+    }));
+
+    const { result } = renderHook(() => useTestParameters(), {
+      wrapper: TestParametersProvider,
+    });
+
+    expect(result.current.testParameters.firstOperandMax).toBe(20);
+    expect(result.current.testParameters.roundingNearest).toBe(10);
+    expect(result.current.testParameters.roundingAnswers).toBe(2);
+    expect(result.current.testParameters.roundingNumberLine).toBe(false);
+    expect(result.current.testParameters.comparisonMode).toBe('numbers');
   });
 });

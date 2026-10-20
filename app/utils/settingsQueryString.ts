@@ -1,4 +1,4 @@
-import { TestParameters, Operation } from '../TestParametersContext';
+import { TestParameters, Operation, allOperations, RoundingNearest, roundingNearestOptions, RoundingAnswers, roundingAnswersOptions, ComparisonMode, comparisonModeOptions } from '../TestParametersContext';
 
 // Serializes settings to a compressed query string
 export function serializeSettings(settings: TestParameters): string {
@@ -13,6 +13,10 @@ export function serializeSettings(settings: TestParameters): string {
   params.set('op', settings.operations.join(','));
   params.set('nr', settings.numberOfResults.toString());
   params.set('sr', settings.sortResults ? '1' : '0');
+  params.set('rn', settings.roundingNearest.toString());
+  params.set('ra', settings.roundingAnswers.toString());
+  params.set('rl', settings.roundingNumberLine ? '1' : '0');
+  params.set('cm', settings.comparisonMode);
   
   return params.toString();
 }
@@ -32,9 +36,7 @@ export function deserializeSettings(queryString: string): Partial<TestParameters
     const opString = params.get('op') ?? '';
     const operations = opString.split(',') as Operation[];
     // Validate operations
-    const validOperations = operations.filter(op => 
-      ['addition', 'subtraction', 'multiplication', 'division'].includes(op)
-    );
+    const validOperations = operations.filter(op => allOperations.includes(op));
     if (validOperations.length > 0) {
       settings.operations = validOperations;
     }
@@ -45,6 +47,26 @@ export function deserializeSettings(queryString: string): Partial<TestParameters
     settings.numberOfResults = Math.min(Math.max(numResults, 2), 8); // Ensure between 2 and 8
   }
   if (params.has('sr')) settings.sortResults = params.get('sr') === '1';
+
+  if (params.has('rn')) {
+    const nearest = parseInt(params.get('rn') ?? '10', 10);
+    if (roundingNearestOptions.includes(nearest as RoundingNearest)) {
+      settings.roundingNearest = nearest as RoundingNearest;
+    }
+  }
+  if (params.has('ra')) {
+    const answers = parseInt(params.get('ra') ?? '2', 10);
+    if (roundingAnswersOptions.includes(answers as RoundingAnswers)) {
+      settings.roundingAnswers = answers as RoundingAnswers;
+    }
+  }
+  if (params.has('rl')) settings.roundingNumberLine = params.get('rl') === '1';
+  if (params.has('cm')) {
+    const mode = params.get('cm') ?? 'numbers';
+    if (comparisonModeOptions.includes(mode as ComparisonMode)) {
+      settings.comparisonMode = mode as ComparisonMode;
+    }
+  }
   
   return settings;
 }
@@ -52,6 +74,6 @@ export function deserializeSettings(queryString: string): Partial<TestParameters
 // Check if query string contains any settings parameters
 export function hasSettingsParams(queryString: string): boolean {
   const params = new URLSearchParams(queryString);
-  const settingsParams = ['fm', 'fx', 'sm', 'sx', 'op', 'nr', 'sr'];
+  const settingsParams = ['fm', 'fx', 'sm', 'sx', 'op', 'nr', 'sr', 'rn', 'ra', 'rl', 'cm'];
   return settingsParams.some(param => params.has(param));
 }
