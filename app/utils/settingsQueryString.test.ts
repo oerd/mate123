@@ -11,7 +11,7 @@ describe('settingsQueryString', () => {
     operations: ['addition', 'subtraction'],
     numberOfResults: 6,
     sortResults: false,
-    roundingNearest: 10,
+    roundingNearest: [10],
     roundingAnswers: 2,
     roundingNumberLine: false,
     comparisonModes: ['numbers'],
@@ -30,7 +30,7 @@ describe('settingsQueryString', () => {
       firstOperandMax: 100,
       operations: ['multiplication'],
       sortResults: true,
-      roundingNearest: 10,
+      roundingNearest: [10],
       roundingAnswers: 2,
       roundingNumberLine: false,
       comparisonModes: ['numbers'],
@@ -65,7 +65,7 @@ describe('settingsQueryString', () => {
       operations: ['addition', 'subtraction', 'multiplication', 'division'],
       numberOfResults: 4,
       sortResults: true,
-      roundingNearest: 10,
+      roundingNearest: [10],
       roundingAnswers: 2,
       roundingNumberLine: false,
       comparisonModes: ['numbers'],
@@ -144,7 +144,7 @@ describe('settingsQueryString', () => {
     const custom: TestParameters = {
       ...defaultSettings,
       operations: ['rounding', 'comparison'],
-      roundingNearest: 100,
+      roundingNearest: [10, 1000],
       roundingAnswers: 4,
       roundingNumberLine: true,
       comparisonModes: ['numbers', 'sums'],
@@ -157,6 +157,10 @@ describe('settingsQueryString', () => {
     expect(result.roundingNearest).toBeUndefined();
     expect(result.roundingAnswers).toBeUndefined();
     expect(result.comparisonModes).toBeUndefined();
+  });
+
+  it('reads a single legacy rounding target', () => {
+    expect(deserializeSettings('rn=100').roundingNearest).toEqual([100]);
   });
 
   it('treats the new parameters as settings params', () => {

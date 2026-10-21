@@ -78,9 +78,10 @@ export function sanitizeParameters(params: TestParameters): TestParameters {
     (op): op is Operation => allOperations.includes(op as Operation)
   );
 
-  const roundingNearest = roundingNearestOptions.includes(params.roundingNearest)
+  const requestedNearest: unknown[] = Array.isArray(params.roundingNearest)
     ? params.roundingNearest
-    : 10;
+    : [params.roundingNearest];
+  const roundingNearest = roundingNearestOptions.filter((option) => requestedNearest.includes(option));
   const roundingAnswers = roundingAnswersOptions.includes(params.roundingAnswers)
     ? params.roundingAnswers
     : 2;
@@ -94,7 +95,7 @@ export function sanitizeParameters(params: TestParameters): TestParameters {
     operations: validOps.length > 0 ? validOps : ['addition'],
     numberOfResults: clamp(params.numberOfResults, 2, 8),
     sortResults: Boolean(params.sortResults),
-    roundingNearest,
+    roundingNearest: roundingNearest.length > 0 ? roundingNearest : [10],
     roundingAnswers,
     roundingNumberLine: Boolean(params.roundingNumberLine),
     comparisonModes: comparisonModes.length > 0 ? comparisonModes : ['numbers'],
@@ -113,8 +114,7 @@ export function roundToNearest(value: number, nearest: RoundingNearest): number 
   return Math.round(value / nearest) * nearest;
 }
 
-export function roundingRange(params: TestParameters): { min: number; max: number } {
-  const nearest = params.roundingNearest;
+export function roundingRange(params: TestParameters, nearest: RoundingNearest): { min: number; max: number } {
   if (params.firstOperandMax > nearest) {
     return { min: params.firstOperandMin, max: params.firstOperandMax };
   }
@@ -122,8 +122,9 @@ export function roundingRange(params: TestParameters): { min: number; max: numbe
 }
 
 function generateRoundingProblem(params: TestParameters): MathProblem {
-  const nearest = params.roundingNearest;
-  const { min, max } = roundingRange(params);
+  const choices = params.roundingNearest.length > 0 ? params.roundingNearest : [10 as const];
+  const nearest = choices[Math.floor(Math.random() * choices.length)];
+  const { min, max } = roundingRange(params, nearest);
   let num1 = getRandomInt(min, max);
   for (let attempts = 0; num1 % nearest === 0 && attempts < 20; attempts++) {
     num1 = getRandomInt(min, max);

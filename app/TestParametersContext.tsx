@@ -39,7 +39,7 @@ export interface TestParameters {
   operations: Operation[];
   numberOfResults: number;
   sortResults: boolean;
-  roundingNearest: RoundingNearest;
+  roundingNearest: RoundingNearest[];
   roundingAnswers: RoundingAnswers;
   roundingNumberLine: boolean;
   comparisonModes: ComparisonMode[];
@@ -59,7 +59,7 @@ export const defaultTestParameters: TestParameters = {
   operations: ['addition', 'subtraction'],
   numberOfResults: 6,
   sortResults: false,
-  roundingNearest: 10,
+  roundingNearest: [10],
   roundingAnswers: 2,
   roundingNumberLine: false,
   comparisonModes: ['numbers']
