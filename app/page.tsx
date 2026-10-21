@@ -108,8 +108,7 @@ export default function Home() {
     return <div className="flex h-dvh flex-col items-center justify-center p-4 sm:p-6 md:p-8 bg-neo-ground" />;
   }
 
-  // Dim secondary controls when answering
-  const peripheralOpacity = (isAnimating || feedback === 'correct') ? 'opacity-30 pointer-events-none' : 'opacity-100';
+  const peripheralOpacity = isAnimating && feedback !== 'correct' ? 'opacity-30 pointer-events-none' : 'opacity-100';
 
   return (
     <div className="flex h-dvh flex-col items-center justify-center gap-2 sm:gap-4 p-4 sm:p-6 md:p-8 overflow-hidden bg-neo-ground transition-colors duration-500">

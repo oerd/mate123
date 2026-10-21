@@ -185,10 +185,11 @@ describe('Settings Page', () => {
   it('reflects toggle switch state on the checkbox', () => {
     render(<Settings />, { wrapper: Wrapper });
 
-    const sort = screen.getByLabelText('Sort Answers') as HTMLInputElement;
+    const sort = screen.getByLabelText('Randomize answer options') as HTMLInputElement;
     expect(sort.checked).toBe(false);
     fireEvent.click(sort);
     expect(sort.checked).toBe(true);
+    expect(screen.getByLabelText('Sort answer options from smallest to largest')).toBe(sort);
     expect(sort.nextElementSibling?.className).toContain('peer-checked:bg-neo-green');
   });
 
@@ -206,5 +207,18 @@ describe('Settings Page', () => {
     fireEvent.click(numbers);
     expect(numbers.getAttribute('aria-pressed')).toBe('false');
     expect(screen.getByRole('button', { name: 'Sums' }).getAttribute('aria-pressed')).toBe('true');
+  });
+
+  it('confirms saving with visual feedback', () => {
+    render(<Settings />, { wrapper: Wrapper });
+
+    fireEvent.click(screen.getByText('Save Settings'));
+    expect(screen.getByText('Saved!')).toBeDefined();
+  });
+
+  it('keeps the close button fixed in view', () => {
+    render(<Settings />, { wrapper: Wrapper });
+
+    expect(screen.getByTestId('settings-close').className).toContain('fixed');
   });
 });

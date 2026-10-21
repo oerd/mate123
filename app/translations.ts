@@ -35,8 +35,9 @@ interface Translations {
   numberOfResults: string;
   saveSettings: string;
   teacherSettings: string;
-  sortResults: string;
   sortResultsDescription: string;
+  randomizeResults: string;
+  saved: string;
   shareSettings: string;
   shareSettingsTooltip: string;
   copied: string;
@@ -94,8 +95,9 @@ export const translations: Record<Language, Translations> = {
     numberOfResults: 'Number of Answers',
     saveSettings: 'Save Settings',
     teacherSettings: 'Teacher Settings',
-    sortResults: 'Sort Answers',
     sortResultsDescription: 'Sort answer options from smallest to largest',
+    randomizeResults: 'Randomize answer options',
+    saved: 'Saved!',
     shareSettings: 'Share Settings',
     shareSettingsTooltip: 'Copy settings URL to clipboard',
     copied: 'Copied!',
@@ -151,8 +153,9 @@ export const translations: Record<Language, Translations> = {
     numberOfResults: 'Anzahl der Ergebnisse',
     saveSettings: 'Einstellungen speichern',
     teacherSettings: 'Lehrereinstellungen',
-    sortResults: 'Ergebnisse sortieren',
     sortResultsDescription: 'Antwortoptionen von klein nach groß sortieren',
+    randomizeResults: 'Antwortoptionen zufällig anordnen',
+    saved: 'Gespeichert!',
     shareSettings: 'Einstellungen teilen',
     shareSettingsTooltip: 'Einstellungs-URL in die Zwischenablage kopieren',
     copied: 'Kopiert!',
@@ -208,8 +211,9 @@ export const translations: Record<Language, Translations> = {
     numberOfResults: 'Numero di Risultati',
     saveSettings: 'Salva Impostazioni',
     teacherSettings: 'Impostazioni Insegnante',
-    sortResults: 'Ordina Risultati',
     sortResultsDescription: 'Ordina le opzioni di risposta dal più piccolo al più grande',
+    randomizeResults: 'Ordine casuale delle opzioni di risposta',
+    saved: 'Salvato!',
     shareSettings: 'Condividi Impostazioni',
     shareSettingsTooltip: 'Copia URL delle impostazioni negli appunti',
     copied: 'Copiato!',
@@ -265,8 +269,9 @@ export const translations: Record<Language, Translations> = {
     numberOfResults: 'Nombre de Résultats',
     saveSettings: 'Enregistrer les Paramètres',
     teacherSettings: 'Paramètres Enseignant',
-    sortResults: 'Trier les Résultats',
     sortResultsDescription: 'Trier les options de réponse du plus petit au plus grand',
+    randomizeResults: 'Mélanger les options de réponse',
+    saved: 'Enregistré !',
     shareSettings: 'Partager les Paramètres',
     shareSettingsTooltip: 'Copier l\'URL des paramètres dans le presse-papiers',
     copied: 'Copié!',
@@ -322,8 +327,9 @@ export const translations: Record<Language, Translations> = {
     numberOfResults: 'Numri i përgjigjeve',
     saveSettings: 'Ruaj cilësimet',
     teacherSettings: 'Opsionet e mësuesit',
-    sortResults: 'Rendit përgjigjet',
     sortResultsDescription: 'Rendit përgjigjet nga më e vogla te më e madhja',
+    randomizeResults: 'Përziej përgjigjet rastësisht',
+    saved: 'U ruajt!',
     shareSettings: 'Ndaj cilësimet',
     shareSettingsTooltip: 'Kopjo URL-në e cilësimeve',
     copied: 'U kopjua!',
