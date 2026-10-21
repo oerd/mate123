@@ -22,12 +22,12 @@ export const NumberLine: React.FC<NumberLineProps> = ({ value, nearest }) => {
   return (
     <svg
       viewBox={`0 0 ${WIDTH} 96`}
-      className="w-full max-w-md h-auto overflow-visible"
+      className="w-full max-w-md h-auto overflow-visible text-neo-ink"
       role="img"
       aria-label={`${lower} – ${value} – ${upper}`}
       data-testid="number-line"
     >
-      <line x1={PAD} y1={BASELINE} x2={WIDTH - PAD} y2={BASELINE} stroke="#000" strokeWidth="6" strokeLinecap="round" />
+      <line x1={PAD} y1={BASELINE} x2={WIDTH - PAD} y2={BASELINE} stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
       {ticks.map((tick) => (
         <line
           key={tick.key}
@@ -35,7 +35,7 @@ export const NumberLine: React.FC<NumberLineProps> = ({ value, nearest }) => {
           y1={BASELINE - tick.half}
           x2={tick.x}
           y2={BASELINE + tick.half}
-          stroke="#000"
+          stroke="currentColor"
           strokeWidth="4"
           strokeLinecap="round"
         />
@@ -45,18 +45,18 @@ export const NumberLine: React.FC<NumberLineProps> = ({ value, nearest }) => {
         y1={BASELINE - 26}
         x2={x(lower + nearest / 2)}
         y2={BASELINE + 20}
-        stroke="#9ca3af"
+        className="stroke-neo-ink-muted"
         strokeWidth="3"
         strokeDasharray="6 6"
       />
-      <circle cx={x(value)} cy={BASELINE} r="13" fill="#A855F7" stroke="#000" strokeWidth="4" />
+      <circle cx={x(value)} cy={BASELINE} r="13" fill="#A855F7" stroke="currentColor" strokeWidth="4" />
       <text x={x(value)} y={BASELINE - 30} textAnchor="middle" fontWeight="700" fontSize="24" fill="#A855F7">
         {value}
       </text>
-      <text x={PAD} y={BASELINE + 46} textAnchor="middle" fontWeight="700" fontSize="26" fill="#000">
+      <text x={PAD} y={BASELINE + 46} textAnchor="middle" fontWeight="700" fontSize="26" fill="currentColor">
         {lower}
       </text>
-      <text x={WIDTH - PAD} y={BASELINE + 46} textAnchor="middle" fontWeight="700" fontSize="26" fill="#000">
+      <text x={WIDTH - PAD} y={BASELINE + 46} textAnchor="middle" fontWeight="700" fontSize="26" fill="currentColor">
         {upper}
       </text>
     </svg>

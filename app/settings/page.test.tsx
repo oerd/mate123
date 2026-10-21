@@ -28,6 +28,20 @@ describe('Settings Page', () => {
     expect(screen.getByText('Teacher Settings')).toBeDefined();
   });
 
+  it('switches theme and persists the choice', () => {
+    render(<Settings />, { wrapper: Wrapper });
+
+    const dark = screen.getByRole('button', { name: 'Dark' });
+    const system = screen.getByRole('button', { name: 'System' });
+    expect(system.getAttribute('aria-pressed')).toBe('true');
+
+    fireEvent.click(dark);
+
+    expect(dark.getAttribute('aria-pressed')).toBe('true');
+    expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
+    expect(window.localStorage.getItem('math-practice:themeMode')).toBe('dark');
+  });
+
   it('cannot reduce operations below 1', () => {
     window.localStorage.setItem(
       'math-practice:testParameters',

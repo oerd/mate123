@@ -3,8 +3,27 @@
 @tailwind utilities;
 
 :root {
-  --background: #FFDE00; /* Neo Yellow */
-  --foreground: #000000;
+  color-scheme: light;
+  --neo-ground: #FFDE00; /* Neo Yellow */
+  --neo-surface: #FFFFFF;
+  --neo-surface-muted: #F3F4F6;
+  --neo-ink: #000000;
+  --neo-ink-muted: #9CA3AF;
+  --neo-shadow: #000000;
+  --neo-pill: #38BDF8;
+  --background: var(--neo-ground);
+  --foreground: var(--neo-ink);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --neo-ground: #120B2E; /* Cosmic indigo */
+  --neo-surface: #1F1448;
+  --neo-surface-muted: #2B1E5C;
+  --neo-ink: #FFFFFF;
+  --neo-ink-muted: #8F86B8;
+  --neo-shadow: #38BDF8;
+  --neo-pill: #A78BFA;
 }
 
 body {
@@ -15,22 +34,22 @@ body {
 
 /* Hard shadow utility class for brutalist look */
 .box-shadow-hard {
-  box-shadow: 4px 4px 0px 0px rgba(0,0,0,1);
+  box-shadow: 4px 4px 0px 0px var(--neo-shadow);
 }
 
 .box-shadow-hard:hover {
   transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0px 0px rgba(0,0,0,1);
+  box-shadow: 6px 6px 0px 0px var(--neo-shadow);
 }
 
 .box-shadow-hard:active {
   transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0px 0px rgba(0,0,0,1);
+  box-shadow: 2px 2px 0px 0px var(--neo-shadow);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .box-shadow-hard:hover, .box-shadow-hard:active {
     transform: none;
-    box-shadow: 4px 4px 0px 0px rgba(0,0,0,1);
+    box-shadow: 4px 4px 0px 0px var(--neo-shadow);
   }
 }

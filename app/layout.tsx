@@ -5,6 +5,8 @@ import { LanguageProvider } from "./LanguageContext";
 import { ThemeProvider } from "./ThemeContext";
 import { TestParametersProvider } from "./TestParametersContext";
 
+const themeInitScript = `(function(){try{var m=localStorage.getItem('math-practice:themeMode');var d=m==='dark'||(m!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light');}catch(e){}})();`;
+
 const fredoka = Fredoka({
   variable: "--font-fredoka",
   subsets: ["latin"],
@@ -22,7 +24,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body className={`${fredoka.variable} font-sans antialiased`}>
         <ThemeProvider>
           <LanguageProvider>

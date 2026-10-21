@@ -40,7 +40,7 @@ describe('AnswerButton', () => {
     );
     const btn = screen.getByRole('button');
     expect(btn.className).toContain('ring-4');
-    expect(btn.className).toContain('ring-black');
+    expect(btn.className).toContain('ring-neo-ink');
   });
 
   it('uses smaller text for 3-digit values', () => {
@@ -57,17 +57,17 @@ describe('AnswerButton', () => {
     expect(btn.className).toContain('w-full');
   });
 
-  it('uses blue background for all buttons', () => {
+  it('uses pill background for all buttons', () => {
     const { unmount } = render(
       <AnswerButton value={1} isSelected={false} isDisabled={false} onClick={() => { }} />
     );
-    expect(screen.getByRole('button').className).toContain('bg-neo-blue');
+    expect(screen.getByRole('button').className).toContain('bg-neo-pill');
     unmount();
 
     render(
       <AnswerButton value={42} isSelected={false} isDisabled={false} onClick={() => { }} />
     );
-    expect(screen.getByRole('button').className).toContain('bg-neo-blue');
+    expect(screen.getByRole('button').className).toContain('bg-neo-pill');
   });
 
   it('applies disabled styling', () => {

@@ -46,7 +46,7 @@ const RoundingNumber = ({ value, nearest }: { value: number; nearest: number }) 
 };
 
 const TaskChip = ({ children }: { children: React.ReactNode }) => (
-  <div className="bg-neo-orange border-[3px] border-black rounded-full px-4 py-1 text-base sm:text-xl font-black text-black box-shadow-hard mb-3">
+  <div className="bg-neo-orange border-[3px] border-neo-ink rounded-full px-4 py-1 text-base sm:text-xl font-black text-black box-shadow-hard mb-3">
     {children}
   </div>
 );
@@ -88,7 +88,7 @@ export const ProblemDisplay = ({
       return (
         <>
           <TaskChip>{t.roundToNearestTask.replace('{n}', String(secondNumber))}</TaskChip>
-          <div className={`${equationSizeClass(chars)} font-black flex items-center justify-center gap-2 sm:gap-4 text-black tabular-nums`}>
+          <div className={`${equationSizeClass(chars)} font-black flex items-center justify-center gap-2 sm:gap-4 text-neo-ink tabular-nums`}>
             <RoundingNumber value={firstNumber} nearest={secondNumber} />
             <span>≈</span>
             <span className={revealed ? 'text-green-600' : ''}>{answerText}</span>
@@ -104,11 +104,11 @@ export const ProblemDisplay = ({
       return (
         <>
           <TaskChip>{t.whichSignFits}</TaskChip>
-          <div className={`${equationSizeClass(chars)} font-black flex items-center justify-center gap-2 sm:gap-4 text-black tabular-nums`}>
+          <div className={`${equationSizeClass(chars)} font-black flex items-center justify-center gap-2 sm:gap-4 text-neo-ink tabular-nums`}>
             <span>{leftText}</span>
             <span
               data-testid="comparison-box"
-              className={`inline-flex items-center justify-center min-w-[1.4em] h-[1.4em] rounded-2xl border-4 ${revealed ? 'border-solid bg-neo-green' : 'border-dashed bg-gray-100'} border-black text-[0.85em]`}
+              className={`inline-flex items-center justify-center min-w-[1.4em] h-[1.4em] rounded-2xl border-4 ${revealed ? 'border-solid bg-neo-green text-black' : 'border-dashed bg-neo-surface-muted'} border-neo-ink text-[0.85em]`}
             >
               {revealed ? comparisonSymbol(answer) : '?'}
             </span>
@@ -119,7 +119,7 @@ export const ProblemDisplay = ({
     }
 
     return (
-      <div className="text-5xl sm:text-7xl md:text-8xl font-black flex items-center justify-center gap-2 sm:gap-4 text-black">
+      <div className="text-5xl sm:text-7xl md:text-8xl font-black flex items-center justify-center gap-2 sm:gap-4 text-neo-ink">
         <span>{firstNumber}</span>
         <span>{operationLookup(operation)}</span>
         <span>{secondNumber}</span>
@@ -134,7 +134,7 @@ export const ProblemDisplay = ({
       <div className="relative w-full max-w-md lg:max-w-xl transform -rotate-2">
         <motion.div
           animate={getAnimationVariants()}
-          className={`math-problem-container flex flex-col lg:flex-row items-center justify-center p-6 sm:p-8 rounded-2xl bg-white border-4 border-black box-shadow-hard w-full ${isAnimating && feedback === 'correct' ? 'animate-success' :
+          className={`math-problem-container flex flex-col lg:flex-row items-center justify-center p-6 sm:p-8 rounded-2xl bg-neo-surface border-4 border-neo-ink box-shadow-hard w-full ${isAnimating && feedback === 'correct' ? 'animate-success' :
             isAnimating && feedback === 'incorrect' ? 'animate-error' : ''
             }`}
         >
