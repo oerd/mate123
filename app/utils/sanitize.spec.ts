@@ -11,7 +11,7 @@ describe('sanitizeParameters', () => {
     operations: ['addition'],
     numberOfResults: 4,
     sortResults: false,
-    roundingNearest: 10,
+    roundingNearest: [10],
     roundingAnswers: 2,
     roundingNumberLine: false,
     comparisonModes: ['numbers'],
@@ -114,20 +114,28 @@ describe('sanitizeParameters', () => {
       roundingAnswers: 3 as unknown as TestParameters['roundingAnswers'],
       comparisonModes: ['nope'] as unknown as TestParameters['comparisonModes'],
     });
-    expect(result.roundingNearest).toBe(10);
+    expect(result.roundingNearest).toEqual([10]);
     expect(result.roundingAnswers).toBe(2);
     expect(result.comparisonModes).toEqual(['numbers']);
+  });
+
+  it('accepts a legacy single rounding target', () => {
+    const result = sanitizeParameters({
+      ...validParams,
+      roundingNearest: 100 as unknown as TestParameters['roundingNearest'],
+    });
+    expect(result.roundingNearest).toEqual([100]);
   });
 
   it('keeps valid rounding and comparison settings', () => {
     const result = sanitizeParameters({
       ...validParams,
-      roundingNearest: 1000,
+      roundingNearest: [1000, 10],
       roundingAnswers: 4,
       roundingNumberLine: true,
       comparisonModes: ['sums', 'numbers'],
     });
-    expect(result.roundingNearest).toBe(1000);
+    expect(result.roundingNearest).toEqual([10, 1000]);
     expect(result.roundingAnswers).toBe(4);
     expect(result.roundingNumberLine).toBe(true);
     expect(result.comparisonModes).toEqual(['numbers', 'sums']);

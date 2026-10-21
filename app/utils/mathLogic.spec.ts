@@ -11,7 +11,7 @@ describe('mathLogic', () => {
     operations: ['addition'],
     numberOfResults: 4,
     sortResults: false,
-    roundingNearest: 10,
+    roundingNearest: [10],
     roundingAnswers: 2,
     roundingNumberLine: false,
     comparisonModes: ['numbers'],
@@ -243,16 +243,24 @@ describe('mathLogic', () => {
     });
 
     it('falls back to a sensible range when the operand range is too small for the target', () => {
-      expect(roundingRange({ ...baseParams, roundingNearest: 10 })).toEqual({ min: 11, max: 99 });
-      expect(roundingRange({ ...baseParams, roundingNearest: 100 })).toEqual({ min: 101, max: 999 });
-      expect(roundingRange({ ...baseParams, firstOperandMin: 0, firstOperandMax: 500, roundingNearest: 10 }))
+      expect(roundingRange(baseParams, 10)).toEqual({ min: 11, max: 99 });
+      expect(roundingRange(baseParams, 100)).toEqual({ min: 101, max: 999 });
+      expect(roundingRange({ ...baseParams, firstOperandMin: 0, firstOperandMax: 500 }, 10))
         .toEqual({ min: 0, max: 500 });
+    });
+
+    it('picks the rounding target from all selected options', () => {
+      const seen = new Set<number>();
+      for (let i = 0; i < 200; i++) {
+        seen.add(generateProblem({ ...baseParams, roundingNearest: [10, 1000] }, 'rounding').num2);
+      }
+      expect([...seen].sort((a, b) => a - b)).toEqual([10, 1000]);
     });
 
     it('never asks to round an exact multiple and always carries the right answer', () => {
       for (const nearest of [10, 100, 1000] as const) {
         for (let i = 0; i < 50; i++) {
-          const p = generateProblem({ ...baseParams, roundingNearest: nearest }, 'rounding');
+          const p = generateProblem({ ...baseParams, roundingNearest: [nearest] }, 'rounding');
           expect(p.operation).toBe('rounding');
           expect(p.num2).toBe(nearest);
           expect(p.num1 % nearest).not.toBe(0);
@@ -274,7 +282,7 @@ describe('mathLogic', () => {
     });
 
     it('respects the rounding answer count through generateOptionsForProblem', () => {
-      const problem = generateProblem({ ...baseParams, roundingNearest: 10 }, 'rounding');
+      const problem = generateProblem({ ...baseParams, roundingNearest: [10] }, 'rounding');
       expect(generateOptionsForProblem(problem, { ...baseParams, roundingAnswers: 2 })).toHaveLength(2);
       expect(generateOptionsForProblem(problem, { ...baseParams, roundingAnswers: 4 })).toHaveLength(4);
     });

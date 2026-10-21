@@ -27,6 +27,23 @@ const chipClass = (active: boolean) =>
     : 'bg-neo-surface text-neo-ink hover:bg-neo-surface-muted'
   }`;
 
+interface ToggleSwitchProps {
+  checked: boolean;
+  onChange: () => void;
+  label: string;
+}
+
+const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ checked, onChange, label }) => (
+  <label className="relative inline-flex items-center cursor-pointer">
+    <input type="checkbox" checked={checked} onChange={onChange} className="sr-only peer" />
+    <span
+      aria-hidden="true"
+      className="relative shrink-0 w-14 h-8 rounded-full border-[3px] border-neo-ink bg-neo-surface-muted transition-colors peer-checked:bg-neo-green peer-focus-visible:ring-4 peer-focus-visible:ring-neo-blue after:content-[''] after:absolute after:top-[3px] after:left-[3px] after:h-5 after:w-5 after:rounded-full after:bg-neo-ink after:transition-transform peer-checked:after:translate-x-6"
+    />
+    <span className="ml-3 text-neo-ink font-bold">{label}</span>
+  </label>
+);
+
 const themeIcons: Record<ThemeMode, React.FC> = {
   light: LightIcon,
   dark: DarkIcon,
@@ -47,7 +64,7 @@ export default function Settings() {
   const [selectedOperations, setSelectedOperations] = useState<Operation[]>(testParameters.operations);
   const [numberOfResults, setNumberOfResults] = useState<number>(testParameters.numberOfResults);
   const [sortResults, setSortResults] = useState<boolean>(testParameters.sortResults);
-  const [roundingNearest, setRoundingNearest] = useState<RoundingNearest>(testParameters.roundingNearest);
+  const [roundingNearest, setRoundingNearest] = useState<RoundingNearest[]>(testParameters.roundingNearest);
   const [roundingAnswers, setRoundingAnswers] = useState<RoundingAnswers>(testParameters.roundingAnswers);
   const [roundingNumberLine, setRoundingNumberLine] = useState<boolean>(testParameters.roundingNumberLine);
   const [comparisonModes, setComparisonModes] = useState<ComparisonMode[]>(testParameters.comparisonModes);
@@ -75,6 +92,16 @@ export default function Settings() {
       }
     } else {
       setSelectedOperations([...selectedOperations, operation]);
+    }
+  };
+
+  const handleRoundingNearestToggle = (nearest: RoundingNearest) => {
+    if (roundingNearest.includes(nearest)) {
+      if (roundingNearest.length > 1) {
+        setRoundingNearest(roundingNearest.filter(n => n !== nearest));
+      }
+    } else {
+      setRoundingNearest(roundingNearestOptions.filter(n => n === nearest || roundingNearest.includes(n)));
     }
   };
 
@@ -319,9 +346,9 @@ export default function Settings() {
               options={allOperations}
               selected={selectedOperations}
               onToggle={handleOperationToggle}
-              className="flex flex-wrap gap-3 mb-4"
+              className="grid grid-cols-3 gap-3 mb-4"
               activeOverlayClass={null}
-              renderButtonClass={(_op, active) => `${chipClass(active)} flex flex-1 items-center justify-center`}
+              renderButtonClass={(_op, active) => `${chipClass(active)} flex items-center justify-center`}
             />
           </div>
 
@@ -336,9 +363,9 @@ export default function Settings() {
                     <button
                       key={nearest}
                       type="button"
-                      onClick={() => setRoundingNearest(nearest)}
-                      aria-pressed={roundingNearest === nearest}
-                      className={chipClass(roundingNearest === nearest)}
+                      onClick={() => handleRoundingNearestToggle(nearest)}
+                      aria-pressed={roundingNearest.includes(nearest)}
+                      className={chipClass(roundingNearest.includes(nearest))}
                     >
                       {nearest}
                     </button>
@@ -364,16 +391,11 @@ export default function Settings() {
               </div>
 
               <div className="mb-4 flex items-center">
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={roundingNumberLine}
-                    onChange={() => setRoundingNumberLine(!roundingNumberLine)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-ctp-surface0 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-ctp-text after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-ctp-blue"></div>
-                  <span className="ml-3 text-ctp-text">{t.showNumberLine}</span>
-                </label>
+                <ToggleSwitch
+                  checked={roundingNumberLine}
+                  onChange={() => setRoundingNumberLine(!roundingNumberLine)}
+                  label={t.showNumberLine}
+                />
               </div>
             </div>
           )}
@@ -430,16 +452,11 @@ export default function Settings() {
             </div>
 
             <div className="mb-4 flex items-center">
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={sortResults}
-                  onChange={() => setSortResults(!sortResults)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-ctp-surface0 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-ctp-text after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-ctp-blue"></div>
-                <span className="ml-3 text-ctp-text">{t.sortResults}</span>
-              </label>
+              <ToggleSwitch
+                checked={sortResults}
+                onChange={() => setSortResults(!sortResults)}
+                label={t.sortResults}
+              />
             </div>
             <p className="text-ctp-subtext0 text-sm">{t.sortResultsDescription}</p>
           </div>

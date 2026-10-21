@@ -155,10 +155,41 @@ describe('Settings Page', () => {
 
     const stored = JSON.parse(window.localStorage.getItem('math-practice:testParameters') ?? '{}');
     expect(stored.operations).toEqual(['addition', 'subtraction', 'rounding', 'comparison']);
-    expect(stored.roundingNearest).toBe(100);
+    expect(stored.roundingNearest).toEqual([10, 100]);
     expect(stored.roundingAnswers).toBe(4);
     expect(stored.roundingNumberLine).toBe(true);
     expect(stored.comparisonModes).toEqual(['numbers', 'sums']);
+  });
+
+  it('allows selecting multiple rounding targets but keeps at least one', () => {
+    render(<Settings />, { wrapper: Wrapper });
+
+    fireEvent.click(screen.getByTitle('Rounding'));
+    const ten = screen.getByRole('button', { name: '10' });
+    const thousand = screen.getByRole('button', { name: '1000' });
+    expect(ten.getAttribute('aria-pressed')).toBe('true');
+
+    fireEvent.click(ten);
+    expect(ten.getAttribute('aria-pressed')).toBe('true');
+
+    fireEvent.click(thousand);
+    expect(thousand.getAttribute('aria-pressed')).toBe('true');
+    fireEvent.click(ten);
+    expect(ten.getAttribute('aria-pressed')).toBe('false');
+
+    fireEvent.click(screen.getByText('Save Settings'));
+    const stored = JSON.parse(window.localStorage.getItem('math-practice:testParameters') ?? '{}');
+    expect(stored.roundingNearest).toEqual([1000]);
+  });
+
+  it('reflects toggle switch state on the checkbox', () => {
+    render(<Settings />, { wrapper: Wrapper });
+
+    const sort = screen.getByLabelText('Sort Answers') as HTMLInputElement;
+    expect(sort.checked).toBe(false);
+    fireEvent.click(sort);
+    expect(sort.checked).toBe(true);
+    expect(sort.nextElementSibling?.className).toContain('peer-checked:bg-neo-green');
   });
 
   it('keeps at least one comparison mode selected', () => {

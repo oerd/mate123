@@ -64,7 +64,7 @@ describe('TestParametersContext', () => {
     });
 
     expect(result.current.testParameters).toMatchObject(savedParams);
-    expect(result.current.testParameters.roundingNearest).toBe(10);
+    expect(result.current.testParameters.roundingNearest).toEqual([10]);
     expect(result.current.testParameters.comparisonModes).toEqual(['numbers']);
   });
 
@@ -103,7 +103,7 @@ describe('TestParametersContext', () => {
     });
 
     expect(result.current.testParameters.firstOperandMax).toBe(20);
-    expect(result.current.testParameters.roundingNearest).toBe(10);
+    expect(result.current.testParameters.roundingNearest).toEqual([10]);
     expect(result.current.testParameters.roundingAnswers).toBe(2);
     expect(result.current.testParameters.roundingNumberLine).toBe(false);
     expect(result.current.testParameters.comparisonModes).toEqual(['numbers']);

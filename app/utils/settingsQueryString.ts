@@ -1,4 +1,4 @@
-import { TestParameters, Operation, allOperations, RoundingNearest, roundingNearestOptions, RoundingAnswers, roundingAnswersOptions, ComparisonMode, comparisonModeOptions } from '../TestParametersContext';
+import { TestParameters, Operation, allOperations, roundingNearestOptions, RoundingAnswers, roundingAnswersOptions, ComparisonMode, comparisonModeOptions } from '../TestParametersContext';
 
 // Serializes settings to a compressed query string
 export function serializeSettings(settings: TestParameters): string {
@@ -13,7 +13,7 @@ export function serializeSettings(settings: TestParameters): string {
   params.set('op', settings.operations.join(','));
   params.set('nr', settings.numberOfResults.toString());
   params.set('sr', settings.sortResults ? '1' : '0');
-  params.set('rn', settings.roundingNearest.toString());
+  params.set('rn', settings.roundingNearest.join(','));
   params.set('ra', settings.roundingAnswers.toString());
   params.set('rl', settings.roundingNumberLine ? '1' : '0');
   params.set('cm', settings.comparisonModes.join(','));
@@ -49,9 +49,10 @@ export function deserializeSettings(queryString: string): Partial<TestParameters
   if (params.has('sr')) settings.sortResults = params.get('sr') === '1';
 
   if (params.has('rn')) {
-    const nearest = parseInt(params.get('rn') ?? '10', 10);
-    if (roundingNearestOptions.includes(nearest as RoundingNearest)) {
-      settings.roundingNearest = nearest as RoundingNearest;
+    const values = (params.get('rn') ?? '').split(',').map(v => parseInt(v, 10));
+    const validNearest = roundingNearestOptions.filter(option => values.includes(option));
+    if (validNearest.length > 0) {
+      settings.roundingNearest = validNearest;
     }
   }
   if (params.has('ra')) {
