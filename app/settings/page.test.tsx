@@ -1,5 +1,5 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, beforeEach } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ThemeProvider } from '../ThemeContext';
 import { LanguageProvider } from '../LanguageContext';
 import { TestParametersProvider } from '../TestParametersContext';
@@ -209,11 +209,60 @@ describe('Settings Page', () => {
     expect(screen.getByRole('button', { name: 'Sums' }).getAttribute('aria-pressed')).toBe('true');
   });
 
-  it('confirms saving with visual feedback', () => {
+  it('turns save green on success and back to blue after a change', () => {
     render(<Settings />, { wrapper: Wrapper });
 
-    fireEvent.click(screen.getByText('Save Settings'));
-    expect(screen.getByText('Saved!')).toBeDefined();
+    const save = screen.getByText('Save Settings').closest('button')!;
+    expect(save.className).toContain('bg-neo-blue');
+
+    fireEvent.click(save);
+    expect(save.getAttribute('data-status')).toBe('success');
+    expect(save.className).toContain('bg-neo-green');
+    expect(save.textContent).toContain('Saved!');
+
+    fireEvent.click(screen.getByLabelText('Randomize answer options'));
+    expect(save.getAttribute('data-status')).toBe('idle');
+    expect(save.className).toContain('bg-neo-blue');
+  });
+
+  it('turns save red when settings cannot be stored', () => {
+    render(<Settings />, { wrapper: Wrapper });
+    const setItem = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('QuotaExceededError');
+    });
+
+    const save = screen.getByText('Save Settings').closest('button')!;
+    fireEvent.click(save);
+
+    expect(save.getAttribute('data-status')).toBe('error');
+    expect(save.className).toContain('bg-neo-red');
+    expect(save.textContent).toContain('Save failed');
+    setItem.mockRestore();
+  });
+
+  it('turns share green on copy and back to blue after a change', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+    render(<Settings />, { wrapper: Wrapper });
+
+    const share = screen.getByText('Share Settings').closest('button')!;
+    expect(share.className).toContain('bg-neo-blue');
+
+    fireEvent.click(share);
+    await waitFor(() => expect(share.getAttribute('data-status')).toBe('success'));
+    expect(share.className).toContain('bg-neo-green');
+    expect(writeText).toHaveBeenCalledWith(expect.stringContaining('?fm='));
+
+    fireEvent.click(screen.getByLabelText('Randomize answer options'));
+    expect(share.getAttribute('data-status')).toBe('idle');
+    expect(share.className).toContain('bg-neo-blue');
+  });
+
+  it('places save and share side by side', () => {
+    render(<Settings />, { wrapper: Wrapper });
+
+    const row = screen.getByText('Save Settings').closest('button')!.parentElement!;
+    expect(row.className).toContain('grid-cols-2');
   });
 
   it('keeps the close button fixed in view', () => {

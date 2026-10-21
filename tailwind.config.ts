@@ -16,6 +16,7 @@ export default {
           pink: '#F472B6',
           green: '#4ADE80',
           orange: '#FB923C',
+          red: '#F87171',
           white: '#FFFFFF',
           black: '#000000',
           ground: 'var(--neo-ground)',

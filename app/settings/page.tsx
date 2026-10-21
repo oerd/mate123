@@ -3,6 +3,7 @@
 import { useLanguage } from '../LanguageContext';
 import {
   useTestParameters,
+  TestParameters,
   Operation,
   allOperations,
   RoundingNearest,
@@ -18,11 +19,22 @@ import { OperationToggle } from '../components/OperationToggle';
 import { LanguageSelector } from '../components/LanguageSelector';
 import { useTheme, ThemeMode, themeModes } from '../ThemeContext';
 import { LightIcon, DarkIcon, SystemIcon } from '../components/ThemeIcons';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { serializeSettings } from '../utils/settingsQueryString';
 
 const actionButtonClass =
   'flex items-center justify-center px-6 py-3 rounded-full border-[3px] border-neo-ink box-shadow-hard font-bold transition-all';
+
+const splitButtonClass =
+  'w-full h-full min-h-16 flex items-center justify-center px-3 py-3 rounded-full border-[3px] border-neo-ink box-shadow-hard font-bold text-sm sm:text-base leading-tight text-center text-black transition-all';
+
+type ActionStatus = 'idle' | 'success' | 'error';
+
+const statusFill: Record<ActionStatus, string> = {
+  idle: 'bg-neo-blue',
+  success: 'bg-neo-green',
+  error: 'bg-neo-red',
+};
 
 const chipClass = (active: boolean) =>
   `px-4 py-2 rounded-full border-[3px] border-neo-ink font-bold transition-all ${active
@@ -72,8 +84,8 @@ export default function Settings() {
   const [roundingNumberLine, setRoundingNumberLine] = useState<boolean>(testParameters.roundingNumberLine);
   const [comparisonModes, setComparisonModes] = useState<ComparisonMode[]>(testParameters.comparisonModes);
   const [shareTooltip, setShareTooltip] = useState<boolean>(false);
-  const [shareSuccess, setShareSuccess] = useState<boolean>(false);
-  const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
+  const [sharedQuery, setSharedQuery] = useState<string | null>(null);
+  const [saveResult, setSaveResult] = useState<{ query: string; status: ActionStatus } | null>(null);
 
   useEffect(() => {
     setFirstOperandMin(testParameters.firstOperandMin);
@@ -119,77 +131,64 @@ export default function Settings() {
     }
   };
 
-  const handleSaveSettings = () => {
-    const validFirstMin = Math.min(firstOperandMin, firstOperandMax);
-    const validFirstMax = Math.max(firstOperandMin, firstOperandMax);
-    const validSecondMin = Math.min(secondOperandMin, secondOperandMax);
-    const validSecondMax = Math.max(secondOperandMin, secondOperandMax);
+  const currentSettings = useMemo<TestParameters>(() => ({
+    firstOperandMin: Math.min(firstOperandMin, firstOperandMax),
+    firstOperandMax: Math.max(firstOperandMin, firstOperandMax),
+    secondOperandMin: Math.min(secondOperandMin, secondOperandMax),
+    secondOperandMax: Math.max(secondOperandMin, secondOperandMax),
+    operations: selectedOperations,
+    numberOfResults,
+    sortResults,
+    roundingNearest,
+    roundingAnswers,
+    roundingNumberLine,
+    comparisonModes
+  }), [firstOperandMin, firstOperandMax, secondOperandMin, secondOperandMax, selectedOperations, numberOfResults, sortResults, roundingNearest, roundingAnswers, roundingNumberLine, comparisonModes]);
 
-    setTestParameters({
-      firstOperandMin: validFirstMin,
-      firstOperandMax: validFirstMax,
-      secondOperandMin: validSecondMin,
-      secondOperandMax: validSecondMax,
-      operations: selectedOperations,
-      numberOfResults: numberOfResults,
-      sortResults: sortResults,
-      roundingNearest,
-      roundingAnswers,
-      roundingNumberLine,
-      comparisonModes
-    });
-    setSaveSuccess(true);
-    setTimeout(() => setSaveSuccess(false), 2000);
+  const currentQuery = useMemo(() => serializeSettings(currentSettings), [currentSettings]);
+  const saveStatus: ActionStatus = saveResult?.query === currentQuery ? saveResult.status : 'idle';
+  const shareStatus: ActionStatus = sharedQuery === currentQuery ? 'success' : 'idle';
+
+  const handleSaveSettings = () => {
+    try {
+      setTestParameters(currentSettings);
+      setSaveResult({ query: currentQuery, status: 'success' });
+    } catch {
+      setSaveResult({ query: currentQuery, status: 'error' });
+    }
   };
 
-  const fallbackCopy = (text: string) => {
+  const fallbackCopy = (text: string, query: string) => {
     const textarea = document.createElement('textarea');
     textarea.value = text;
     textarea.style.position = 'fixed';
     textarea.style.opacity = '0';
     document.body.appendChild(textarea);
     textarea.select();
+    let copied = false;
     try {
-      document.execCommand('copy');
-      setShareSuccess(true);
-      setTimeout(() => setShareSuccess(false), 2000);
+      copied = document.execCommand('copy');
     } catch {
-      window.prompt('Copy this URL:', text);
+      copied = false;
     }
     document.body.removeChild(textarea);
+    if (copied) {
+      setSharedQuery(query);
+    } else {
+      window.prompt('Copy this URL:', text);
+    }
   };
 
   const handleShareSettings = () => {
-    const currentSettings = {
-      firstOperandMin,
-      firstOperandMax,
-      secondOperandMin,
-      secondOperandMax,
-      operations: selectedOperations,
-      numberOfResults,
-      sortResults,
-      roundingNearest,
-      roundingAnswers,
-      roundingNumberLine,
-      comparisonModes
-    };
-
-    const queryString = serializeSettings(currentSettings);
-
-    const baseUrl = window.location.origin;
-    const shareUrl = `${baseUrl}/?${queryString}`;
+    const query = currentQuery;
+    const shareUrl = `${window.location.origin}/?${query}`;
 
     if (navigator.clipboard?.writeText) {
       navigator.clipboard.writeText(shareUrl)
-        .then(() => {
-          setShareSuccess(true);
-          setTimeout(() => setShareSuccess(false), 2000);
-        })
-        .catch(() => {
-          fallbackCopy(shareUrl);
-        });
+        .then(() => setSharedQuery(query))
+        .catch(() => fallbackCopy(shareUrl, query));
     } else {
-      fallbackCopy(shareUrl);
+      fallbackCopy(shareUrl, query);
     }
   };
 
@@ -466,45 +465,49 @@ export default function Settings() {
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-4">
+          <div className="grid grid-cols-2 gap-3">
             <button
               onClick={handleSaveSettings}
-              className={`${actionButtonClass} flex-1 bg-neo-green text-black`}
+              data-status={saveStatus}
+              aria-live="polite"
+              className={`${splitButtonClass} ${statusFill[saveStatus]}`}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 mr-2"
+                className="h-5 w-5 mr-2 shrink-0"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
                 aria-hidden="true"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d={saveStatus === 'error' ? 'M12 8v5m0 4h.01' : 'M5 13l4 4L19 7'} />
               </svg>
-              {saveSuccess ? t.saved : t.saveSettings}
+              {saveStatus === 'success' ? t.saved : saveStatus === 'error' ? t.saveFailed : t.saveSettings}
             </button>
 
-            <div className="relative flex-1">
+            <div className="relative">
               <button
                 onClick={handleShareSettings}
                 onMouseEnter={() => setShareTooltip(true)}
                 onMouseLeave={() => setShareTooltip(false)}
-                className={`${actionButtonClass} w-full bg-neo-blue text-black`}
+                data-status={shareStatus}
+                aria-live="polite"
+                className={`${splitButtonClass} ${statusFill[shareStatus]}`}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   aria-hidden="true"
-                  className="h-5 w-5 mr-2"
+                  className="h-5 w-5 mr-2 shrink-0"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                 </svg>
-                {shareSuccess ? t.copied : t.shareSettings}
+                {shareStatus === 'success' ? t.copied : t.shareSettings}
               </button>
 
-              {shareTooltip && !shareSuccess && (
+              {shareTooltip && shareStatus !== 'success' && (
                 <div className="absolute right-0 top-full mt-3 z-10 bg-neo-ink text-neo-ground px-3 py-1 rounded-xl text-sm font-bold whitespace-nowrap">
                   {t.shareSettingsTooltip}
                 </div>

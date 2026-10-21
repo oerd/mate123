@@ -38,6 +38,7 @@ interface Translations {
   sortResultsDescription: string;
   randomizeResults: string;
   saved: string;
+  saveFailed: string;
   shareSettings: string;
   shareSettingsTooltip: string;
   copied: string;
@@ -98,6 +99,7 @@ export const translations: Record<Language, Translations> = {
     sortResultsDescription: 'Sort answer options from smallest to largest',
     randomizeResults: 'Randomize answer options',
     saved: 'Saved!',
+    saveFailed: 'Save failed',
     shareSettings: 'Share Settings',
     shareSettingsTooltip: 'Copy settings URL to clipboard',
     copied: 'Copied!',
@@ -156,6 +158,7 @@ export const translations: Record<Language, Translations> = {
     sortResultsDescription: 'Antwortoptionen von klein nach groß sortieren',
     randomizeResults: 'Antwortoptionen zufällig anordnen',
     saved: 'Gespeichert!',
+    saveFailed: 'Speichern fehlgeschlagen',
     shareSettings: 'Einstellungen teilen',
     shareSettingsTooltip: 'Einstellungs-URL in die Zwischenablage kopieren',
     copied: 'Kopiert!',
@@ -214,6 +217,7 @@ export const translations: Record<Language, Translations> = {
     sortResultsDescription: 'Ordina le opzioni di risposta dal più piccolo al più grande',
     randomizeResults: 'Ordine casuale delle opzioni di risposta',
     saved: 'Salvato!',
+    saveFailed: 'Salvataggio non riuscito',
     shareSettings: 'Condividi Impostazioni',
     shareSettingsTooltip: 'Copia URL delle impostazioni negli appunti',
     copied: 'Copiato!',
@@ -272,6 +276,7 @@ export const translations: Record<Language, Translations> = {
     sortResultsDescription: 'Trier les options de réponse du plus petit au plus grand',
     randomizeResults: 'Mélanger les options de réponse',
     saved: 'Enregistré !',
+    saveFailed: 'Échec de l\'enregistrement',
     shareSettings: 'Partager les Paramètres',
     shareSettingsTooltip: 'Copier l\'URL des paramètres dans le presse-papiers',
     copied: 'Copié!',
@@ -330,6 +335,7 @@ export const translations: Record<Language, Translations> = {
     sortResultsDescription: 'Rendit përgjigjet nga më e vogla te më e madhja',
     randomizeResults: 'Përziej përgjigjet rastësisht',
     saved: 'U ruajt!',
+    saveFailed: 'Ruajtja dështoi',
     shareSettings: 'Ndaj cilësimet',
     shareSettingsTooltip: 'Kopjo URL-në e cilësimeve',
     copied: 'U kopjua!',
