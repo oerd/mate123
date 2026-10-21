@@ -10,7 +10,7 @@ interface OperationToggleProps {
   onToggle: (operation: Operation) => void;
   className?: string;
   renderButtonClass?: (op: Operation, isSelected: boolean) => string;
-  activeOverlayClass?: string;
+  activeOverlayClass?: string | null;
 }
 
 export const OperationToggle: React.FC<OperationToggleProps> = ({
@@ -52,7 +52,7 @@ export const OperationToggle: React.FC<OperationToggleProps> = ({
             title={t[op]}
             type="button"
           >
-            {isSelected(op) && (
+            {activeOverlayClass && isSelected(op) && (
               <motion.div
                 layoutId="activeOperation"
                 className={activeOverlayClass}
