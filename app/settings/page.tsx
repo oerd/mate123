@@ -161,7 +161,7 @@ export default function Settings() {
   };
 
   return (
-    <div className="fixed inset-4 sm:inset-6 md:inset-8 bg-neo-pink dark:bg-neo-surface border-4 border-neo-ink box-shadow-hard rounded-neo overflow-y-auto">
+    <div className="fixed inset-4 sm:inset-6 md:inset-8 bg-neo-pink dark:bg-neo-surface border-4 border-neo-ink shadow-hard rounded-neo overflow-y-auto">
       <div className="flex min-h-full flex-col items-center justify-start py-8 sm:py-12 p-4 sm:p-6 md:p-8">
         <div className="absolute top-4 right-4">
           <div className="relative">
@@ -320,12 +320,8 @@ export default function Settings() {
               selected={selectedOperations}
               onToggle={handleOperationToggle}
               className="flex flex-wrap gap-3 mb-4"
-              renderButtonClass={(op, active) =>
-                `relative p-3 rounded-neo transition-all flex items-center justify-center flex-1 ${active
-                  ? 'bg-ctp-surface1 border-2 border-ctp-blue'
-                  : 'bg-ctp-surface0 hover:bg-ctp-surface1'
-                }`
-              }
+              activeOverlayClass={null}
+              renderButtonClass={(_op, active) => `${chipClass(active)} flex flex-1 items-center justify-center`}
             />
           </div>
 

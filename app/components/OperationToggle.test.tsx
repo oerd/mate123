@@ -82,4 +82,19 @@ describe('OperationToggle', () => {
     expect(screen.getByTitle(/rounding/i).textContent).toBe('≈');
     expect(screen.getByTitle(/comparison/i).textContent).toBe('<=>');
   });
+
+  it('omits the active overlay when activeOverlayClass is null', () => {
+    render(
+      <Wrapper>
+        <OperationToggle
+          selected={['addition']}
+          onToggle={() => { }}
+          options={['addition', 'subtraction']}
+          activeOverlayClass={null}
+        />
+      </Wrapper>
+    );
+
+    expect(screen.getByTitle(/addition/i).querySelector('div')).toBeNull();
+  });
 });

@@ -28,6 +28,23 @@ describe('Settings Page', () => {
     expect(screen.getByText('Teacher Settings')).toBeDefined();
   });
 
+  it('does not apply the interactive press effect to the settings overlay', () => {
+    const { container } = render(<Settings />, { wrapper: Wrapper });
+
+    const overlay = container.firstElementChild as HTMLElement;
+    expect(overlay.className).toContain('shadow-hard');
+    expect(overlay.className).not.toContain('box-shadow-hard');
+  });
+
+  it('marks selected operations without the animated overlay', () => {
+    const { container } = render(<Settings />, { wrapper: Wrapper });
+
+    const addition = screen.getByTitle(/addition/i);
+    expect(addition.getAttribute('aria-pressed')).toBe('true');
+    expect(addition.className).toContain('bg-neo-orange');
+    expect(container.querySelector('button[title] > div')).toBeNull();
+  });
+
   it('switches theme and persists the choice', () => {
     render(<Settings />, { wrapper: Wrapper });
 
