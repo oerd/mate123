@@ -16,17 +16,26 @@ import { translations } from '../translations';
 import Link from 'next/link';
 import { OperationToggle } from '../components/OperationToggle';
 import { LanguageSelector } from '../components/LanguageSelector';
-import { useState, useEffect } from 'react';
+import { useTheme, ThemeMode, themeModes } from '../ThemeContext';
+import { LightIcon, DarkIcon, SystemIcon } from '../components/ThemeIcons';
+import React, { useState, useEffect } from 'react';
 import { serializeSettings } from '../utils/settingsQueryString';
 
 const chipClass = (active: boolean) =>
-  `px-4 py-2 rounded-full border-[3px] border-black font-bold text-black transition-all ${active
-    ? 'bg-neo-orange box-shadow-hard'
-    : 'bg-white hover:bg-gray-100'
+  `px-4 py-2 rounded-full border-[3px] border-neo-ink font-bold transition-all ${active
+    ? 'bg-neo-orange text-black box-shadow-hard'
+    : 'bg-neo-surface text-neo-ink hover:bg-neo-surface-muted'
   }`;
+
+const themeIcons: Record<ThemeMode, React.FC> = {
+  light: LightIcon,
+  dark: DarkIcon,
+  system: SystemIcon,
+};
 
 export default function Settings() {
   const { language, setLanguage } = useLanguage();
+  const { themeMode, setThemeMode } = useTheme();
   const { testParameters, setTestParameters, loadedFromUrl } = useTestParameters();
   const t = translations[language];
   const [tooltip, setTooltip] = useState<string | null>(null);
@@ -152,7 +161,7 @@ export default function Settings() {
   };
 
   return (
-    <div className="fixed inset-4 sm:inset-6 md:inset-8 bg-neo-pink border-4 border-black box-shadow-hard rounded-neo overflow-y-auto">
+    <div className="fixed inset-4 sm:inset-6 md:inset-8 bg-neo-pink dark:bg-neo-surface border-4 border-neo-ink box-shadow-hard rounded-neo overflow-y-auto">
       <div className="flex min-h-full flex-col items-center justify-start py-8 sm:py-12 p-4 sm:p-6 md:p-8">
         <div className="absolute top-4 right-4">
           <div className="relative">
@@ -216,6 +225,28 @@ export default function Settings() {
             tooltip={tooltip}
             setTooltip={setTooltip}
           />
+        </div>
+
+        <div className="p-4 sm:p-6 md:p-8 rounded-xl shadow-lg bg-ctp-mantle border border-ctp-surface0 w-full max-w-md mb-6 sm:mb-8">
+          <h2 className="text-2xl font-bold mb-6 text-ctp-text">{t.themeSettings}</h2>
+
+          <div className="flex flex-wrap gap-2" role="group" aria-label={t.themeSettings}>
+            {themeModes.map((mode) => {
+              const Icon = themeIcons[mode];
+              return (
+                <button
+                  key={mode}
+                  type="button"
+                  onClick={() => setThemeMode(mode)}
+                  aria-pressed={themeMode === mode}
+                  className={`${chipClass(themeMode === mode)} flex items-center gap-2`}
+                >
+                  <Icon />
+                  {t[`${mode}Theme`]}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <div className="p-4 sm:p-6 md:p-8 rounded-xl shadow-lg bg-ctp-mantle border border-ctp-surface0 w-full max-w-md mb-6 sm:mb-8">
@@ -290,7 +321,7 @@ export default function Settings() {
               onToggle={handleOperationToggle}
               className="flex flex-wrap gap-3 mb-4"
               renderButtonClass={(op, active) =>
-                `p-3 rounded-neo transition-all flex items-center justify-center flex-1 ${active
+                `relative p-3 rounded-neo transition-all flex items-center justify-center flex-1 ${active
                   ? 'bg-ctp-surface1 border-2 border-ctp-blue'
                   : 'bg-ctp-surface0 hover:bg-ctp-surface1'
                 }`

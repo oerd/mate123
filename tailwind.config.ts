@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 export default {
+  darkMode: ['selector', '[data-theme="dark"]'],
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -16,14 +17,21 @@ export default {
           green: '#4ADE80',
           orange: '#FB923C',
           white: '#FFFFFF',
-          black: '#000000'
+          black: '#000000',
+          ground: 'var(--neo-ground)',
+          surface: 'var(--neo-surface)',
+          'surface-muted': 'var(--neo-surface-muted)',
+          ink: 'var(--neo-ink)',
+          'ink-muted': 'var(--neo-ink-muted)',
+          shadow: 'var(--neo-shadow)',
+          pill: 'var(--neo-pill)',
         },
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
       boxShadow: {
-        'hard': '4px 4px 0px 0px rgba(0,0,0,1)',
-        'hard-lg': '8px 8px 0px 0px rgba(0,0,0,1)',
+        'hard': '4px 4px 0px 0px var(--neo-shadow)',
+        'hard-lg': '8px 8px 0px 0px var(--neo-shadow)',
       },
       borderRadius: {
         neo: '56px',

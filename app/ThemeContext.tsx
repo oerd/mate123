@@ -2,15 +2,14 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from 'react';
 
-type ThemeMode = 'light' | 'dark' | 'system';
+export const themeModes = ['light', 'dark', 'system'] as const;
+export type ThemeMode = (typeof themeModes)[number];
 
 interface ThemeContextType {
   themeMode: ThemeMode;
   setThemeMode: (theme: ThemeMode) => void;
   currentTheme: 'light' | 'dark';
 }
-
-const VALID_THEMES: ThemeMode[] = ['dark', 'light', 'system'];
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
@@ -21,16 +20,20 @@ function resolveTheme(mode: ThemeMode): 'light' | 'dark' {
   return mode;
 }
 
+function isThemeMode(value: string | null): value is ThemeMode {
+  return themeModes.some((mode) => mode === value);
+}
+
 function getInitialThemeMode(): ThemeMode {
-  if (typeof window === 'undefined') return 'dark';
-  const saved = localStorage.getItem('math-practice:themeMode') as ThemeMode | null;
-  return saved && VALID_THEMES.includes(saved) ? saved : 'dark';
+  if (typeof window === 'undefined') return 'system';
+  const saved = localStorage.getItem('math-practice:themeMode');
+  return isThemeMode(saved) ? saved : 'system';
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [themeMode, setThemeModeState] = useState<ThemeMode>(getInitialThemeMode);
   const [currentTheme, setCurrentTheme] = useState<'light' | 'dark'>(() => {
-    if (typeof window === 'undefined') return 'dark';
+    if (typeof window === 'undefined') return 'light';
     return resolveTheme(getInitialThemeMode());
   });
 

@@ -62,10 +62,10 @@ describe('OperationToggle', () => {
     const subBtn = screen.getByTitle(/subtraction/i);
     const mulBtn = screen.getByTitle(/multiplication/i);
 
-    // Active button gets text-black, inactive is text-gray-400
+    // Active button gets text-black, inactive is text-neo-ink-muted
     expect(addBtn.className).toContain('text-black');
     expect(subBtn.className).toContain('text-black');
-    expect(mulBtn.className).toContain('text-gray-400');
+    expect(mulBtn.className).toContain('text-neo-ink-muted');
   });
 
   it('renders the rounding and comparison operations', () => {

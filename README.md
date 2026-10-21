@@ -9,7 +9,7 @@ An interactive math practice app for elementary school kids and their teachers, 
 - **Teacher settings**: configure operand ranges, operations, number of answer options, and sorting
 - **Shareable settings**: teachers can generate a URL to share configurations with students
 - **Multi-language support**: English, German, Italian, French, Albanian
-- **Catppuccin theme**: light (Latte) and dark (Mocha) modes, with system preference detection
+- **Neo-brutalist theme**: Neo Yellow light mode and Cosmic dark mode, with system preference detection
 - **Accessible**: screen reader support, keyboard navigation, reduced-motion support
 
 ## Getting Started

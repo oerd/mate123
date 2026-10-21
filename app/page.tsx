@@ -105,20 +105,20 @@ export default function Home() {
   }, [clearAllTimers]);
 
   if (!isMounted) {
-    return <div className="flex h-dvh flex-col items-center justify-center p-4 sm:p-6 md:p-8 bg-neo-yellow" />;
+    return <div className="flex h-dvh flex-col items-center justify-center p-4 sm:p-6 md:p-8 bg-neo-ground" />;
   }
 
   // Dim secondary controls when answering
   const peripheralOpacity = (isAnimating || feedback === 'correct') ? 'opacity-30 pointer-events-none' : 'opacity-100';
 
   return (
-    <div className="flex h-dvh flex-col items-center justify-center gap-2 sm:gap-4 p-4 sm:p-6 md:p-8 overflow-hidden bg-neo-yellow transition-colors duration-500">
+    <div className="flex h-dvh flex-col items-center justify-center gap-2 sm:gap-4 p-4 sm:p-6 md:p-8 overflow-hidden bg-neo-ground transition-colors duration-500">
 
       <div className={`absolute top-4 right-4 transition-opacity duration-300 ${peripheralOpacity}`}>
         <div className="relative">
           <Link
             href="/settings"
-            className="p-3 bg-white text-black border-4 border-black box-shadow-hard rounded-2xl hover:bg-gray-100 flex items-center justify-center"
+            className="p-3 bg-neo-surface text-neo-ink border-4 border-neo-ink box-shadow-hard rounded-2xl hover:bg-neo-surface-muted flex items-center justify-center"
             onMouseEnter={() => setShowTooltip(true)}
             onMouseLeave={() => setShowTooltip(false)}
             onFocus={() => setShowTooltip(true)}
@@ -128,14 +128,14 @@ export default function Home() {
             <SettingsIcon />
           </Link>
           {showTooltip && (
-            <div className="absolute right-0 top-full mt-2 bg-black text-white px-4 py-2 rounded-xl text-lg font-bold whitespace-nowrap z-20">
+            <div className="absolute right-0 top-full mt-2 bg-neo-ink text-neo-ground px-4 py-2 rounded-xl text-lg font-bold whitespace-nowrap z-20">
               {t.settings}
             </div>
           )}
         </div>
       </div>
 
-      <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-black tracking-tight text-center drop-shadow-md">
+      <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-neo-ink tracking-tight text-center drop-shadow-md">
         {t.title}
       </h1>
 
@@ -163,7 +163,7 @@ export default function Home() {
       <div className={`transition-all duration-300 ${feedback === 'correct' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
         <button
           onClick={generateNewProblem}
-          className="px-6 py-3 sm:px-8 sm:py-4 md:px-10 md:py-5 bg-neo-green font-black text-xl sm:text-2xl md:text-3xl text-black border-4 border-black box-shadow-hard rounded-full hover:bg-green-400 active:translate-y-2 active:translate-x-2 active:shadow-none transition-all"
+          className="px-6 py-3 sm:px-8 sm:py-4 md:px-10 md:py-5 bg-neo-green font-black text-xl sm:text-2xl md:text-3xl text-black border-4 border-neo-ink box-shadow-hard rounded-full hover:bg-green-400 active:translate-y-2 active:translate-x-2 active:shadow-none transition-all"
         >
           {t.newProblem}
         </button>

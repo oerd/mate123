@@ -17,9 +17,9 @@ export const OperationToggle: React.FC<OperationToggleProps> = ({
   options = allOperations,
   selected,
   onToggle,
-  className = "flex bg-white border-4 border-black box-shadow-hard rounded-full p-1 sm:p-2 mb-4 sm:mb-6 gap-1 sm:gap-2",
+  className = "flex bg-neo-surface border-4 border-neo-ink box-shadow-hard rounded-full p-1 sm:p-2 mb-4 sm:mb-6 gap-1 sm:gap-2",
   renderButtonClass,
-  activeOverlayClass = "absolute inset-0 bg-neo-pink border-4 border-black box-shadow-hard rounded-full -z-10"
+  activeOverlayClass = "absolute inset-0 bg-neo-pink border-4 border-neo-ink box-shadow-hard rounded-full -z-10"
 }) => {
   const { language } = useLanguage();
   const t = translations[language];
@@ -34,7 +34,7 @@ export const OperationToggle: React.FC<OperationToggleProps> = ({
   const defaultButtonClass = (op: Operation, active: boolean) =>
     `relative p-2 sm:p-3 flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 text-2xl sm:text-3xl md:text-4xl font-black rounded-full z-10 transition-colors ${active
       ? 'text-black'
-      : 'text-gray-400 hover:text-black hover:bg-gray-100'
+      : 'text-neo-ink-muted hover:text-neo-ink hover:bg-neo-surface-muted'
     }`;
 
   const getButtonClass = renderButtonClass || defaultButtonClass;

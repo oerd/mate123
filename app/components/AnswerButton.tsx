@@ -40,12 +40,12 @@ export const AnswerButton = React.memo(({
       className={`
         ${getSizeClasses(text)}
         ${shapeClasses[shape]}
-        bg-neo-blue
+        bg-neo-pill
         font-black text-black
-        border-4 border-black box-shadow-hard
+        border-4 border-neo-ink box-shadow-hard
         flex items-center justify-center
         transition-all duration-150
-        ${isSelected ? 'ring-4 ring-black ring-offset-2' : ''}
+        ${isSelected ? 'ring-4 ring-neo-ink ring-offset-2 ring-offset-neo-ground' : ''}
         ${isDisabled && !isSelected ? 'opacity-50 grayscale' : ''}
       `}
     >
