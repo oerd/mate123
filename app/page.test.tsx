@@ -2,10 +2,13 @@ import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { hydrateRoot } from 'react-dom/client';
 import { describe, it, expect, vi, afterEach } from 'vitest';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { ThemeProvider } from './ThemeContext';
 import { LanguageProvider } from './LanguageContext';
 import { TestParametersProvider } from './TestParametersContext';
 import Home from './page';
+
+vi.mock('canvas-confetti', () => ({ default: vi.fn() }));
 
 const Wrapper = ({ children }: { children: React.ReactNode }) => (
     <ThemeProvider>
@@ -59,5 +62,38 @@ describe('Home Page Hydration', () => {
 
         // Clean up
         document.body.removeChild(container);
+    });
+});
+
+describe('Home Page settings link', () => {
+    afterEach(() => {
+        vi.useRealTimers();
+        window.localStorage.clear();
+    });
+
+    it('keeps the settings link enabled after a correct answer', () => {
+        vi.useFakeTimers();
+        window.localStorage.setItem('math-practice:testParameters', JSON.stringify({
+            firstOperandMin: 2,
+            firstOperandMax: 2,
+            secondOperandMin: 2,
+            secondOperandMax: 2,
+            operations: ['addition'],
+            numberOfResults: 4,
+            sortResults: true,
+        }));
+
+        render(<Home />, { wrapper: Wrapper });
+
+        fireEvent.click(screen.getByRole('button', { name: '4' }));
+        expect(screen.getByText('New Problem')).toBeDefined();
+
+        const wrapper = screen.getByRole('link', { name: 'Settings' }).closest('.absolute');
+        expect(wrapper?.className).not.toContain('pointer-events-none');
+
+        act(() => {
+            vi.advanceTimersByTime(2500);
+        });
+        expect(wrapper?.className).not.toContain('pointer-events-none');
     });
 });

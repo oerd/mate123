@@ -21,6 +21,9 @@ import { LightIcon, DarkIcon, SystemIcon } from '../components/ThemeIcons';
 import React, { useState, useEffect } from 'react';
 import { serializeSettings } from '../utils/settingsQueryString';
 
+const actionButtonClass =
+  'flex items-center justify-center px-6 py-3 rounded-full border-[3px] border-neo-ink box-shadow-hard font-bold transition-all';
+
 const chipClass = (active: boolean) =>
   `px-4 py-2 rounded-full border-[3px] border-neo-ink font-bold transition-all ${active
     ? 'bg-neo-orange text-black box-shadow-hard'
@@ -70,6 +73,7 @@ export default function Settings() {
   const [comparisonModes, setComparisonModes] = useState<ComparisonMode[]>(testParameters.comparisonModes);
   const [shareTooltip, setShareTooltip] = useState<boolean>(false);
   const [shareSuccess, setShareSuccess] = useState<boolean>(false);
+  const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
 
   useEffect(() => {
     setFirstOperandMin(testParameters.firstOperandMin);
@@ -134,6 +138,8 @@ export default function Settings() {
       roundingNumberLine,
       comparisonModes
     });
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 2000);
   };
 
   const fallbackCopy = (text: string) => {
@@ -190,11 +196,11 @@ export default function Settings() {
   return (
     <div className="fixed inset-4 sm:inset-6 md:inset-8 bg-neo-pink dark:bg-neo-surface border-4 border-neo-ink shadow-hard rounded-neo overflow-y-auto">
       <div className="flex min-h-full flex-col items-center justify-start py-8 sm:py-12 p-4 sm:p-6 md:p-8">
-        <div className="absolute top-4 right-4">
+        <div className="fixed top-8 right-8 sm:top-10 sm:right-10 md:top-12 md:right-12 z-20" data-testid="settings-close">
           <div className="relative">
             <Link
               href="/"
-              className="p-2 bg-ctp-surface0 text-ctp-text rounded-lg hover:bg-ctp-surface1 transition-colors flex items-center justify-center"
+              className="p-2 bg-neo-surface text-neo-ink border-[3px] border-neo-ink box-shadow-hard rounded-2xl hover:bg-neo-surface-muted flex items-center justify-center"
               onMouseEnter={() => setTooltip('close')}
               onMouseLeave={() => setTooltip(null)}
               aria-label={t.backToGame}
@@ -215,7 +221,7 @@ export default function Settings() {
               </svg>
             </Link>
             {tooltip === 'close' && (
-              <div className="absolute right-0 top-full mt-2 bg-ctp-surface2 text-ctp-text px-3 py-1 rounded text-sm whitespace-nowrap">
+              <div className="absolute right-0 top-full mt-2 bg-neo-ink text-neo-ground px-3 py-1 rounded-xl text-sm font-bold whitespace-nowrap">
                 {t.backToGame}
               </div>
             )}
@@ -455,29 +461,39 @@ export default function Settings() {
               <ToggleSwitch
                 checked={sortResults}
                 onChange={() => setSortResults(!sortResults)}
-                label={t.sortResults}
+                label={sortResults ? t.sortResultsDescription : t.randomizeResults}
               />
             </div>
-            <p className="text-ctp-subtext0 text-sm">{t.sortResultsDescription}</p>
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex flex-wrap gap-4">
             <button
               onClick={handleSaveSettings}
-              className="flex-1 px-6 py-3 bg-ctp-blue text-ctp-base font-bold rounded-lg hover:bg-ctp-lavender transition-colors"
+              className={`${actionButtonClass} flex-1 bg-neo-green text-black`}
             >
-              {t.saveSettings}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+              </svg>
+              {saveSuccess ? t.saved : t.saveSettings}
             </button>
 
-            <div className="relative">
+            <div className="relative flex-1">
               <button
                 onClick={handleShareSettings}
                 onMouseEnter={() => setShareTooltip(true)}
                 onMouseLeave={() => setShareTooltip(false)}
-                className="px-6 py-3 bg-ctp-sapphire text-ctp-base font-bold rounded-lg hover:bg-ctp-sky transition-colors flex items-center"
+                className={`${actionButtonClass} w-full bg-neo-blue text-black`}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
                   className="h-5 w-5 mr-2"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -489,7 +505,7 @@ export default function Settings() {
               </button>
 
               {shareTooltip && !shareSuccess && (
-                <div className="absolute right-0 top-full mt-2 bg-ctp-surface2 text-ctp-text px-3 py-1 rounded text-sm whitespace-nowrap">
+                <div className="absolute right-0 top-full mt-3 z-10 bg-neo-ink text-neo-ground px-3 py-1 rounded-xl text-sm font-bold whitespace-nowrap">
                   {t.shareSettingsTooltip}
                 </div>
               )}
@@ -500,8 +516,18 @@ export default function Settings() {
         <div className="mt-4 flex justify-center mb-8">
           <Link
             href="/"
-            className="px-6 py-3 bg-ctp-blue text-ctp-base font-bold rounded-lg hover:bg-ctp-lavender transition-colors"
+            className={`${actionButtonClass} bg-neo-surface text-neo-ink`}
           >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 19l-7-7 7-7" />
+            </svg>
             {t.backToGame}
           </Link>
         </div>
