@@ -111,7 +111,7 @@ export default function Home() {
   const peripheralOpacity = isAnimating && feedback !== 'correct' ? 'opacity-30 pointer-events-none' : 'opacity-100';
 
   return (
-    <div className="flex h-dvh flex-col items-center justify-center gap-2 sm:gap-4 p-4 sm:p-6 md:p-8 overflow-hidden bg-neo-ground transition-colors duration-500">
+    <div className="flex h-dvh flex-col items-center justify-center gap-5 sm:gap-8 md:gap-10 p-4 sm:p-6 md:p-8 overflow-hidden bg-neo-ground transition-colors duration-500">
 
       <div className={`absolute top-4 right-4 transition-opacity duration-300 ${peripheralOpacity}`}>
         <div className="relative">
@@ -159,7 +159,7 @@ export default function Home() {
       />
 
       {/* Only show "New Problem" button explicitly when they get it right, or let them click anywhere? */}
-      <div className={`transition-all duration-300 ${feedback === 'correct' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
+      <div className={`mt-1 sm:mt-0 transition-all duration-300 ${feedback === 'correct' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
         <button
           onClick={generateNewProblem}
           className="px-6 py-3 sm:px-8 sm:py-4 md:px-10 md:py-5 bg-neo-green font-black text-xl sm:text-2xl md:text-3xl text-black border-4 border-neo-ink box-shadow-hard rounded-full hover:bg-green-400 active:translate-y-2 active:translate-x-2 active:shadow-none transition-all"
