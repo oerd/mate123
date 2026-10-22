@@ -6,6 +6,7 @@ import { useLanguage } from './LanguageContext';
 import { useTestParameters, Operation } from './TestParametersContext';
 import { translations } from './translations';
 import { SettingsIcon } from './components/SettingsIcon';
+import { FitTitle } from './components/FitTitle';
 import { generateProblem, generateOptionsForProblem, pickRandomOperation, isAnswerCorrect, comparisonSymbol } from './utils/mathLogic';
 import { ProblemDisplay } from './components/ProblemDisplay';
 import { ResultGrid } from './components/ResultGrid';
@@ -113,11 +114,11 @@ export default function Home() {
   return (
     <div className="flex h-dvh flex-col items-center justify-center gap-5 sm:gap-8 md:gap-10 p-4 sm:p-6 md:p-8 overflow-hidden bg-neo-ground transition-colors duration-500">
 
-      <div className={`absolute top-4 right-4 transition-opacity duration-300 ${peripheralOpacity}`}>
+      <div className={`absolute top-4 right-4 max-sm:top-2 max-sm:right-2 transition-opacity duration-300 ${peripheralOpacity}`}>
         <div className="relative">
           <Link
             href="/settings"
-            className="p-3 bg-neo-surface text-neo-ink border-4 border-neo-ink box-shadow-hard rounded-2xl hover:bg-neo-surface-muted flex items-center justify-center"
+            className="p-3 max-sm:p-2 bg-neo-surface text-neo-ink border-4 border-neo-ink box-shadow-hard rounded-2xl hover:bg-neo-surface-muted flex items-center justify-center"
             onMouseEnter={() => setShowTooltip(true)}
             onMouseLeave={() => setShowTooltip(false)}
             onFocus={() => setShowTooltip(true)}
@@ -134,9 +135,9 @@ export default function Home() {
         </div>
       </div>
 
-      <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-neo-ink tracking-tight text-center drop-shadow-md">
+      <FitTitle maxViewportHeightRatio={0.1} className="w-full max-w-md lg:max-w-xl max-sm:px-14 text-4xl leading-none font-black text-neo-ink tracking-tight text-center drop-shadow-md">
         {t.title}
-      </h1>
+      </FitTitle>
 
       <ProblemDisplay
         firstNumber={currentProblem.num1}
