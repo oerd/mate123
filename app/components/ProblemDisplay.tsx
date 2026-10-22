@@ -93,7 +93,7 @@ export const ProblemDisplay = ({
             <span>≈</span>
             <span className={revealed ? 'text-green-600' : ''}>{answerText}</span>
           </div>
-          {showNumberLine && <NumberLine value={firstNumber} nearest={secondNumber} />}
+          {showNumberLine && <div className="mt-3 w-full flex justify-center"><NumberLine value={firstNumber} nearest={secondNumber} /></div>}
         </>
       );
     }

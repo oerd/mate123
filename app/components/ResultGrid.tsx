@@ -30,8 +30,8 @@ export const ResultGrid = ({
   shape = 'pill'
 }: ResultGridProps) => {
   return (
-    <div className="mt-4 sm:mt-6 md:mt-8 w-full max-w-xl">
-      <div className={`grid ${getGridColsClass(answerOptions.length)} gap-2 sm:gap-3`}>
+    <div className="mt-3 w-full max-w-xl">
+      <div className={`grid ${getGridColsClass(answerOptions.length)} gap-3 sm:gap-4`}>
         {answerOptions.map((option) => (
           <AnswerButton
             key={option}
