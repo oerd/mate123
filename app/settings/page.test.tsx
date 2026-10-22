@@ -258,6 +258,55 @@ describe('Settings Page', () => {
     expect(share.className).toContain('bg-neo-blue');
   });
 
+  it('opens the native share sheet when available', async () => {
+    const share = vi.fn().mockResolvedValue(undefined);
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'share', { value: share, configurable: true });
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+    render(<Settings />, { wrapper: Wrapper });
+
+    const button = screen.getByText('Share Settings').closest('button')!;
+    fireEvent.click(button);
+
+    await waitFor(() => expect(button.getAttribute('data-status')).toBe('success'));
+    expect(share).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('?fm=') }));
+    expect(writeText).not.toHaveBeenCalled();
+    expect(button.textContent).toContain('Shared!');
+    Reflect.deleteProperty(navigator, 'share');
+  });
+
+  it('stays idle when the share sheet is dismissed', async () => {
+    const share = vi.fn().mockRejectedValue(new DOMException('cancelled', 'AbortError'));
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'share', { value: share, configurable: true });
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+    render(<Settings />, { wrapper: Wrapper });
+
+    const button = screen.getByText('Share Settings').closest('button')!;
+    fireEvent.click(button);
+
+    await waitFor(() => expect(share).toHaveBeenCalled());
+    expect(writeText).not.toHaveBeenCalled();
+    expect(button.getAttribute('data-status')).toBe('idle');
+    Reflect.deleteProperty(navigator, 'share');
+  });
+
+  it('falls back to copying when native share fails', async () => {
+    const share = vi.fn().mockRejectedValue(new DOMException('denied', 'NotAllowedError'));
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'share', { value: share, configurable: true });
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+    render(<Settings />, { wrapper: Wrapper });
+
+    const button = screen.getByText('Share Settings').closest('button')!;
+    fireEvent.click(button);
+
+    await waitFor(() => expect(button.getAttribute('data-status')).toBe('success'));
+    expect(writeText).toHaveBeenCalledWith(expect.stringContaining('?fm='));
+    expect(button.textContent).toContain('Copied!');
+    Reflect.deleteProperty(navigator, 'share');
+  });
+
   it('places save and share side by side', () => {
     render(<Settings />, { wrapper: Wrapper });
 

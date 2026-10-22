@@ -42,6 +42,7 @@ interface Translations {
   shareSettings: string;
   shareSettingsTooltip: string;
   copied: string;
+  shared: string;
   loadedFromUrl: string;
   answerLabel: string;
   rounding: string;
@@ -101,8 +102,9 @@ export const translations: Record<Language, Translations> = {
     saved: 'Saved!',
     saveFailed: 'Save failed',
     shareSettings: 'Share Settings',
-    shareSettingsTooltip: 'Copy settings URL to clipboard',
+    shareSettingsTooltip: 'Share or copy the settings link',
     copied: 'Copied!',
+    shared: 'Shared!',
     loadedFromUrl: 'Settings loaded from shared link',
     answerLabel: 'Your answer',
     rounding: 'Rounding',
@@ -160,8 +162,9 @@ export const translations: Record<Language, Translations> = {
     saved: 'Gespeichert!',
     saveFailed: 'Speichern fehlgeschlagen',
     shareSettings: 'Einstellungen teilen',
-    shareSettingsTooltip: 'Einstellungs-URL in die Zwischenablage kopieren',
+    shareSettingsTooltip: 'Einstellungs-Link teilen oder kopieren',
     copied: 'Kopiert!',
+    shared: 'Geteilt!',
     loadedFromUrl: 'Einstellungen aus geteiltem Link geladen',
     answerLabel: 'Deine Antwort',
     rounding: 'Runden',
@@ -219,8 +222,9 @@ export const translations: Record<Language, Translations> = {
     saved: 'Salvato!',
     saveFailed: 'Salvataggio non riuscito',
     shareSettings: 'Condividi Impostazioni',
-    shareSettingsTooltip: 'Copia URL delle impostazioni negli appunti',
+    shareSettingsTooltip: 'Condividi o copia il link delle impostazioni',
     copied: 'Copiato!',
+    shared: 'Condiviso!',
     loadedFromUrl: 'Impostazioni caricate da link condiviso',
     answerLabel: 'La tua risposta',
     rounding: 'Arrotondamento',
@@ -278,8 +282,9 @@ export const translations: Record<Language, Translations> = {
     saved: 'Enregistré !',
     saveFailed: 'Échec de l\'enregistrement',
     shareSettings: 'Partager les Paramètres',
-    shareSettingsTooltip: 'Copier l\'URL des paramètres dans le presse-papiers',
+    shareSettingsTooltip: 'Partager ou copier le lien des paramètres',
     copied: 'Copié!',
+    shared: 'Partagé!',
     loadedFromUrl: 'Paramètres chargés depuis un lien partagé',
     answerLabel: 'Ta réponse',
     rounding: 'Arrondi',
@@ -337,8 +342,9 @@ export const translations: Record<Language, Translations> = {
     saved: 'U ruajt!',
     saveFailed: 'Ruajtja dështoi',
     shareSettings: 'Ndaj cilësimet',
-    shareSettingsTooltip: 'Kopjo URL-në e cilësimeve',
+    shareSettingsTooltip: 'Ndaj ose kopjo lidhjen e cilësimeve',
     copied: 'U kopjua!',
+    shared: 'U nda!',
     loadedFromUrl: 'Cilësimet u ngarkuan nga lidhja e ndarë',
     answerLabel: 'Përgjigja jote',
     rounding: 'Rrumbullakim',
