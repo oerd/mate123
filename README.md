@@ -10,6 +10,7 @@ An interactive math practice app for elementary school kids and their teachers, 
 - **Shareable settings**: teachers can generate a URL to share configurations with students
 - **Multi-language support**: English, German, Italian, French, Albanian
 - **Neo-brutalist theme**: Neo Yellow light mode and Cosmic dark mode, with system preference detection
+- **Installable**: add it to your home screen or desktop; works offline after the first visit
 - **Accessible**: screen reader support, keyboard navigation, reduced-motion support
 
 ## Getting Started
@@ -61,3 +62,13 @@ app/
 docs/                 # Implementation plans
 e2e/                  # Playwright end-to-end tests
 ```
+
+## App Icons
+
+The install icons in `public/icons/` and `app/apple-icon.png` are drawn from the mascot. To regenerate them:
+
+```bash
+CHROMIUM_PATH=/path/to/chromium node scripts/generate-icons.mjs
+```
+
+`CHROMIUM_PATH` is optional; without it Playwright's own browser is used.
