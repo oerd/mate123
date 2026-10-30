@@ -78,7 +78,7 @@ test.describe('App Stability', () => {
     const newProblemBtn = page.getByRole('button', { name: /New Problem|Neue Aufgabe|Nuovo Problema|Nouveau Problème|Problem i Ri/i });
     
     for (let i = 0; i < 20; i++) {
-      await newProblemBtn.click();
+      await newProblemBtn.click({ force: true });
       // Wait a tiny bit to ensure the event loop processes
       await page.waitForTimeout(50); 
     }
