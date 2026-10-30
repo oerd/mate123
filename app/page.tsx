@@ -12,6 +12,9 @@ import { ProblemDisplay } from './components/ProblemDisplay';
 import { ResultGrid } from './components/ResultGrid';
 import confetti from 'canvas-confetti';
 
+const AUTO_ADVANCE_MS = 2000;
+const AUTO_PRESS_MS = 160;
+
 export default function Home() {
   const { language } = useLanguage();
   const { testParameters } = useTestParameters();
@@ -25,6 +28,7 @@ export default function Home() {
   const [problemSeed, setProblemSeed] = useState<number>(0);
 
   const [selectedOptionValue, setSelectedOptionValue] = useState<number | null>(null);
+  const [isAutoPressing, setIsAutoPressing] = useState<boolean>(false);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -61,7 +65,14 @@ export default function Home() {
     setFeedback(null);
     setIsAnimating(false);
     setSelectedOptionValue(null);
+    setIsAutoPressing(false);
   }, [clearAllTimers, testParameters.operations]);
+
+  const handleCountdownEnd = useCallback(() => {
+    clearAllTimers();
+    setIsAutoPressing(true);
+    feedbackTimerRef.current = setTimeout(generateNewProblem, AUTO_PRESS_MS);
+  }, [clearAllTimers, generateNewProblem]);
 
   const commitAnswer = useCallback((answer: number) => {
     if (isAnimating) return;
@@ -77,18 +88,14 @@ export default function Home() {
         origin: { y: 0.6 },
         colors: ['#FFDE00', '#38BDF8', '#F472B6', '#4ADE80', '#FB923C']
       });
+      return;
     }
 
     if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
     feedbackTimerRef.current = setTimeout(() => {
       setIsAnimating(false);
-      if (ok) {
-        // We do not auto-advance immediately anymore, let them enjoy the confetti and click "Next"
-        // Or we can auto-advance after 2 seconds. Let's let them click next to control pacing.
-      } else {
-        setSelectedOptionValue(null);
-      }
-    }, ok ? 2000 : 800); // Wait longer on success for confetti
+      setSelectedOptionValue(null);
+    }, 800);
   }, [isAnimating, currentProblem.answer]);
 
   const handleOptionClick = useCallback((option: number) => {
@@ -110,6 +117,7 @@ export default function Home() {
   }
 
   const peripheralOpacity = isAnimating && feedback !== 'correct' ? 'opacity-30 pointer-events-none' : 'opacity-100';
+  const isCorrect = feedback === 'correct';
 
   return (
     <div className="flex h-dvh flex-col items-center justify-center gap-5 sm:gap-8 md:gap-10 p-4 sm:p-6 md:p-8 overflow-hidden bg-neo-ground transition-colors duration-500">
@@ -159,13 +167,27 @@ export default function Home() {
         shape={activeOperation === 'comparison' ? 'square' : 'pill'}
       />
 
-      {/* Only show "New Problem" button explicitly when they get it right, or let them click anywhere? */}
-      <div className={`mt-1 sm:mt-0 transition-all duration-300 ${feedback === 'correct' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
+      <div className="mt-1 sm:mt-0">
         <button
+          type="button"
           onClick={generateNewProblem}
-          className="px-6 py-3 sm:px-8 sm:py-4 md:px-10 md:py-5 bg-neo-green font-black text-xl sm:text-2xl md:text-3xl text-black border-4 border-neo-ink box-shadow-hard rounded-full hover:bg-green-400 active:translate-y-2 active:translate-x-2 active:shadow-none transition-all"
+          disabled={!isCorrect}
+          className={`auto-advance relative overflow-hidden px-6 py-3 sm:px-8 sm:py-4 md:px-10 md:py-5 font-black text-xl sm:text-2xl md:text-3xl border-4 border-neo-ink rounded-full transition-all ${
+            isCorrect ? 'bg-green-200 text-black' : 'bg-neo-surface text-neo-ink opacity-50'
+          } ${
+            isAutoPressing ? 'translate-x-2 translate-y-2' : 'box-shadow-hard active:translate-y-2 active:translate-x-2 active:shadow-none'
+          }`}
         >
-          {t.newProblem}
+          {isCorrect && (
+            <span
+              data-testid="auto-advance-fill"
+              aria-hidden="true"
+              className="auto-advance-fill absolute left-0 top-0 bottom-0 bg-neo-green"
+              style={{ animationDuration: `${AUTO_ADVANCE_MS}ms` }}
+              onAnimationEnd={handleCountdownEnd}
+            />
+          )}
+          <span className="relative">{t.newProblem}</span>
         </button>
       </div>
     </div>

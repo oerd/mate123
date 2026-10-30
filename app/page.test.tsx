@@ -97,3 +97,89 @@ describe('Home Page settings link', () => {
         expect(wrapper?.className).not.toContain('pointer-events-none');
     });
 });
+
+describe('Home Page auto-advance', () => {
+    const fixedParameters = {
+        firstOperandMin: 2,
+        firstOperandMax: 2,
+        secondOperandMin: 2,
+        secondOperandMax: 2,
+        operations: ['addition'],
+        numberOfResults: 4,
+        sortResults: true,
+    };
+
+    const renderFixed = () => {
+        window.localStorage.setItem('math-practice:testParameters', JSON.stringify(fixedParameters));
+        render(<Home />, { wrapper: Wrapper });
+    };
+
+    const newProblemButton = () => screen.getByRole('button', { name: 'New Problem' });
+
+    afterEach(() => {
+        vi.useRealTimers();
+        window.localStorage.clear();
+    });
+
+    it('shows a disabled "New Problem" button before answering', () => {
+        renderFixed();
+
+        expect(newProblemButton()).toHaveProperty('disabled', true);
+        expect(screen.queryByTestId('auto-advance-fill')).toBeNull();
+    });
+
+    it('enables the button and starts the green countdown on a correct answer', () => {
+        renderFixed();
+
+        fireEvent.click(screen.getByRole('button', { name: '4' }));
+
+        expect(newProblemButton()).toHaveProperty('disabled', false);
+        expect(screen.getByTestId('auto-advance-fill').getAttribute('style')).toContain('animation-duration: 2000ms');
+    });
+
+    it('presses the button itself when the green runs out', () => {
+        vi.useFakeTimers();
+        renderFixed();
+
+        fireEvent.click(screen.getByRole('button', { name: '4' }));
+        fireEvent.animationEnd(screen.getByTestId('auto-advance-fill'));
+
+        expect(newProblemButton().classList.contains('translate-x-2')).toBe(true);
+
+        act(() => {
+            vi.advanceTimersByTime(160);
+        });
+
+        expect(newProblemButton()).toHaveProperty('disabled', true);
+        expect(newProblemButton().classList.contains('translate-x-2')).toBe(false);
+        expect(screen.queryByTestId('auto-advance-fill')).toBeNull();
+        expect(screen.getByRole('button', { name: '4' })).toHaveProperty('disabled', false);
+    });
+
+    it('advances immediately when the button is tapped during the countdown', () => {
+        renderFixed();
+
+        fireEvent.click(screen.getByRole('button', { name: '4' }));
+        fireEvent.click(newProblemButton());
+
+        expect(newProblemButton()).toHaveProperty('disabled', true);
+        expect(screen.queryByTestId('auto-advance-fill')).toBeNull();
+    });
+
+    it('never starts the countdown after a wrong answer', () => {
+        vi.useFakeTimers();
+        renderFixed();
+
+        fireEvent.click(screen.getByRole('button', { name: '5' }));
+
+        expect(newProblemButton()).toHaveProperty('disabled', true);
+        expect(screen.queryByTestId('auto-advance-fill')).toBeNull();
+
+        act(() => {
+            vi.advanceTimersByTime(3000);
+        });
+
+        expect(newProblemButton()).toHaveProperty('disabled', true);
+        expect(screen.getByRole('button', { name: '5' })).toHaveProperty('disabled', false);
+    });
+});

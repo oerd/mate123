@@ -47,9 +47,34 @@ body {
   box-shadow: 2px 2px 0px 0px var(--neo-shadow);
 }
 
+.box-shadow-hard:disabled:hover {
+  transform: none;
+  box-shadow: 4px 4px 0px 0px var(--neo-shadow);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .box-shadow-hard:hover, .box-shadow-hard:active {
     transform: none;
     box-shadow: 4px 4px 0px 0px var(--neo-shadow);
+  }
+}
+
+/* Auto-advance: the green on the "New Problem" button drains, then the button presses itself */
+@keyframes auto-advance-drain {
+  from { width: 100%; }
+  to { width: 0%; }
+}
+
+.auto-advance-fill {
+  animation: auto-advance-drain 2s linear forwards;
+}
+
+.auto-advance:hover .auto-advance-fill {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auto-advance-fill {
+    animation-timing-function: steps(4, end);
   }
 }
