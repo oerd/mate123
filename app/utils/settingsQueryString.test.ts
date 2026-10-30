@@ -15,6 +15,7 @@ describe('settingsQueryString', () => {
     roundingAnswers: 2,
     roundingNumberLine: false,
     comparisonModes: ['numbers'],
+    autoAdvance: 'medium',
   };
 
   it('should serialize and deserialize settings correctly', () => {
@@ -34,6 +35,7 @@ describe('settingsQueryString', () => {
       roundingAnswers: 2,
       roundingNumberLine: false,
       comparisonModes: ['numbers'],
+      autoAdvance: 'medium',
     };
     
     const serialized = serializeSettings(customSettings);
@@ -69,6 +71,7 @@ describe('settingsQueryString', () => {
       roundingAnswers: 2,
       roundingNumberLine: false,
       comparisonModes: ['numbers'],
+      autoAdvance: 'medium',
     };
 
     const result = deserializeSettings(serializeSettings(fullSettings));
@@ -166,5 +169,17 @@ describe('settingsQueryString', () => {
   it('treats the new parameters as settings params', () => {
     expect(hasSettingsParams('?rn=10')).toBe(true);
     expect(hasSettingsParams('?cm=sums')).toBe(true);
+    expect(hasSettingsParams('?aa=fast')).toBe(true);
+  });
+
+  it('round-trips the auto-advance speed', () => {
+    const custom: TestParameters = { ...defaultSettings, autoAdvance: 'off' };
+    expect(serializeSettings(custom)).toContain('aa=off');
+    expect(deserializeSettings(serializeSettings(custom)).autoAdvance).toBe('off');
+    expect(deserializeSettings('aa=slow').autoAdvance).toBe('slow');
+  });
+
+  it('ignores an invalid auto-advance speed', () => {
+    expect(deserializeSettings('aa=turbo').autoAdvance).toBeUndefined();
   });
 });

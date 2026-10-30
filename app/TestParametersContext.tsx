@@ -30,6 +30,9 @@ export type RoundingAnswers = 2 | 4;
 export const roundingAnswersOptions: RoundingAnswers[] = [2, 4];
 export type ComparisonMode = 'numbers' | 'sums';
 export const comparisonModeOptions: ComparisonMode[] = ['numbers', 'sums'];
+export type AutoAdvanceSpeed = 'off' | 'slow' | 'medium' | 'fast';
+export const autoAdvanceSpeedOptions: AutoAdvanceSpeed[] = ['off', 'slow', 'medium', 'fast'];
+export const autoAdvanceDelayMs: Record<AutoAdvanceSpeed, number> = { off: 0, slow: 3000, medium: 2000, fast: 1000 };
 
 export interface TestParameters {
   firstOperandMin: number;
@@ -43,6 +46,7 @@ export interface TestParameters {
   roundingAnswers: RoundingAnswers;
   roundingNumberLine: boolean;
   comparisonModes: ComparisonMode[];
+  autoAdvance: AutoAdvanceSpeed;
 }
 
 interface TestParametersContextType {
@@ -62,7 +66,8 @@ export const defaultTestParameters: TestParameters = {
   roundingNearest: [10],
   roundingAnswers: 2,
   roundingNumberLine: false,
-  comparisonModes: ['numbers']
+  comparisonModes: ['numbers'],
+  autoAdvance: 'medium'
 };
 
 const TestParametersContext = createContext<TestParametersContextType | undefined>(undefined);

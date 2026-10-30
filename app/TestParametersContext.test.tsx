@@ -66,6 +66,18 @@ describe('TestParametersContext', () => {
     expect(result.current.testParameters).toMatchObject(savedParams);
     expect(result.current.testParameters.roundingNearest).toEqual([10]);
     expect(result.current.testParameters.comparisonModes).toEqual(['numbers']);
+    expect(result.current.testParameters.autoAdvance).toBe('medium');
+  });
+
+  it('reads the auto-advance speed from the share link', () => {
+    window.history.pushState({}, '', '/?aa=fast');
+
+    const { result } = renderHook(() => useTestParameters(), {
+      wrapper: TestParametersProvider,
+    });
+
+    expect(result.current.testParameters.autoAdvance).toBe('fast');
+    expect(result.current.loadedFromUrl).toBe(true);
   });
 
   it('prioritizes URL parameters over defaults/localStorage', () => {

@@ -15,6 +15,7 @@ describe('mathLogic', () => {
     roundingAnswers: 2,
     roundingNumberLine: false,
     comparisonModes: ['numbers'],
+    autoAdvance: 'medium',
   };
 
   describe('pickRandomOperation', () => {

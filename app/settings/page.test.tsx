@@ -161,6 +161,18 @@ describe('Settings Page', () => {
     expect(stored.comparisonModes).toEqual(['numbers', 'sums']);
   });
 
+  it('saves the auto-advance speed', () => {
+    render(<Settings />, { wrapper: Wrapper });
+
+    expect(screen.getByRole('button', { name: 'Medium (2 s)' }).getAttribute('aria-pressed')).toBe('true');
+    fireEvent.click(screen.getByRole('button', { name: 'Wait for a tap' }));
+    expect(screen.getByRole('button', { name: 'Wait for a tap' }).getAttribute('aria-pressed')).toBe('true');
+    fireEvent.click(screen.getByText('Save Settings'));
+
+    const stored = JSON.parse(window.localStorage.getItem('math-practice:testParameters') ?? '{}');
+    expect(stored.autoAdvance).toBe('off');
+  });
+
   it('allows selecting multiple rounding targets but keeps at least one', () => {
     render(<Settings />, { wrapper: Wrapper });
 

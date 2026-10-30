@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { useLanguage } from './LanguageContext';
-import { useTestParameters, Operation } from './TestParametersContext';
+import { useTestParameters, Operation, autoAdvanceDelayMs } from './TestParametersContext';
 import { translations } from './translations';
 import { SettingsIcon } from './components/SettingsIcon';
 import { FitTitle } from './components/FitTitle';
@@ -11,9 +11,10 @@ import { generateProblem, generateOptionsForProblem, pickRandomOperation, isAnsw
 import { ProblemDisplay } from './components/ProblemDisplay';
 import { ResultGrid } from './components/ResultGrid';
 import confetti from 'canvas-confetti';
+import { AnimatePresence, MotionConfig, motion } from 'framer-motion';
 
-const AUTO_ADVANCE_MS = 2000;
 const AUTO_PRESS_MS = 160;
+const SLIDE_TRANSITION = { duration: 0.25, ease: 'easeOut' } as const;
 
 export default function Home() {
   const { language } = useLanguage();
@@ -118,6 +119,8 @@ export default function Home() {
 
   const peripheralOpacity = isAnimating && feedback !== 'correct' ? 'opacity-30 pointer-events-none' : 'opacity-100';
   const isCorrect = feedback === 'correct';
+  const autoAdvanceMs = autoAdvanceDelayMs[testParameters.autoAdvance];
+  const countsDown = isCorrect && autoAdvanceMs > 0;
 
   return (
     <div className="flex h-dvh flex-col items-center justify-center gap-5 sm:gap-8 md:gap-10 p-4 sm:p-6 md:p-8 overflow-hidden bg-neo-ground transition-colors duration-500">
@@ -147,17 +150,31 @@ export default function Home() {
         {t.title}
       </FitTitle>
 
-      <ProblemDisplay
-        firstNumber={currentProblem.num1}
-        secondNumber={currentProblem.num2}
-        operation={activeOperation}
-        feedback={feedback}
-        isAnimating={isAnimating}
-        t={t}
-        answer={currentProblem.answer}
-        addends={currentProblem.addends}
-        showNumberLine={testParameters.roundingNumberLine}
-      />
+      <MotionConfig reducedMotion="user">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={problemSeed}
+            data-testid="problem-slide"
+            className="w-full flex justify-center"
+            initial={{ x: '120%', opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: '-120%', opacity: 0 }}
+            transition={SLIDE_TRANSITION}
+          >
+            <ProblemDisplay
+              firstNumber={currentProblem.num1}
+              secondNumber={currentProblem.num2}
+              operation={activeOperation}
+              feedback={feedback}
+              isAnimating={isAnimating}
+              t={t}
+              answer={currentProblem.answer}
+              addends={currentProblem.addends}
+              showNumberLine={testParameters.roundingNumberLine}
+            />
+          </motion.div>
+        </AnimatePresence>
+      </MotionConfig>
 
       <ResultGrid
         answerOptions={answerOptions}
@@ -173,17 +190,17 @@ export default function Home() {
           onClick={generateNewProblem}
           disabled={!isCorrect}
           className={`auto-advance relative overflow-hidden px-6 py-3 sm:px-8 sm:py-4 md:px-10 md:py-5 font-black text-xl sm:text-2xl md:text-3xl border-4 border-neo-ink rounded-full transition-all ${
-            isCorrect ? 'bg-green-200 text-black' : 'bg-neo-surface text-neo-ink opacity-50'
+            countsDown ? 'bg-green-200 text-black' : isCorrect ? 'bg-neo-green text-black' : 'bg-neo-surface text-neo-ink opacity-50'
           } ${
             isAutoPressing ? 'translate-x-2 translate-y-2' : 'box-shadow-hard active:translate-y-2 active:translate-x-2 active:shadow-none'
           }`}
         >
-          {isCorrect && (
+          {countsDown && (
             <span
               data-testid="auto-advance-fill"
               aria-hidden="true"
               className="auto-advance-fill absolute left-0 top-0 bottom-0 bg-neo-green"
-              style={{ animationDuration: `${AUTO_ADVANCE_MS}ms` }}
+              style={{ animationDuration: `${autoAdvanceMs}ms` }}
               onAnimationEnd={handleCountdownEnd}
             />
           )}

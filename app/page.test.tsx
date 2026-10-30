@@ -109,8 +109,8 @@ describe('Home Page auto-advance', () => {
         sortResults: true,
     };
 
-    const renderFixed = () => {
-        window.localStorage.setItem('math-practice:testParameters', JSON.stringify(fixedParameters));
+    const renderFixed = (overrides: Record<string, unknown> = {}) => {
+        window.localStorage.setItem('math-practice:testParameters', JSON.stringify({ ...fixedParameters, ...overrides }));
         render(<Home />, { wrapper: Wrapper });
     };
 
@@ -166,11 +166,40 @@ describe('Home Page auto-advance', () => {
         expect(screen.queryByTestId('auto-advance-fill')).toBeNull();
     });
 
+    it('uses the delay of the configured speed', () => {
+        renderFixed({ autoAdvance: 'fast' });
+
+        fireEvent.click(screen.getByRole('button', { name: '4' }));
+
+        expect(screen.getByTestId('auto-advance-fill').getAttribute('style')).toContain('animation-duration: 1000ms');
+    });
+
+    it('waits for a tap when auto-advance is off', () => {
+        vi.useFakeTimers();
+        renderFixed({ autoAdvance: 'off' });
+
+        fireEvent.click(screen.getByRole('button', { name: '4' }));
+
+        expect(newProblemButton()).toHaveProperty('disabled', false);
+        expect(newProblemButton().classList.contains('bg-neo-green')).toBe(true);
+        expect(screen.queryByTestId('auto-advance-fill')).toBeNull();
+
+        act(() => {
+            vi.advanceTimersByTime(5000);
+        });
+        expect(newProblemButton()).toHaveProperty('disabled', false);
+
+        fireEvent.click(newProblemButton());
+        expect(newProblemButton()).toHaveProperty('disabled', true);
+    });
+
     it('never starts the countdown after a wrong answer', () => {
         vi.useFakeTimers();
         renderFixed();
 
-        fireEvent.click(screen.getByRole('button', { name: '5' }));
+        const wrongOption = screen.getAllByRole('button').find(b => /^\d+$/.test(b.textContent ?? '') && b.textContent !== '4');
+        if (!wrongOption) throw new Error('expected a wrong answer option');
+        fireEvent.click(wrongOption);
 
         expect(newProblemButton()).toHaveProperty('disabled', true);
         expect(screen.queryByTestId('auto-advance-fill')).toBeNull();
@@ -180,6 +209,6 @@ describe('Home Page auto-advance', () => {
         });
 
         expect(newProblemButton()).toHaveProperty('disabled', true);
-        expect(screen.getByRole('button', { name: '5' })).toHaveProperty('disabled', false);
+        expect(wrongOption).toHaveProperty('disabled', false);
     });
 });

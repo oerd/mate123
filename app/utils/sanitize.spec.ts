@@ -15,10 +15,23 @@ describe('sanitizeParameters', () => {
     roundingAnswers: 2,
     roundingNumberLine: false,
     comparisonModes: ['numbers'],
+    autoAdvance: 'medium',
   };
 
   it('passes through valid parameters unchanged', () => {
     expect(sanitizeParameters(validParams)).toEqual(validParams);
+  });
+
+  it('keeps a valid auto-advance speed', () => {
+    expect(sanitizeParameters({ ...validParams, autoAdvance: 'off' }).autoAdvance).toBe('off');
+    expect(sanitizeParameters({ ...validParams, autoAdvance: 'fast' }).autoAdvance).toBe('fast');
+  });
+
+  it('falls back to a medium auto-advance speed when the value is invalid or missing', () => {
+    const { autoAdvance: _unused, ...withoutSpeed } = validParams;
+    void _unused;
+    expect(sanitizeParameters(withoutSpeed as TestParameters).autoAdvance).toBe('medium');
+    expect(sanitizeParameters({ ...validParams, autoAdvance: 'turbo' as TestParameters['autoAdvance'] }).autoAdvance).toBe('medium');
   });
 
   it('swaps min/max when min > max', () => {
