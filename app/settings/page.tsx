@@ -12,6 +12,8 @@ import {
   roundingAnswersOptions,
   ComparisonMode,
   comparisonModeOptions,
+  AutoAdvanceSpeed,
+  autoAdvanceSpeedOptions,
 } from '../TestParametersContext';
 import { translations } from '../translations';
 import Link from 'next/link';
@@ -59,6 +61,13 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ checked, onChange, label })
   </label>
 );
 
+const autoAdvanceLabelKey: Record<AutoAdvanceSpeed, 'autoAdvanceOff' | 'autoAdvanceSlow' | 'autoAdvanceMedium' | 'autoAdvanceFast'> = {
+  off: 'autoAdvanceOff',
+  slow: 'autoAdvanceSlow',
+  medium: 'autoAdvanceMedium',
+  fast: 'autoAdvanceFast',
+};
+
 const themeIcons: Record<ThemeMode, React.FC> = {
   light: LightIcon,
   dark: DarkIcon,
@@ -83,6 +92,7 @@ export default function Settings() {
   const [roundingAnswers, setRoundingAnswers] = useState<RoundingAnswers>(testParameters.roundingAnswers);
   const [roundingNumberLine, setRoundingNumberLine] = useState<boolean>(testParameters.roundingNumberLine);
   const [comparisonModes, setComparisonModes] = useState<ComparisonMode[]>(testParameters.comparisonModes);
+  const [autoAdvance, setAutoAdvance] = useState<AutoAdvanceSpeed>(testParameters.autoAdvance);
   const [shareTooltip, setShareTooltip] = useState<boolean>(false);
   const [shareResult, setShareResult] = useState<{ query: string; method: 'share' | 'copy' } | null>(null);
   const [saveResult, setSaveResult] = useState<{ query: string; status: ActionStatus } | null>(null);
@@ -99,6 +109,7 @@ export default function Settings() {
     setRoundingAnswers(testParameters.roundingAnswers);
     setRoundingNumberLine(testParameters.roundingNumberLine);
     setComparisonModes(testParameters.comparisonModes);
+    setAutoAdvance(testParameters.autoAdvance);
   }, [testParameters]);
 
   const handleOperationToggle = (operation: Operation) => {
@@ -142,8 +153,9 @@ export default function Settings() {
     roundingNearest,
     roundingAnswers,
     roundingNumberLine,
-    comparisonModes
-  }), [firstOperandMin, firstOperandMax, secondOperandMin, secondOperandMax, selectedOperations, numberOfResults, sortResults, roundingNearest, roundingAnswers, roundingNumberLine, comparisonModes]);
+    comparisonModes,
+    autoAdvance
+  }), [firstOperandMin, firstOperandMax, secondOperandMin, secondOperandMax, selectedOperations, numberOfResults, sortResults, roundingNearest, roundingAnswers, roundingNumberLine, comparisonModes, autoAdvance]);
 
   const currentQuery = useMemo(() => serializeSettings(currentSettings), [currentSettings]);
   const saveStatus: ActionStatus = saveResult?.query === currentQuery ? saveResult.status : 'idle';
@@ -476,6 +488,27 @@ export default function Settings() {
                 onChange={() => setSortResults(!sortResults)}
                 label={sortResults ? t.sortResultsDescription : t.randomizeResults}
               />
+            </div>
+          </div>
+
+          <div className="mb-6" data-testid="auto-advance-settings">
+            <h3 className="text-xl font-semibold mb-4 text-ctp-text">{t.autoAdvanceSettings}</h3>
+
+            <div className="mb-4">
+              <label className="block text-ctp-text mb-2">{t.autoAdvanceLabel}</label>
+              <div className="flex flex-wrap gap-2" role="group" aria-label={t.autoAdvanceLabel}>
+                {autoAdvanceSpeedOptions.map((speed) => (
+                  <button
+                    key={speed}
+                    type="button"
+                    onClick={() => setAutoAdvance(speed)}
+                    aria-pressed={autoAdvance === speed}
+                    className={chipClass(autoAdvance === speed)}
+                  >
+                    {t[autoAdvanceLabelKey[speed]]}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 

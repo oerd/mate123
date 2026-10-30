@@ -59,6 +59,12 @@ interface Translations {
   compareNumbers: string;
   compareSums: string;
   whichSignFits: string;
+  autoAdvanceSettings: string;
+  autoAdvanceLabel: string;
+  autoAdvanceOff: string;
+  autoAdvanceSlow: string;
+  autoAdvanceMedium: string;
+  autoAdvanceFast: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -120,7 +126,13 @@ export const translations: Record<Language, Translations> = {
     compareWhat: 'Compare',
     compareNumbers: 'Numbers',
     compareSums: 'Sums',
-    whichSignFits: 'Which sign fits?'
+    whichSignFits: 'Which sign fits?',
+    autoAdvanceSettings: 'Pace',
+    autoAdvanceLabel: 'After a correct answer',
+    autoAdvanceOff: 'Wait for a tap',
+    autoAdvanceSlow: 'Slow (3 s)',
+    autoAdvanceMedium: 'Medium (2 s)',
+    autoAdvanceFast: 'Fast (1 s)'
   },
   de: {
     title: 'Mathe-Übung',
@@ -180,7 +192,13 @@ export const translations: Record<Language, Translations> = {
     compareWhat: 'Vergleiche',
     compareNumbers: 'Zahlen',
     compareSums: 'Summen',
-    whichSignFits: 'Welches Zeichen passt?'
+    whichSignFits: 'Welches Zeichen passt?',
+    autoAdvanceSettings: 'Tempo',
+    autoAdvanceLabel: 'Nach einer richtigen Antwort',
+    autoAdvanceOff: 'Auf Tippen warten',
+    autoAdvanceSlow: 'Langsam (3 s)',
+    autoAdvanceMedium: 'Mittel (2 s)',
+    autoAdvanceFast: 'Schnell (1 s)'
   },
   it: {
     title: 'Esercizi di Matematica',
@@ -240,7 +258,13 @@ export const translations: Record<Language, Translations> = {
     compareWhat: 'Confronta',
     compareNumbers: 'Numeri',
     compareSums: 'Somme',
-    whichSignFits: 'Quale segno ci va?'
+    whichSignFits: 'Quale segno ci va?',
+    autoAdvanceSettings: 'Ritmo',
+    autoAdvanceLabel: 'Dopo una risposta corretta',
+    autoAdvanceOff: 'Aspetta un tocco',
+    autoAdvanceSlow: 'Lento (3 s)',
+    autoAdvanceMedium: 'Medio (2 s)',
+    autoAdvanceFast: 'Veloce (1 s)'
   },
   fr: {
     title: 'Exercices de Mathématiques',
@@ -300,7 +324,13 @@ export const translations: Record<Language, Translations> = {
     compareWhat: 'Comparer',
     compareNumbers: 'Nombres',
     compareSums: 'Sommes',
-    whichSignFits: 'Quel signe convient ?'
+    whichSignFits: 'Quel signe convient ?',
+    autoAdvanceSettings: 'Rythme',
+    autoAdvanceLabel: 'Après une bonne réponse',
+    autoAdvanceOff: 'Attendre un appui',
+    autoAdvanceSlow: 'Lent (3 s)',
+    autoAdvanceMedium: 'Moyen (2 s)',
+    autoAdvanceFast: 'Rapide (1 s)'
   },
   sq: {
     title: 'Praktikë Matematike',
@@ -360,7 +390,13 @@ export const translations: Record<Language, Translations> = {
     compareWhat: 'Krahaso',
     compareNumbers: 'Numra',
     compareSums: 'Shuma',
-    whichSignFits: 'Cila shenjë përshtatet?'
+    whichSignFits: 'Cila shenjë përshtatet?',
+    autoAdvanceSettings: 'Ritmi',
+    autoAdvanceLabel: 'Pas një përgjigjeje të saktë',
+    autoAdvanceOff: 'Prit një prekje',
+    autoAdvanceSlow: 'Ngadalë (3 s)',
+    autoAdvanceMedium: 'Mesatar (2 s)',
+    autoAdvanceFast: 'Shpejt (1 s)'
   }
 };
 

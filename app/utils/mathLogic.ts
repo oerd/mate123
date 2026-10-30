@@ -7,6 +7,7 @@ import {
   RoundingAnswers,
   roundingAnswersOptions,
   comparisonModeOptions,
+  autoAdvanceSpeedOptions,
 } from '../TestParametersContext';
 
 export const COMPARISON_LESS = -1;
@@ -86,6 +87,7 @@ export function sanitizeParameters(params: TestParameters): TestParameters {
     ? params.roundingAnswers
     : 2;
   const comparisonModes = comparisonModeOptions.filter((mode) => (params.comparisonModes ?? []).includes(mode));
+  const autoAdvance = autoAdvanceSpeedOptions.includes(params.autoAdvance) ? params.autoAdvance : 'medium';
 
   return {
     firstOperandMin: Math.min(firstMin, firstMax),
@@ -99,6 +101,7 @@ export function sanitizeParameters(params: TestParameters): TestParameters {
     roundingAnswers,
     roundingNumberLine: Boolean(params.roundingNumberLine),
     comparisonModes: comparisonModes.length > 0 ? comparisonModes : ['numbers'],
+    autoAdvance,
   };
 }
 

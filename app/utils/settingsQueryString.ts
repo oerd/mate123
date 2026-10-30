@@ -1,4 +1,4 @@
-import { TestParameters, Operation, allOperations, roundingNearestOptions, RoundingAnswers, roundingAnswersOptions, ComparisonMode, comparisonModeOptions } from '../TestParametersContext';
+import { TestParameters, Operation, allOperations, roundingNearestOptions, RoundingAnswers, roundingAnswersOptions, ComparisonMode, comparisonModeOptions, AutoAdvanceSpeed, autoAdvanceSpeedOptions } from '../TestParametersContext';
 
 // Serializes settings to a compressed query string
 export function serializeSettings(settings: TestParameters): string {
@@ -17,6 +17,7 @@ export function serializeSettings(settings: TestParameters): string {
   params.set('ra', settings.roundingAnswers.toString());
   params.set('rl', settings.roundingNumberLine ? '1' : '0');
   params.set('cm', settings.comparisonModes.join(','));
+  params.set('aa', settings.autoAdvance);
   
   return params.toString();
 }
@@ -69,6 +70,12 @@ export function deserializeSettings(queryString: string): Partial<TestParameters
       settings.comparisonModes = validModes;
     }
   }
+  if (params.has('aa')) {
+    const speed = params.get('aa') as AutoAdvanceSpeed;
+    if (autoAdvanceSpeedOptions.includes(speed)) {
+      settings.autoAdvance = speed;
+    }
+  }
   
   return settings;
 }
@@ -76,6 +83,6 @@ export function deserializeSettings(queryString: string): Partial<TestParameters
 // Check if query string contains any settings parameters
 export function hasSettingsParams(queryString: string): boolean {
   const params = new URLSearchParams(queryString);
-  const settingsParams = ['fm', 'fx', 'sm', 'sx', 'op', 'nr', 'sr', 'rn', 'ra', 'rl', 'cm'];
+  const settingsParams = ['fm', 'fx', 'sm', 'sx', 'op', 'nr', 'sr', 'rn', 'ra', 'rl', 'cm', 'aa'];
   return settingsParams.some(param => params.has(param));
 }
