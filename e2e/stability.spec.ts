@@ -2,7 +2,6 @@ import { test, expect } from '@playwright/test';
 
 test.describe('App Stability', () => {
   test('should iterate through many math problems without freezing', async ({ page }) => {
-    // Increase timeout to allow for animations (1.5s per iteration * 20 = 30s+)
     test.setTimeout(120000);
 
     // 1. Navigate to home
@@ -17,6 +16,14 @@ test.describe('App Stability', () => {
     console.log(`Starting ${iterations} iterations of solve-and-refresh...`);
 
     for (let i = 0; i < iterations; i++) {
+      // Every ten solved problems the set-complete card replaces the problem; continue from it
+      const setComplete = page.getByTestId('set-complete');
+      if (await setComplete.isVisible()) {
+        await setComplete.getByRole('button').click();
+        // Hovering the advance button pauses the auto-advance countdown, so park the mouse
+        await page.mouse.move(0, 0);
+      }
+
       // 2. Extract problem data from the DOM
       // The structure is: <span>{num1}</span> <span>{op}</span> <span>{num2}</span> ...
       // We can locate the problem container
@@ -50,7 +57,7 @@ test.describe('App Stability', () => {
       // We need to match the button with the exact text of the answer
       // Round to 2 decimals if needed (display logic in app uses rounding)
       const displayAnswer = Math.round(expectedAnswer * 100) / 100;
-      const answerBtn = page.locator(`button`, { hasText: `${displayAnswer}` }).first();
+      const answerBtn = page.getByRole('button', { name: `${displayAnswer}`, exact: true });
       
       // Check if button exists (it should!)
       await expect(answerBtn).toBeVisible();
@@ -61,8 +68,9 @@ test.describe('App Stability', () => {
       // 4. Wait for the "Correct!" feedback
       await expect(container).toContainText(/Correct|Richtig|Corretto|Saktë/);
       
-      // 5. Wait for the new problem to appear
+      // 5. Move on right away instead of waiting out the auto-advance countdown
       // The feedback element is removed from the DOM when the next problem loads
+      await page.getByTestId('advance-button').click();
       await expect(container.getByRole('status')).not.toBeVisible({ timeout: 3000 });
       
       // Optional: Verify the numbers changed (unless by chance they are the same, which is rare but possible)
@@ -75,7 +83,7 @@ test.describe('App Stability', () => {
 
   test('should handle rapid "New Problem" clicks', async ({ page }) => {
     await page.goto('/');
-    const newProblemBtn = page.getByRole('button', { name: /New Problem|Neue Aufgabe|Nuovo Problema|Nouveau Problème|Problem i Ri/i });
+    const newProblemBtn = page.getByTestId('advance-button');
     
     for (let i = 0; i < 20; i++) {
       await newProblemBtn.click({ force: true });
