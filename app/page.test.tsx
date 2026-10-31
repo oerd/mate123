@@ -10,6 +10,9 @@ import Home from './page';
 
 vi.mock('canvas-confetti', () => ({ default: vi.fn() }));
 
+const wrongAnswerButton = () =>
+    screen.getAllByRole('button').find(b => b.getAttribute('data-state') === 'idle' && b.textContent !== '4') as HTMLButtonElement;
+
 const Wrapper = ({ children }: { children: React.ReactNode }) => (
     <ThemeProvider>
         <LanguageProvider>
@@ -86,9 +89,9 @@ describe('Home Page settings link', () => {
         render(<Home />, { wrapper: Wrapper });
 
         fireEvent.click(screen.getByRole('button', { name: '4' }));
-        expect(screen.getByText('New Problem')).toBeDefined();
+        expect(screen.getByText('Next')).toBeDefined();
 
-        const wrapper = screen.getByRole('link', { name: 'Settings' }).closest('.absolute');
+        const wrapper = screen.getByRole('link', { name: 'Settings' }).closest('header');
         expect(wrapper?.className).not.toContain('pointer-events-none');
 
         act(() => {
@@ -114,26 +117,42 @@ describe('Home Page auto-advance', () => {
         render(<Home />, { wrapper: Wrapper });
     };
 
-    const newProblemButton = () => screen.getByRole('button', { name: 'New Problem' });
+    const advanceButton = () => screen.getByTestId('advance-button');
 
     afterEach(() => {
         vi.useRealTimers();
         window.localStorage.clear();
     });
 
-    it('shows a disabled "New Problem" button before answering', () => {
+    it('offers a live "Skip" button before answering', () => {
         renderFixed();
 
-        expect(newProblemButton()).toHaveProperty('disabled', true);
+        expect(advanceButton()).toHaveProperty('disabled', false);
+        expect(advanceButton().textContent).toContain('Skip');
         expect(screen.queryByTestId('auto-advance-fill')).toBeNull();
     });
 
-    it('enables the button and starts the green countdown on a correct answer', () => {
+    it('skipping loads a new problem and resets the streak', () => {
+        renderFixed();
+
+        fireEvent.click(screen.getByRole('button', { name: '4' }));
+        fireEvent.click(advanceButton());
+        fireEvent.click(screen.getByRole('button', { name: '4' }));
+        expect(screen.getByTestId('streak-badge').textContent).toContain('2');
+
+        fireEvent.click(advanceButton());
+        fireEvent.click(advanceButton());
+        expect(screen.queryByTestId('streak-badge')).toBeNull();
+        expect(screen.getByRole('button', { name: '4' })).toHaveProperty('disabled', false);
+    });
+
+    it('turns into "Next" and starts the green countdown on a correct answer', () => {
         renderFixed();
 
         fireEvent.click(screen.getByRole('button', { name: '4' }));
 
-        expect(newProblemButton()).toHaveProperty('disabled', false);
+        expect(advanceButton()).toHaveProperty('disabled', false);
+        expect(advanceButton().textContent).toContain('Next');
         expect(screen.getByTestId('auto-advance-fill').getAttribute('style')).toContain('animation-duration: 2000ms');
     });
 
@@ -144,14 +163,14 @@ describe('Home Page auto-advance', () => {
         fireEvent.click(screen.getByRole('button', { name: '4' }));
         fireEvent.animationEnd(screen.getByTestId('auto-advance-fill'));
 
-        expect(newProblemButton().classList.contains('translate-x-2')).toBe(true);
+        expect(advanceButton().classList.contains('translate-x-2')).toBe(true);
 
         act(() => {
             vi.advanceTimersByTime(160);
         });
 
-        expect(newProblemButton()).toHaveProperty('disabled', true);
-        expect(newProblemButton().classList.contains('translate-x-2')).toBe(false);
+        expect(advanceButton().textContent).toContain('Skip');
+        expect(advanceButton().classList.contains('translate-x-2')).toBe(false);
         expect(screen.queryByTestId('auto-advance-fill')).toBeNull();
         expect(screen.getByRole('button', { name: '4' })).toHaveProperty('disabled', false);
     });
@@ -160,9 +179,9 @@ describe('Home Page auto-advance', () => {
         renderFixed();
 
         fireEvent.click(screen.getByRole('button', { name: '4' }));
-        fireEvent.click(newProblemButton());
+        fireEvent.click(advanceButton());
 
-        expect(newProblemButton()).toHaveProperty('disabled', true);
+        expect(advanceButton().textContent).toContain('Skip');
         expect(screen.queryByTestId('auto-advance-fill')).toBeNull();
     });
 
@@ -170,16 +189,113 @@ describe('Home Page auto-advance', () => {
         vi.useFakeTimers();
         renderFixed();
 
-        fireEvent.click(screen.getByRole('button', { name: '5' }));
+        fireEvent.click(wrongAnswerButton());
 
-        expect(newProblemButton()).toHaveProperty('disabled', true);
+        expect(advanceButton().textContent).toContain('Skip');
         expect(screen.queryByTestId('auto-advance-fill')).toBeNull();
 
         act(() => {
             vi.advanceTimersByTime(3000);
         });
 
-        expect(newProblemButton()).toHaveProperty('disabled', true);
-        expect(screen.getByRole('button', { name: '5' })).toHaveProperty('disabled', false);
+        expect(advanceButton().textContent).toContain('Skip');
+        expect(screen.getByRole('button', { name: '4' })).toHaveProperty('disabled', false);
+    });
+});
+
+describe('Home Page answer feedback', () => {
+    const fixedParameters = {
+        firstOperandMin: 2,
+        firstOperandMax: 2,
+        secondOperandMin: 2,
+        secondOperandMax: 2,
+        operations: ['addition'],
+        numberOfResults: 4,
+        sortResults: true,
+    };
+
+    const renderFixed = () => {
+        window.localStorage.setItem('math-practice:testParameters', JSON.stringify(fixedParameters));
+        render(<Home />, { wrapper: Wrapper });
+    };
+
+    afterEach(() => {
+        vi.useRealTimers();
+        window.localStorage.clear();
+    });
+
+    it('reveals the answer in the equation once correct', () => {
+        renderFixed();
+        expect(screen.getByTestId('equation-answer').textContent).toBe('?');
+
+        fireEvent.click(screen.getByRole('button', { name: '4' }));
+
+        expect(screen.getByTestId('equation-answer').textContent).toBe('4');
+        expect(screen.getByTestId('equation-answer').className).toContain('text-neo-correct');
+        expect(screen.getByRole('button', { name: '4' }).getAttribute('data-state')).toBe('correct');
+    });
+
+    it('keeps a wrong pick marked and disabled while the rest stay tappable', () => {
+        vi.useFakeTimers();
+        renderFixed();
+
+        const wrong = wrongAnswerButton();
+        fireEvent.click(wrong);
+        expect(wrong.getAttribute('data-state')).toBe('wrong');
+
+        act(() => {
+            vi.advanceTimersByTime(800);
+        });
+
+        expect(wrong).toHaveProperty('disabled', true);
+        expect(wrong.getAttribute('data-state')).toBe('wrong');
+        expect(screen.getByTestId('equation-answer').textContent).toBe('?');
+        expect(screen.getByRole('button', { name: '4' })).toHaveProperty('disabled', false);
+
+        fireEvent.click(screen.getByRole('button', { name: '4' }));
+        expect(wrong.getAttribute('data-state')).toBe('wrong');
+        expect(screen.getByTestId('equation-answer').textContent).toBe('4');
+    });
+
+    it('fills the progress tray and shows the set-complete card after ten correct answers', () => {
+        vi.useFakeTimers();
+        renderFixed();
+
+        const dots = () => screen.getByTestId('progress-tray').querySelectorAll('[data-filled="true"]').length;
+        expect(dots()).toBe(0);
+
+        for (let i = 0; i < 10; i++) {
+            fireEvent.click(screen.getByRole('button', { name: '4' }));
+            expect(dots()).toBe(i + 1);
+            fireEvent.click(screen.getByTestId('advance-button'));
+        }
+
+        expect(screen.getByTestId('set-complete')).toBeDefined();
+        expect(screen.getByText('You did 10!')).toBeDefined();
+        expect(screen.queryByTestId('advance-button')).toBeNull();
+
+        fireEvent.click(screen.getByRole('button', { name: 'Keep going' }));
+        expect(dots()).toBe(0);
+        expect(screen.getByRole('button', { name: '4' })).toHaveProperty('disabled', false);
+    });
+
+    it('counts a streak only for first-try answers', () => {
+        vi.useFakeTimers();
+        renderFixed();
+
+        fireEvent.click(screen.getByRole('button', { name: '4' }));
+        expect(screen.queryByTestId('streak-badge')).toBeNull();
+        fireEvent.click(screen.getByTestId('advance-button'));
+
+        fireEvent.click(screen.getByRole('button', { name: '4' }));
+        expect(screen.getByTestId('streak-badge').textContent).toContain('2');
+        fireEvent.click(screen.getByTestId('advance-button'));
+
+        fireEvent.click(wrongAnswerButton());
+        act(() => {
+            vi.advanceTimersByTime(800);
+        });
+        fireEvent.click(screen.getByRole('button', { name: '4' }));
+        expect(screen.queryByTestId('streak-badge')).toBeNull();
     });
 });

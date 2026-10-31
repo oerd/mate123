@@ -4,7 +4,7 @@ import { translations } from '../translations';
 import { motion } from 'framer-motion';
 import { Mascot } from './Mascot';
 import { NumberLine } from './NumberLine';
-import { comparisonSymbol } from '../utils/mathLogic';
+import { comparisonSymbol, round2 } from '../utils/mathLogic';
 
 interface ProblemDisplayProps {
   firstNumber: number;
@@ -39,7 +39,7 @@ const RoundingNumber = ({ value, nearest }: { value: number; nearest: number }) 
   return (
     <span>
       {digits.slice(0, index)}
-      <span className="text-purple-500">{digits.charAt(index)}</span>
+      <span className="text-neo-mark">{digits.charAt(index)}</span>
       {digits.slice(index + 1)}
     </span>
   );
@@ -91,7 +91,7 @@ export const ProblemDisplay = ({
           <div className={`${equationSizeClass(chars)} font-black flex items-center justify-center gap-2 sm:gap-4 text-neo-ink tabular-nums`}>
             <RoundingNumber value={firstNumber} nearest={secondNumber} />
             <span>≈</span>
-            <span className={revealed ? 'text-green-600' : ''}>{answerText}</span>
+            <span className={revealed ? 'text-neo-correct' : ''}>{answerText}</span>
           </div>
           {showNumberLine && <div className="mt-3 w-full flex justify-center"><NumberLine value={firstNumber} nearest={secondNumber} /></div>}
         </>
@@ -124,7 +124,7 @@ export const ProblemDisplay = ({
         <span>{operationLookup(operation)}</span>
         <span>{secondNumber}</span>
         <span>=</span>
-        <span>?</span>
+        <span data-testid="equation-answer" className={revealed ? 'text-neo-correct' : ''}>{revealed ? round2(answer) : '?'}</span>
       </div>
     );
   };
@@ -134,7 +134,7 @@ export const ProblemDisplay = ({
       <div className="relative w-full max-w-md lg:max-w-xl transform -rotate-2">
         <motion.div
           animate={getAnimationVariants()}
-          className={`math-problem-container flex flex-col lg:flex-row items-center justify-center p-6 sm:p-8 rounded-2xl bg-neo-surface border-4 border-neo-ink box-shadow-hard w-full ${isAnimating && feedback === 'correct' ? 'animate-success' :
+          className={`math-problem-container flex flex-col lg:flex-row items-center justify-center p-5 sm:p-8 rounded-2xl bg-neo-surface border-4 border-neo-ink box-shadow-hard w-full ${isAnimating && feedback === 'correct' ? 'animate-success' :
             isAnimating && feedback === 'incorrect' ? 'animate-error' : ''
             }`}
         >
@@ -142,20 +142,19 @@ export const ProblemDisplay = ({
             {renderEquation()}
           </div>
 
-          {/* Mascot: below text on mobile, inline right on wide screens */}
           <Mascot
-            className="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 pointer-events-none drop-shadow-xl lg:ml-4 mt-2 lg:mt-0 flex-shrink-0"
+            className="w-20 h-20 sm:w-28 sm:h-28 lg:w-32 lg:h-32 pointer-events-none lg:ml-4 mt-1 lg:mt-0 flex-shrink-0"
             isAnimating={isAnimating}
             feedback={feedback}
           />
+
+          {feedback && (
+            <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+              {feedback === 'correct' ? t.correct : t.tryAgain}
+            </div>
+          )}
         </motion.div>
       </div>
-
-      {feedback && (
-        <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
-          {feedback === 'correct' ? t.correct : t.tryAgain}
-        </div>
-      )}
     </div>
   );
 };

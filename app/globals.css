@@ -11,6 +11,8 @@
   --neo-ink-muted: #9CA3AF;
   --neo-shadow: #000000;
   --neo-pill: #38BDF8;
+  --neo-mark: #7C3AED;
+  --neo-correct: #15803D;
   --background: var(--neo-ground);
   --foreground: var(--neo-ink);
 }
@@ -24,6 +26,8 @@
   --neo-ink-muted: #8F86B8;
   --neo-shadow: #38BDF8;
   --neo-pill: #A78BFA;
+  --neo-mark: #C4B5FD;
+  --neo-correct: #4ADE80;
 }
 
 body {
