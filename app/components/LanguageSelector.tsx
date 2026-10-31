@@ -4,8 +4,7 @@ import { Language } from '../translations';
 interface LanguageSelectorProps {
   language: Language;
   setLanguage: (language: Language) => void;
-  tooltip: string | null;
-  setTooltip: (tooltip: string | null) => void;
+  ariaLabel: string;
 }
 
 interface LanguageOption {
@@ -17,10 +16,8 @@ interface LanguageOption {
 export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   language,
   setLanguage,
-  tooltip,
-  setTooltip
+  ariaLabel
 }) => {
-  // Define all available languages with their display names and flag emojis
   const languageOptions: LanguageOption[] = [
     { code: 'sq', name: 'Shqip', flag: '🇦🇱' },
     { code: 'en', name: 'English', flag: '🇬🇧' },
@@ -30,27 +27,22 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   ];
 
   return (
-    <div className="flex justify-center gap-4 mb-4 flex-wrap">
+    <div className="flex justify-center gap-2 sm:gap-3 flex-wrap" role="group" aria-label={ariaLabel}>
       {languageOptions.map((option) => (
-        <div key={option.code} className="relative">
-          <button
-            onClick={() => setLanguage(option.code)}
-            onMouseEnter={() => setTooltip(option.code)}
-            onMouseLeave={() => setTooltip(null)}
-            className={`p-3 rounded-2xl transition-all border-4 box-shadow-hard ${language === option.code
-                ? 'bg-neo-pill border-neo-ink -translate-y-1'
-                : 'bg-neo-surface border-neo-ink hover:bg-neo-surface-muted hover:-translate-y-1'
-              }`}
-            aria-label={option.name}
-          >
-            <span className="text-4xl leading-none">{option.flag}</span>
-          </button>
-          {tooltip === option.code && (
-            <div className="absolute -bottom-14 left-1/2 transform -translate-x-1/2 bg-neo-ink text-neo-ground font-bold px-4 py-2 rounded-xl text-lg whitespace-nowrap z-20">
-              {option.name}
-            </div>
-          )}
-        </div>
+        <button
+          key={option.code}
+          type="button"
+          onClick={() => setLanguage(option.code)}
+          aria-pressed={language === option.code}
+          aria-label={option.name}
+          className={`flex items-center gap-2 px-3 py-2 rounded-full border-[3px] border-neo-ink font-bold transition-all ${language === option.code
+            ? 'bg-neo-orange text-black box-shadow-hard'
+            : 'bg-neo-surface text-neo-ink hover:bg-neo-surface-muted'
+          }`}
+        >
+          <span className="text-2xl leading-none" aria-hidden="true">{option.flag}</span>
+          <span>{option.name}</span>
+        </button>
       ))}
     </div>
   );
