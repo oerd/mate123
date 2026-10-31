@@ -33,11 +33,10 @@ interface Translations {
   selectOperations: string;
   resultOptions: string;
   numberOfResults: string;
-  saveSettings: string;
   teacherSettings: string;
   sortResultsDescription: string;
   randomizeResults: string;
-  saved: string;
+  autoSaved: string;
   saveFailed: string;
   shareSettings: string;
   shareSettingsTooltip: string;
@@ -101,11 +100,10 @@ export const translations: Record<Language, Translations> = {
     selectOperations: 'Select Operations',
     resultOptions: 'Answers',
     numberOfResults: 'Number of Answers',
-    saveSettings: 'Save Settings',
     teacherSettings: 'Teacher Settings',
     sortResultsDescription: 'Sort answer options from smallest to largest',
     randomizeResults: 'Randomize answer options',
-    saved: 'Saved!',
+    autoSaved: 'Saved automatically',
     saveFailed: 'Save failed',
     shareSettings: 'Share Settings',
     shareSettingsTooltip: 'Share or copy the settings link',
@@ -167,11 +165,10 @@ export const translations: Record<Language, Translations> = {
     selectOperations: 'Operationen auswählen',
     resultOptions: 'Ergebnisoptionen',
     numberOfResults: 'Anzahl der Ergebnisse',
-    saveSettings: 'Einstellungen speichern',
     teacherSettings: 'Lehrereinstellungen',
     sortResultsDescription: 'Antwortoptionen von klein nach groß sortieren',
     randomizeResults: 'Antwortoptionen zufällig anordnen',
-    saved: 'Gespeichert!',
+    autoSaved: 'Automatisch gespeichert',
     saveFailed: 'Speichern fehlgeschlagen',
     shareSettings: 'Einstellungen teilen',
     shareSettingsTooltip: 'Einstellungs-Link teilen oder kopieren',
@@ -233,11 +230,10 @@ export const translations: Record<Language, Translations> = {
     selectOperations: 'Seleziona Operazioni',
     resultOptions: 'Opzioni Risultato',
     numberOfResults: 'Numero di Risultati',
-    saveSettings: 'Salva Impostazioni',
     teacherSettings: 'Impostazioni Insegnante',
     sortResultsDescription: 'Ordina le opzioni di risposta dal più piccolo al più grande',
     randomizeResults: 'Ordine casuale delle opzioni di risposta',
-    saved: 'Salvato!',
+    autoSaved: 'Salvato automaticamente',
     saveFailed: 'Salvataggio non riuscito',
     shareSettings: 'Condividi Impostazioni',
     shareSettingsTooltip: 'Condividi o copia il link delle impostazioni',
@@ -299,11 +295,10 @@ export const translations: Record<Language, Translations> = {
     selectOperations: 'Sélectionner les Opérations',
     resultOptions: 'Options de Résultat',
     numberOfResults: 'Nombre de Résultats',
-    saveSettings: 'Enregistrer les Paramètres',
     teacherSettings: 'Paramètres Enseignant',
     sortResultsDescription: 'Trier les options de réponse du plus petit au plus grand',
     randomizeResults: 'Mélanger les options de réponse',
-    saved: 'Enregistré !',
+    autoSaved: 'Enregistré automatiquement',
     saveFailed: 'Échec de l\'enregistrement',
     shareSettings: 'Partager les Paramètres',
     shareSettingsTooltip: 'Partager ou copier le lien des paramètres',
@@ -365,11 +360,10 @@ export const translations: Record<Language, Translations> = {
     selectOperations: 'Zgjidh veprimet',
     resultOptions: 'Përgjigjet',
     numberOfResults: 'Numri i përgjigjeve',
-    saveSettings: 'Ruaj cilësimet',
     teacherSettings: 'Opsionet e mësuesit',
     sortResultsDescription: 'Rendit përgjigjet nga më e vogla te më e madhja',
     randomizeResults: 'Përziej përgjigjet rastësisht',
-    saved: 'U ruajt!',
+    autoSaved: 'U ruajt automatikisht',
     saveFailed: 'Ruajtja dështoi',
     shareSettings: 'Ndaj cilësimet',
     shareSettingsTooltip: 'Ndaj ose kopjo lidhjen e cilësimeve',
