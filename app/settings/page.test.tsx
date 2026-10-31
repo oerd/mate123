@@ -95,18 +95,16 @@ describe('Settings Page', () => {
     expect(additionButton.getAttribute('aria-pressed')).toBe('true');
   });
 
-  it('save button updates context and localStorage', () => {
+  it('saves every change to localStorage without a save button', () => {
     render(<Settings />, { wrapper: Wrapper });
 
-    const saveButton = screen.getByText('Save Settings');
-    fireEvent.click(saveButton);
+    expect(screen.queryByText('Save Settings')).toBeNull();
+    expect(window.localStorage.getItem('math-practice:testParameters')).toBeNull();
 
-    const stored = window.localStorage.getItem('math-practice:testParameters');
-    expect(stored).toBeDefined();
+    fireEvent.click(screen.getByTitle('Multiplication'));
 
-    const parsed = JSON.parse(stored!);
-    expect(parsed.operations).toContain('addition');
-    expect(parsed.operations).toContain('subtraction');
+    const parsed = JSON.parse(window.localStorage.getItem('math-practice:testParameters')!);
+    expect(parsed.operations).toEqual(['addition', 'subtraction', 'multiplication']);
     expect(parsed.numberOfResults).toBe(6);
     expect(parsed.sortResults).toBe(false);
   });
@@ -120,9 +118,6 @@ describe('Settings Page', () => {
 
     fireEvent.click(within(group).getByRole('button', { name: '4' }));
 
-    const saveButton = screen.getByText('Save Settings');
-    fireEvent.click(saveButton);
-
     const stored = window.localStorage.getItem('math-practice:testParameters');
     const parsed = JSON.parse(stored!);
     expect(parsed.numberOfResults).toBe(4);
@@ -135,9 +130,6 @@ describe('Settings Page', () => {
     expect(toggle).toBeDefined();
 
     fireEvent.click(toggle);
-
-    const saveButton = screen.getByText('Save Settings');
-    fireEvent.click(saveButton);
 
     const stored = window.localStorage.getItem('math-practice:testParameters');
     const parsed = JSON.parse(stored!);
@@ -166,7 +158,6 @@ describe('Settings Page', () => {
     fireEvent.click(screen.getByRole('button', { name: '4 · with distractors' }));
     fireEvent.click(screen.getByLabelText('Show the number line'));
     fireEvent.click(screen.getByRole('button', { name: 'Sums' }));
-    fireEvent.click(screen.getByText('Save Settings'));
 
     const stored = JSON.parse(window.localStorage.getItem('math-practice:testParameters') ?? '{}');
     expect(stored.operations).toEqual(['addition', 'subtraction', 'rounding', 'comparison']);
@@ -191,8 +182,6 @@ describe('Settings Page', () => {
     expect(thousand.getAttribute('aria-pressed')).toBe('true');
     fireEvent.click(ten);
     expect(ten.getAttribute('aria-pressed')).toBe('false');
-
-    fireEvent.click(screen.getByText('Save Settings'));
     const stored = JSON.parse(window.localStorage.getItem('math-practice:testParameters') ?? '{}');
     expect(stored.roundingNearest).toEqual([1000]);
   });
@@ -224,35 +213,27 @@ describe('Settings Page', () => {
     expect(screen.getByRole('button', { name: 'Sums' }).getAttribute('aria-pressed')).toBe('true');
   });
 
-  it('turns save green on success and back to blue after a change', () => {
+  it('shows the autosave status and turns it red when settings cannot be stored', () => {
     render(<Settings />, { wrapper: Wrapper });
 
-    const save = screen.getByText('Save Settings').closest('button')!;
-    expect(save.className).toContain('bg-neo-blue');
+    const status = screen.getByTestId('autosave-status');
+    expect(status.getAttribute('data-status')).toBe('success');
+    expect(status.textContent).toContain('Saved automatically');
 
-    fireEvent.click(save);
-    expect(save.getAttribute('data-status')).toBe('success');
-    expect(save.className).toContain('bg-neo-green');
-    expect(save.textContent).toContain('Saved!');
-
-    fireEvent.click(screen.getByLabelText('Randomize answer options'));
-    expect(save.getAttribute('data-status')).toBe('idle');
-    expect(save.className).toContain('bg-neo-blue');
-  });
-
-  it('turns save red when settings cannot be stored', () => {
-    render(<Settings />, { wrapper: Wrapper });
     const setItem = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
       throw new Error('QuotaExceededError');
     });
+    fireEvent.click(screen.getByTitle('Multiplication'));
 
-    const save = screen.getByText('Save Settings').closest('button')!;
-    fireEvent.click(save);
-
-    expect(save.getAttribute('data-status')).toBe('error');
-    expect(save.className).toContain('bg-neo-red');
-    expect(save.textContent).toContain('Save failed');
+    expect(status.getAttribute('data-status')).toBe('error');
+    expect(status.className).toContain('bg-neo-red');
+    expect(status.textContent).toContain('Save failed');
     setItem.mockRestore();
+
+    fireEvent.click(screen.getByTitle('Division'));
+    expect(status.getAttribute('data-status')).toBe('success');
+    const parsed = JSON.parse(window.localStorage.getItem('math-practice:testParameters')!);
+    expect(parsed.operations).toContain('division');
   });
 
   it('turns share green on copy and back to blue after a change', async () => {
@@ -322,19 +303,12 @@ describe('Settings Page', () => {
     Reflect.deleteProperty(navigator, 'share');
   });
 
-  it('places save and share side by side', () => {
+  it('keeps the title and close button in a sticky header', () => {
     render(<Settings />, { wrapper: Wrapper });
 
-    const row = screen.getByText('Save Settings').closest('button')!.parentElement!;
-    expect(row.className).toContain('grid-cols-2');
-  });
-
-  it('anchors the close button to the panel so it never overlaps scrolled content', () => {
-    render(<Settings />, { wrapper: Wrapper });
-
-    const close = screen.getByTestId('settings-close');
-    expect(close.className).toContain('absolute');
-    expect(close.className).not.toContain('fixed');
-    expect(close.parentElement?.className).toContain('relative');
+    const header = screen.getByTestId('settings-header');
+    expect(header.className).toContain('sticky');
+    expect(header.contains(screen.getByRole('heading', { level: 1 }))).toBe(true);
+    expect(header.contains(screen.getByTestId('settings-close'))).toBe(true);
   });
 });

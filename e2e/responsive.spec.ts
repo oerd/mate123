@@ -52,12 +52,20 @@ test.describe('Responsive Design', () => {
             await teacherHeading.scrollIntoViewIfNeeded();
             await expect(teacherHeading).toBeVisible();
 
-            // Save button should be reachable
-            const saveButton = page.getByText('Save', { exact: false }).or(
-                page.getByText('Speichern', { exact: false })
+            // Share button should be reachable
+            const shareButton = page.getByText('Share', { exact: false }).or(
+                page.getByText('Teilen', { exact: false })
             ).first();
-            await saveButton.scrollIntoViewIfNeeded();
-            await expect(saveButton).toBeVisible();
+            await shareButton.scrollIntoViewIfNeeded();
+            await expect(shareButton).toBeVisible();
+
+            // The close button stays in view while scrolled to the bottom
+            const close = page.getByTestId('settings-close').getByRole('link');
+            await expect(close).toBeVisible();
+            const box = await close.boundingBox();
+            expect(box).not.toBeNull();
+            expect(box!.y).toBeGreaterThanOrEqual(0);
+            expect(box!.y + box!.height).toBeLessThanOrEqual(IPHONE_X.height);
         });
     });
 

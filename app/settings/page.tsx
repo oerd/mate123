@@ -25,8 +25,8 @@ import { serializeSettings } from '../utils/settingsQueryString';
 const actionButtonClass =
   'flex items-center justify-center px-6 py-3 rounded-full border-[3px] border-neo-ink box-shadow-hard font-bold transition-all';
 
-const splitButtonClass =
-  'w-full h-full min-h-16 flex items-center justify-center px-3 py-3 rounded-full border-[3px] border-neo-ink box-shadow-hard font-bold text-sm sm:text-base leading-tight text-center text-black transition-all';
+const shareButtonClass =
+  'w-full min-h-14 flex items-center justify-center px-4 py-3 rounded-full border-[3px] border-neo-ink box-shadow-hard font-bold text-base leading-tight text-center text-black transition-all';
 
 type ActionStatus = 'idle' | 'success' | 'error';
 
@@ -97,7 +97,7 @@ export default function Settings() {
   const [comparisonModes, setComparisonModes] = useState<ComparisonMode[]>(testParameters.comparisonModes);
   const [shareTooltip, setShareTooltip] = useState<boolean>(false);
   const [shareResult, setShareResult] = useState<{ query: string; method: 'share' | 'copy' } | null>(null);
-  const [saveResult, setSaveResult] = useState<{ query: string; status: ActionStatus } | null>(null);
+  const [failedQuery, setFailedQuery] = useState<string | null>(null);
 
   useEffect(() => {
     setFirstOperandMin(testParameters.firstOperandMin);
@@ -158,17 +158,19 @@ export default function Settings() {
   }), [firstOperandMin, firstOperandMax, secondOperandMin, secondOperandMax, selectedOperations, numberOfResults, sortResults, roundingNearest, roundingAnswers, roundingNumberLine, comparisonModes]);
 
   const currentQuery = useMemo(() => serializeSettings(currentSettings), [currentSettings]);
-  const saveStatus: ActionStatus = saveResult?.query === currentQuery ? saveResult.status : 'idle';
+  const storedQuery = useMemo(() => serializeSettings(testParameters), [testParameters]);
+  const saveStatus: ActionStatus = failedQuery === currentQuery ? 'error' : storedQuery === currentQuery ? 'success' : 'idle';
   const shareStatus: ActionStatus = shareResult?.query === currentQuery ? 'success' : 'idle';
 
-  const handleSaveSettings = () => {
+  useEffect(() => {
+    if (currentQuery === storedQuery || currentQuery === failedQuery) return;
     try {
       setTestParameters(currentSettings);
-      setSaveResult({ query: currentQuery, status: 'success' });
+      setFailedQuery(null);
     } catch {
-      setSaveResult({ query: currentQuery, status: 'error' });
+      setFailedQuery(currentQuery);
     }
-  };
+  }, [currentQuery, storedQuery, failedQuery, currentSettings, setTestParameters]);
 
   const fallbackCopy = (text: string, query: string) => {
     const textarea = document.createElement('textarea');
@@ -220,9 +222,36 @@ export default function Settings() {
 
   return (
     <div className="fixed inset-4 sm:inset-6 md:inset-8 bg-neo-pink dark:bg-neo-surface border-4 border-neo-ink shadow-hard rounded-neo overflow-y-auto">
-      <div className="relative flex min-h-full flex-col items-center justify-start py-8 sm:py-12 p-4 sm:p-6 md:p-8">
-        <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-20" data-testid="settings-close">
-          <div className="relative">
+      <div
+        data-testid="settings-header"
+        className="sticky top-0 z-20 flex items-center justify-between gap-3 px-4 sm:px-6 py-3 sm:py-4 bg-neo-pink dark:bg-neo-surface border-b-4 border-neo-ink"
+      >
+        <h1 className="text-2xl sm:text-3xl font-black text-neo-ink truncate">
+          {t.settings}
+        </h1>
+
+        <div className="flex items-center gap-3 shrink-0">
+          <p
+            role="status"
+            aria-live="polite"
+            data-testid="autosave-status"
+            data-status={saveStatus}
+            className={`flex items-center gap-1.5 h-10 px-3 rounded-full border-[3px] border-neo-ink text-sm font-bold text-black ${saveStatus === 'error' ? 'bg-neo-red' : 'bg-neo-green'}`}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4 shrink-0"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d={saveStatus === 'error' ? 'M12 8v5m0 4h.01' : 'M5 13l4 4L19 7'} />
+            </svg>
+            <span className="max-sm:sr-only">{saveStatus === 'error' ? t.saveFailed : t.autoSaved}</span>
+          </p>
+
+          <div className="relative" data-testid="settings-close">
             <Link
               href="/"
               className="h-12 w-12 bg-neo-surface text-neo-ink border-4 border-neo-ink box-shadow-hard rounded-2xl hover:bg-neo-surface-muted flex items-center justify-center"
@@ -252,11 +281,9 @@ export default function Settings() {
             )}
           </div>
         </div>
+      </div>
 
-        <h1 className="text-3xl sm:text-4xl font-black mb-6 sm:mb-8 text-neo-ink">
-          {t.settings}
-        </h1>
-
+      <div className="flex flex-col items-center justify-start py-6 sm:py-8 p-4 sm:p-6 md:p-8">
         {loadedFromUrl && (
           <div className="mb-6 w-full max-w-md px-4 py-3 bg-neo-blue text-black font-bold rounded-xl border-[3px] border-neo-ink box-shadow-hard">
             <p className="text-center">
@@ -483,34 +510,14 @@ export default function Settings() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={handleSaveSettings}
-              data-status={saveStatus}
-              aria-live="polite"
-              className={`${splitButtonClass} ${statusFill[saveStatus]}`}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 mr-2 shrink-0"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d={saveStatus === 'error' ? 'M12 8v5m0 4h.01' : 'M5 13l4 4L19 7'} />
-              </svg>
-              {saveStatus === 'success' ? t.saved : saveStatus === 'error' ? t.saveFailed : t.saveSettings}
-            </button>
-
-            <div className="relative">
+          <div className="relative">
               <button
                 onClick={handleShareSettings}
                 onMouseEnter={() => setShareTooltip(true)}
                 onMouseLeave={() => setShareTooltip(false)}
                 data-status={shareStatus}
                 aria-live="polite"
-                className={`${splitButtonClass} ${statusFill[shareStatus]}`}
+                className={`${shareButtonClass} ${statusFill[shareStatus]}`}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -530,7 +537,6 @@ export default function Settings() {
                   {t.shareSettingsTooltip}
                 </div>
               )}
-            </div>
           </div>
         </div>
 
