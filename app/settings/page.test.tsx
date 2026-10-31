@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ThemeProvider } from '../ThemeContext';
 import { LanguageProvider } from '../LanguageContext';
@@ -34,6 +34,20 @@ describe('Settings Page', () => {
     const overlay = container.firstElementChild as HTMLElement;
     expect(overlay.className).toContain('shadow-hard');
     expect(overlay.className).not.toContain('box-shadow-hard');
+  });
+
+  it('uses only theme tokens, no leftover Catppuccin classes', () => {
+    const { container } = render(<Settings />, { wrapper: Wrapper });
+    expect(container.innerHTML).not.toMatch(/ctp-/);
+  });
+
+  it('highlights the active language chip in the shared selected color', () => {
+    render(<Settings />, { wrapper: Wrapper });
+    const english = screen.getByRole('button', { name: 'English' });
+    expect(english.getAttribute('aria-pressed')).toBe('true');
+    expect(english.className).toContain('bg-neo-orange');
+    fireEvent.click(screen.getByRole('button', { name: 'Deutsch' }));
+    expect(screen.getByRole('button', { name: 'Deutsch' }).className).toContain('bg-neo-orange');
   });
 
   it('marks selected operations without the animated overlay', () => {
@@ -97,13 +111,14 @@ describe('Settings Page', () => {
     expect(parsed.sortResults).toBe(false);
   });
 
-  it('number of results slider works', () => {
+  it('number of results chips work', () => {
     render(<Settings />, { wrapper: Wrapper });
 
-    const slider = screen.getByRole('slider');
-    expect(slider).toBeDefined();
+    const group = screen.getByRole('group', { name: 'Number of Answers' });
+    const six = within(group).getByRole('button', { name: '6' });
+    expect(six.getAttribute('aria-pressed')).toBe('true');
 
-    fireEvent.change(slider, { target: { value: '4' } });
+    fireEvent.click(within(group).getByRole('button', { name: '4' }));
 
     const saveButton = screen.getByText('Save Settings');
     fireEvent.click(saveButton);
@@ -314,9 +329,12 @@ describe('Settings Page', () => {
     expect(row.className).toContain('grid-cols-2');
   });
 
-  it('keeps the close button fixed in view', () => {
+  it('anchors the close button to the panel so it never overlaps scrolled content', () => {
     render(<Settings />, { wrapper: Wrapper });
 
-    expect(screen.getByTestId('settings-close').className).toContain('fixed');
+    const close = screen.getByTestId('settings-close');
+    expect(close.className).toContain('absolute');
+    expect(close.className).not.toContain('fixed');
+    expect(close.parentElement?.className).toContain('relative');
   });
 });
