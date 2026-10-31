@@ -26,6 +26,36 @@ describe('ProblemDisplay', () => {
     expect(screen.getByText('?')).toBeDefined();
   });
 
+  it('reveals the answer in green once correct', () => {
+    render(
+      <ProblemDisplay
+        firstNumber={5}
+        secondNumber={3}
+        operation="addition"
+        feedback="correct"
+        isAnimating={false}
+        t={t}
+        answer={8}
+      />
+    );
+    const answer = screen.getByTestId('equation-answer');
+    expect(answer.textContent).toBe('8');
+    expect(answer.className).toContain('text-neo-correct');
+    expect(screen.queryByText('?')).toBeNull();
+  });
+
+  it('switches the mascot mood with the feedback', () => {
+    const { container, rerender } = render(
+      <ProblemDisplay firstNumber={1} secondNumber={1} operation="addition" feedback={null} isAnimating={false} t={t} />
+    );
+    const mood = () => container.querySelector('[data-mood]')?.getAttribute('data-mood');
+    expect(mood()).toBe('neutral');
+    rerender(<ProblemDisplay firstNumber={1} secondNumber={1} operation="addition" feedback="correct" isAnimating t={t} answer={2} />);
+    expect(mood()).toBe('happy');
+    rerender(<ProblemDisplay firstNumber={1} secondNumber={1} operation="addition" feedback="incorrect" isAnimating t={t} />);
+    expect(mood()).toBe('thinking');
+  });
+
   it('displays correct feedback', () => {
     render(
       <ProblemDisplay

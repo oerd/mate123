@@ -1,9 +1,11 @@
 import React from 'react';
-import { AnswerButton, AnswerShape } from './AnswerButton';
+import { AnswerButton, AnswerShape, AnswerState } from './AnswerButton';
 
 interface ResultGridProps {
   answerOptions: number[];
-  selectedOptionValue: number | null;
+  correctValue: number | null;
+  wrongValues: number[];
+  pendingValue: number | null;
   onOptionClick: (option: number) => void;
   formatLabel?: (option: number) => string;
   shape?: AnswerShape;
@@ -22,15 +24,29 @@ function getGridColsClass(count: number): string {
   return gridColsClasses[cols] || 'grid-cols-3';
 }
 
+export function answerState(
+  option: number,
+  correctValue: number | null,
+  wrongValues: number[],
+  pendingValue: number | null
+): AnswerState {
+  if (wrongValues.includes(option)) return 'wrong';
+  if (correctValue !== null) return option === correctValue ? 'correct' : 'dimmed';
+  if (pendingValue === option) return 'pending';
+  return 'idle';
+}
+
 export const ResultGrid = ({
   answerOptions,
-  selectedOptionValue,
+  correctValue,
+  wrongValues,
+  pendingValue,
   onOptionClick,
   formatLabel,
   shape = 'pill'
 }: ResultGridProps) => {
   return (
-    <div className="mt-3 w-full max-w-xl">
+    <div className="w-full max-w-xl">
       <div className={`grid ${getGridColsClass(answerOptions.length)} gap-3 sm:gap-4`}>
         {answerOptions.map((option) => (
           <AnswerButton
@@ -38,8 +54,7 @@ export const ResultGrid = ({
             value={option}
             label={formatLabel ? formatLabel(option) : undefined}
             shape={shape}
-            isSelected={selectedOptionValue === option}
-            isDisabled={selectedOptionValue !== null && selectedOptionValue !== option}
+            state={answerState(option, correctValue, wrongValues, pendingValue)}
             onClick={onOptionClick}
           />
         ))}

@@ -49,8 +49,8 @@ export const NumberLine: React.FC<NumberLineProps> = ({ value, nearest }) => {
         strokeWidth="3"
         strokeDasharray="6 6"
       />
-      <circle cx={x(value)} cy={BASELINE} r="13" fill="#A855F7" stroke="currentColor" strokeWidth="4" />
-      <text x={x(value)} y={BASELINE - 30} textAnchor="middle" fontWeight="700" fontSize="24" fill="#A855F7">
+      <circle cx={x(value)} cy={BASELINE} r="13" className="fill-neo-mark" stroke="currentColor" strokeWidth="4" />
+      <text x={x(value)} y={BASELINE - 30} textAnchor="middle" fontWeight="700" fontSize="26" className="fill-neo-mark">
         {value}
       </text>
       <text x={PAD} y={BASELINE + 46} textAnchor="middle" fontWeight="700" fontSize="26" fill="currentColor">

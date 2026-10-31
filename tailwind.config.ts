@@ -26,6 +26,8 @@ export default {
           'ink-muted': 'var(--neo-ink-muted)',
           shadow: 'var(--neo-shadow)',
           pill: 'var(--neo-pill)',
+          mark: 'var(--neo-mark)',
+          correct: 'var(--neo-correct)',
         },
         background: "var(--background)",
         foreground: "var(--foreground)",

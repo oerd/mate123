@@ -59,6 +59,12 @@ interface Translations {
   compareNumbers: string;
   compareSums: string;
   whichSignFits: string;
+  skip: string;
+  next: string;
+  setDone: string;
+  keepGoing: string;
+  progressLabel: string;
+  streakLabel: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -76,7 +82,7 @@ export const translations: Record<Language, Translations> = {
     italian: 'Italian',
     french: 'French',
     albanian: 'Albanian',
-    backToGame: 'Back to Game',
+    backToGame: 'Back to practice',
     themeSettings: 'Theme Settings',
     lightTheme: 'Light',
     darkTheme: 'Dark',
@@ -120,7 +126,13 @@ export const translations: Record<Language, Translations> = {
     compareWhat: 'Compare',
     compareNumbers: 'Numbers',
     compareSums: 'Sums',
-    whichSignFits: 'Which sign fits?'
+    whichSignFits: 'Which sign fits?',
+    skip: 'Skip',
+    next: 'Next',
+    setDone: 'You did {n}!',
+    keepGoing: 'Keep going',
+    progressLabel: '{n} of {total} solved',
+    streakLabel: '{n} in a row'
   },
   de: {
     title: 'Mathe-Übung',
@@ -136,7 +148,7 @@ export const translations: Record<Language, Translations> = {
     italian: 'Italienisch',
     french: 'Französisch',
     albanian: 'Albanisch',
-    backToGame: 'Zurück zum Spiel',
+    backToGame: 'Zurück zum Üben',
     themeSettings: 'Theme-Einstellungen',
     lightTheme: 'Hell',
     darkTheme: 'Dunkel',
@@ -180,7 +192,13 @@ export const translations: Record<Language, Translations> = {
     compareWhat: 'Vergleiche',
     compareNumbers: 'Zahlen',
     compareSums: 'Summen',
-    whichSignFits: 'Welches Zeichen passt?'
+    whichSignFits: 'Welches Zeichen passt?',
+    skip: 'Überspringen',
+    next: 'Weiter',
+    setDone: 'Du hast {n} geschafft!',
+    keepGoing: 'Weiter so',
+    progressLabel: '{n} von {total} gelöst',
+    streakLabel: '{n} in Folge'
   },
   it: {
     title: 'Esercizi di Matematica',
@@ -196,7 +214,7 @@ export const translations: Record<Language, Translations> = {
     italian: 'Italiano',
     french: 'Francese',
     albanian: 'Albanese',
-    backToGame: 'Torna al Gioco',
+    backToGame: 'Torna agli esercizi',
     themeSettings: 'Impostazioni Tema',
     lightTheme: 'Chiaro',
     darkTheme: 'Scuro',
@@ -240,7 +258,13 @@ export const translations: Record<Language, Translations> = {
     compareWhat: 'Confronta',
     compareNumbers: 'Numeri',
     compareSums: 'Somme',
-    whichSignFits: 'Quale segno ci va?'
+    whichSignFits: 'Quale segno ci va?',
+    skip: 'Salta',
+    next: 'Avanti',
+    setDone: 'Ne hai fatti {n}!',
+    keepGoing: 'Continua',
+    progressLabel: '{n} su {total} risolti',
+    streakLabel: '{n} di fila'
   },
   fr: {
     title: 'Exercices de Mathématiques',
@@ -256,7 +280,7 @@ export const translations: Record<Language, Translations> = {
     italian: 'Italien',
     french: 'Français',
     albanian: 'Albanais',
-    backToGame: 'Retour au Jeu',
+    backToGame: 'Retour à l\'exercice',
     themeSettings: 'Paramètres de Thème',
     lightTheme: 'Clair',
     darkTheme: 'Sombre',
@@ -300,7 +324,13 @@ export const translations: Record<Language, Translations> = {
     compareWhat: 'Comparer',
     compareNumbers: 'Nombres',
     compareSums: 'Sommes',
-    whichSignFits: 'Quel signe convient ?'
+    whichSignFits: 'Quel signe convient ?',
+    skip: 'Passer',
+    next: 'Suivant',
+    setDone: 'Tu en as fait {n} !',
+    keepGoing: 'Continuer',
+    progressLabel: '{n} sur {total} résolus',
+    streakLabel: "{n} d'affilée"
   },
   sq: {
     title: 'Praktikë Matematike',
@@ -316,7 +346,7 @@ export const translations: Record<Language, Translations> = {
     italian: 'Italisht',
     french: 'Frëngjisht',
     albanian: 'Shqip',
-    backToGame: 'Kthehu te loja',
+    backToGame: 'Kthehu te ushtrimet',
     themeSettings: 'Opsionet e temës',
     lightTheme: 'E çelur',
     darkTheme: 'E errët',
@@ -360,7 +390,13 @@ export const translations: Record<Language, Translations> = {
     compareWhat: 'Krahaso',
     compareNumbers: 'Numra',
     compareSums: 'Shuma',
-    whichSignFits: 'Cila shenjë përshtatet?'
+    whichSignFits: 'Cila shenjë përshtatet?',
+    skip: 'Kalo',
+    next: 'Tjetra',
+    setDone: 'Bëre {n}!',
+    keepGoing: 'Vazhdo',
+    progressLabel: '{n} nga {total} të zgjidhura',
+    streakLabel: '{n} radhazi'
   }
 };
 
