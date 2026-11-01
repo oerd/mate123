@@ -1,7 +1,8 @@
 import React from 'react';
 import { useLanguage } from '../LanguageContext';
 import { translations } from '../translations';
-import { Operation, operationLookup, allOperations } from '../TestParametersContext';
+import { Operation, allOperations } from '../TestParametersContext';
+import { OperationIcon } from './OperationIcon';
 import { motion } from 'framer-motion';
 
 interface OperationToggleProps {
@@ -34,7 +35,7 @@ export const OperationToggle: React.FC<OperationToggleProps> = ({
   };
 
   const defaultButtonClass = (op: Operation, active: boolean) =>
-    `relative p-2 sm:p-3 flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 text-2xl sm:text-3xl md:text-4xl font-black rounded-full z-10 transition-colors ${active
+    `relative p-2 sm:p-3 flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full z-10 transition-colors ${active
       ? 'text-black'
       : 'text-neo-ink-muted hover:text-neo-ink hover:bg-neo-surface-muted'
     }`;
@@ -61,14 +62,10 @@ export const OperationToggle: React.FC<OperationToggleProps> = ({
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
               />
             )}
-            <span
-              className={`relative z-10 font-black leading-none ${op === 'comparison'
-                ? `tracking-tighter ${showLabels ? 'text-xl' : 'text-base sm:text-lg md:text-xl'}`
-                : showLabels ? 'text-5xl' : ''
-              }`}
-            >
-              {op === 'subtraction' ? '−' : operationLookup(op)}
-            </span>
+            <OperationIcon
+              operation={op}
+              className={`relative z-10 ${showLabels ? 'w-6 h-6' : 'w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9'}`}
+            />
             {showLabels && <span className="relative z-10 text-xs font-bold leading-none">{t[op]}</span>}
           </button>
         )

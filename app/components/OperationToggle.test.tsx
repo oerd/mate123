@@ -79,8 +79,8 @@ describe('OperationToggle', () => {
       </Wrapper>
     );
 
-    expect(screen.getByTitle(/rounding/i).textContent).toBe('≈');
-    expect(screen.getByTitle(/comparison/i).textContent).toBe('<=>');
+    expect(screen.getByTitle(/rounding/i).querySelector('svg[data-operation="rounding"]')).not.toBeNull();
+    expect(screen.getByTitle(/comparison/i).querySelector('svg[data-operation="comparison"]')).not.toBeNull();
   });
 
   it('omits the active overlay when activeOverlayClass is null', () => {
