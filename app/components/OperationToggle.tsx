@@ -61,8 +61,13 @@ export const OperationToggle: React.FC<OperationToggleProps> = ({
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
               />
             )}
-            <span className={`relative z-10 ${op === 'comparison' ? 'text-base sm:text-lg md:text-xl tracking-tighter' : ''}`}>
-              {operationLookup(op)}
+            <span
+              className={`relative z-10 font-black leading-none ${op === 'comparison'
+                ? `tracking-tighter ${showLabels ? 'text-xl' : 'text-base sm:text-lg md:text-xl'}`
+                : showLabels ? 'text-5xl' : ''
+              }`}
+            >
+              {op === 'subtraction' ? '−' : operationLookup(op)}
             </span>
             {showLabels && <span className="relative z-10 text-xs font-bold leading-none">{t[op]}</span>}
           </button>

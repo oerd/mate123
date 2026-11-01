@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { generateProblem, generateAnswerOptions, generateRoundingOptions, generateOptionsForProblem, roundToNearest, roundingRange, comparisonSymbol, comparisonAnswers, pickRandomOperation } from './mathLogic';
+import { generateProblem, generateAnswerOptions, generateRoundingOptions, generateOptionsForProblem, roundToNearest, roundingRange, comparisonSymbol, comparisonAnswers, pickRandomOperation, snapNumberOfResults, sanitizeParameters } from './mathLogic';
 import { TestParameters, Operation } from '../TestParametersContext';
 
 describe('mathLogic', () => {
@@ -331,6 +331,26 @@ describe('mathLogic', () => {
       const problem = generateProblem(baseParams, 'comparison');
       expect(generateOptionsForProblem(problem, { ...baseParams, sortResults: false })).toEqual(comparisonAnswers);
       expect(comparisonAnswers.map(comparisonSymbol)).toEqual(['<', '=', '>']);
+    });
+  });
+
+  describe('snapNumberOfResults', () => {
+    it('keeps values that are already valid options', () => {
+      [2, 3, 4, 6, 8].forEach((count) => expect(snapNumberOfResults(count)).toBe(count));
+    });
+
+    it('snaps unavailable counts to the nearest option, rounding up on ties', () => {
+      expect(snapNumberOfResults(5)).toBe(6);
+      expect(snapNumberOfResults(7)).toBe(8);
+      expect(snapNumberOfResults(1)).toBe(2);
+      expect(snapNumberOfResults(0)).toBe(2);
+      expect(snapNumberOfResults(20)).toBe(8);
+      expect(snapNumberOfResults(NaN)).toBe(2);
+    });
+
+    it('is applied by sanitizeParameters', () => {
+      expect(sanitizeParameters({ ...baseParams, numberOfResults: 7 }).numberOfResults).toBe(8);
+      expect(sanitizeParameters({ ...baseParams, numberOfResults: 5 }).numberOfResults).toBe(6);
     });
   });
 });

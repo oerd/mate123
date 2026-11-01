@@ -46,12 +46,41 @@ const fullBleedIcon = (scale) => `<svg xmlns="http://www.w3.org/2000/svg" viewBo
   ${placeMascot(scale)}
 </svg>`;
 
+const faviconIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="${GROUND}" />
+  ${placeMascot(2.4)}
+</svg>`;
+
 const targets = [
   { file: 'public/icons/icon-192.png', size: 192, svg: roundedIcon },
   { file: 'public/icons/icon-512.png', size: 512, svg: roundedIcon },
   { file: 'public/icons/icon-maskable-512.png', size: 512, svg: fullBleedIcon(1.6) },
   { file: 'app/apple-icon.png', size: 180, svg: fullBleedIcon(1.9) },
 ];
+
+const faviconSizes = [16, 32, 48, 64];
+
+const buildIco = (images) => {
+  const headerSize = 6 + 16 * images.length;
+  const header = Buffer.alloc(headerSize);
+  header.writeUInt16LE(0, 0);
+  header.writeUInt16LE(1, 2);
+  header.writeUInt16LE(images.length, 4);
+  let offset = headerSize;
+  images.forEach(({ size, png }, index) => {
+    const entry = 6 + index * 16;
+    header.writeUInt8(size === 256 ? 0 : size, entry);
+    header.writeUInt8(size === 256 ? 0 : size, entry + 1);
+    header.writeUInt8(0, entry + 2);
+    header.writeUInt8(0, entry + 3);
+    header.writeUInt16LE(1, entry + 4);
+    header.writeUInt16LE(32, entry + 6);
+    header.writeUInt32LE(png.length, entry + 8);
+    header.writeUInt32LE(offset, entry + 12);
+    offset += png.length;
+  });
+  return Buffer.concat([header, ...images.map(({ png }) => png)]);
+};
 
 const browser = await chromium.launch(
   process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {},
@@ -64,5 +93,15 @@ for (const { file, size, svg } of targets) {
   );
   await writeFile(file, await page.screenshot({ omitBackground: true }));
 }
+const faviconImages = [];
+for (const size of faviconSizes) {
+  await page.setViewportSize({ width: size, height: size });
+  await page.setContent(
+    `<html><body style="margin:0;background:transparent">${faviconIcon.replace('<svg ', `<svg width="${size}" height="${size}" `)}</body></html>`,
+  );
+  faviconImages.push({ size, png: await page.screenshot({ omitBackground: true }) });
+}
+await writeFile('app/favicon.ico', buildIco(faviconImages));
+await writeFile('app/icon.svg', `${faviconIcon}\n`);
 await writeFile('public/icons/icon.svg', `${roundedIcon}\n`);
 await browser.close();
