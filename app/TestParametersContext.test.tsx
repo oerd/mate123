@@ -70,13 +70,13 @@ describe('TestParametersContext', () => {
 
   it('prioritizes URL parameters over defaults/localStorage', () => {
     // Use real history API to simulate URL
-    window.history.pushState({}, '', '/?nr=5&op=division');
+    window.history.pushState({}, '', '/?nr=3&op=division');
 
     const { result } = renderHook(() => useTestParameters(), {
       wrapper: TestParametersProvider,
     });
 
-    expect(result.current.testParameters.numberOfResults).toBe(5);
+    expect(result.current.testParameters.numberOfResults).toBe(3);
     expect(result.current.testParameters.operations).toEqual(['division']);
     expect(result.current.loadedFromUrl).toBe(true);
     

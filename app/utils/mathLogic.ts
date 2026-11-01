@@ -2,6 +2,7 @@ import {
   TestParameters,
   Operation,
   allOperations,
+  numberOfResultsOptions,
   RoundingNearest,
   roundingNearestOptions,
   RoundingAnswers,
@@ -65,6 +66,13 @@ export function generateAnswerOptions(correct: number, config: GenerateOptionsCo
     : arr.sort(() => Math.random() - 0.5);
 }
 
+export function snapNumberOfResults(value: number): number {
+  if (!Number.isFinite(value)) return numberOfResultsOptions[0];
+  return numberOfResultsOptions.reduce((best, option) =>
+    Math.abs(option - value) <= Math.abs(best - value) ? option : best
+  );
+}
+
 export function sanitizeParameters(params: TestParameters): TestParameters {
   const clamp = (val: number, min: number, max: number) =>
     Number.isFinite(val) ? Math.max(min, Math.min(max, Math.round(val))) : min;
@@ -93,7 +101,7 @@ export function sanitizeParameters(params: TestParameters): TestParameters {
     secondOperandMin: Math.min(secondMin, secondMax),
     secondOperandMax: Math.max(secondMin, secondMax),
     operations: validOps.length > 0 ? validOps : ['addition'],
-    numberOfResults: clamp(params.numberOfResults, 2, 8),
+    numberOfResults: snapNumberOfResults(params.numberOfResults),
     sortResults: Boolean(params.sortResults),
     roundingNearest: roundingNearest.length > 0 ? roundingNearest : [10],
     roundingAnswers,

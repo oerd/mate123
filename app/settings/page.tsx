@@ -6,6 +6,7 @@ import {
   TestParameters,
   Operation,
   allOperations,
+  numberOfResultsOptions,
   RoundingNearest,
   roundingNearestOptions,
   RoundingAnswers,
@@ -52,7 +53,6 @@ const subLabelClass = 'block text-neo-ink-muted text-sm font-bold mb-1';
 const numberInputClass =
   'w-full h-12 px-3 rounded-xl bg-neo-surface-muted text-neo-ink text-lg font-bold border-[3px] border-neo-ink focus:outline-none focus-visible:ring-4 focus-visible:ring-neo-blue';
 
-const answerCountOptions = [2, 3, 4, 5, 6, 7, 8];
 
 interface ToggleSwitchProps {
   checked: boolean;
@@ -487,7 +487,7 @@ export default function Settings() {
             <div className="mb-4">
               <label className={fieldLabelClass}>{t.numberOfResults}</label>
               <div className="flex flex-wrap gap-2" role="group" aria-label={t.numberOfResults}>
-                {answerCountOptions.map((count) => (
+                {numberOfResultsOptions.map((count) => (
                   <button
                     key={count}
                     type="button"

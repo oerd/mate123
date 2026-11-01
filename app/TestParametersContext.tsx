@@ -24,6 +24,8 @@ export function operationLookup(operation: Operation): string {
   }
 }
 
+export type NumberOfResults = 2 | 3 | 4 | 6 | 8;
+export const numberOfResultsOptions: NumberOfResults[] = [2, 3, 4, 6, 8];
 export type RoundingNearest = 10 | 100 | 1000;
 export const roundingNearestOptions: RoundingNearest[] = [10, 100, 1000];
 export type RoundingAnswers = 2 | 4;

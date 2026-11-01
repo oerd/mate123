@@ -1,4 +1,5 @@
 import { TestParameters, Operation, allOperations, roundingNearestOptions, RoundingAnswers, roundingAnswersOptions, ComparisonMode, comparisonModeOptions } from '../TestParametersContext';
+import { snapNumberOfResults } from './mathLogic';
 
 // Serializes settings to a compressed query string
 export function serializeSettings(settings: TestParameters): string {
@@ -44,7 +45,7 @@ export function deserializeSettings(queryString: string): Partial<TestParameters
   
   if (params.has('nr')) {
     const numResults = parseInt(params.get('nr') ?? '6', 10);
-    settings.numberOfResults = Math.min(Math.max(numResults, 2), 8); // Ensure between 2 and 8
+    settings.numberOfResults = snapNumberOfResults(numResults);
   }
   if (params.has('sr')) settings.sortResults = params.get('sr') === '1';
 

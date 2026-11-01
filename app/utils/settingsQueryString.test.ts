@@ -116,6 +116,10 @@ describe('settingsQueryString', () => {
 
     const maxResults: TestParameters = { ...defaultSettings, numberOfResults: 8 };
     expect(deserializeSettings(serializeSettings(maxResults)).numberOfResults).toBe(8);
+
+    expect(deserializeSettings('nr=5').numberOfResults).toBe(6);
+    expect(deserializeSettings('nr=7').numberOfResults).toBe(8);
+    expect(deserializeSettings('nr=100').numberOfResults).toBe(8);
   });
 
   it('invalid operations in query string are filtered out', () => {
