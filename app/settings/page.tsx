@@ -406,7 +406,7 @@ export default function Settings() {
               className="grid grid-cols-3 gap-3 mb-4"
               activeOverlayClass={null}
               showLabels
-              renderButtonClass={(_op, active) => `${chipClass(active)} flex flex-col items-center justify-center gap-0.5 py-2 px-2`}
+              renderButtonClass={(_op, active) => `${chipClass(active)} flex flex-col items-center justify-center gap-1 py-2 px-2`}
             />
           </div>
 
