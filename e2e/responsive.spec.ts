@@ -105,4 +105,31 @@ test.describe('Responsive Design', () => {
             expect(scrollWidth).toBeLessThanOrEqual(IPAD.width);
         });
     });
+
+    for (const viewport of [{ width: 320, height: 640 }, IPHONE_X, IPAD, { width: 1440, height: 900 }]) {
+        test.describe(`comparison sums at ${viewport.width}px`, () => {
+            test.use({ viewport });
+
+            test('keep the equation on one line inside the card', async ({ page }) => {
+                await page.goto('/?op=comparison&cm=sums&fm=999&fx=999&sm=999&sx=999');
+                const box = page.getByTestId('comparison-box');
+                await expect(box).toBeVisible();
+
+                const layout = await page.evaluate(() => {
+                    const line = document.querySelector('[data-testid=fit-line]') as HTMLElement;
+                    const lineBox = line.parentElement as HTMLElement;
+                    const left = line.firstElementChild as HTMLElement;
+                    const comparison = document.querySelector('[data-testid=comparison-box]') as HTMLElement;
+                    return {
+                        lineWidth: line.offsetWidth,
+                        boxWidth: lineBox.clientWidth,
+                        leftHeight: left.offsetHeight,
+                        comparisonHeight: comparison.offsetHeight,
+                    };
+                });
+                expect(layout.lineWidth).toBeLessThanOrEqual(layout.boxWidth);
+                expect(layout.leftHeight).toBeLessThanOrEqual(layout.comparisonHeight);
+            });
+        });
+    }
 });

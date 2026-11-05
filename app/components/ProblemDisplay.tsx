@@ -4,6 +4,7 @@ import { translations } from '../translations';
 import { motion } from 'framer-motion';
 import { Mascot } from './Mascot';
 import { NumberLine } from './NumberLine';
+import { FitLine } from './FitLine';
 import { comparisonSymbol, round2 } from '../utils/mathLogic';
 
 interface ProblemDisplayProps {
@@ -19,10 +20,11 @@ interface ProblemDisplayProps {
 }
 
 const LONG_LINE_CHARS = 9;
+const EQUATION_ROW = 'font-black flex items-center justify-center gap-[0.2em] text-neo-ink tabular-nums';
 
 function equationSizeClass(chars: number): string {
   return chars > LONG_LINE_CHARS
-    ? 'text-4xl sm:text-6xl md:text-7xl'
+    ? 'text-5xl sm:text-6xl md:text-7xl'
     : 'text-5xl sm:text-7xl md:text-8xl';
 }
 
@@ -88,11 +90,11 @@ export const ProblemDisplay = ({
       return (
         <>
           <TaskChip>{t.roundToNearestTask.replace('{n}', String(secondNumber))}</TaskChip>
-          <div className={`${equationSizeClass(chars)} font-black flex items-center justify-center gap-2 sm:gap-4 text-neo-ink tabular-nums`}>
+          <FitLine className={`${equationSizeClass(chars)} ${EQUATION_ROW}`}>
             <RoundingNumber value={firstNumber} nearest={secondNumber} />
             <span>≈</span>
             <span className={revealed ? 'text-neo-correct' : ''}>{answerText}</span>
-          </div>
+          </FitLine>
           {showNumberLine && <div className="mt-3 w-full flex justify-center"><NumberLine value={firstNumber} nearest={secondNumber} /></div>}
         </>
       );
@@ -104,41 +106,41 @@ export const ProblemDisplay = ({
       return (
         <>
           <TaskChip>{t.whichSignFits}</TaskChip>
-          <div className={`${equationSizeClass(chars)} font-black flex items-center justify-center gap-2 sm:gap-4 text-neo-ink tabular-nums`}>
+          <FitLine className={`${equationSizeClass(chars)} ${EQUATION_ROW}`}>
             <span>{leftText}</span>
             <span
               data-testid="comparison-box"
-              className={`inline-flex items-center justify-center min-w-[1.4em] h-[1.4em] rounded-2xl border-4 ${revealed ? 'border-solid bg-neo-green text-black' : 'border-dashed bg-neo-surface-muted'} border-neo-ink text-[0.85em]`}
+              className={`inline-flex items-center justify-center min-w-[1.4em] h-[1.4em] rounded-[0.25em] border-4 ${revealed ? 'border-solid bg-neo-green text-black' : 'border-dashed bg-neo-surface-muted'} border-neo-ink text-[0.85em]`}
             >
               {revealed ? comparisonSymbol(answer) : '?'}
             </span>
             <span>{secondNumber}</span>
-          </div>
+          </FitLine>
         </>
       );
     }
 
     return (
-      <div className="text-5xl sm:text-7xl md:text-8xl font-black flex items-center justify-center gap-2 sm:gap-4 text-neo-ink">
+      <FitLine className={`text-5xl sm:text-7xl md:text-8xl ${EQUATION_ROW}`}>
         <span>{firstNumber}</span>
         <span>{operationLookup(operation)}</span>
         <span>{secondNumber}</span>
         <span>=</span>
         <span data-testid="equation-answer" className={revealed ? 'text-neo-correct' : ''}>{revealed ? round2(answer) : '?'}</span>
-      </div>
+      </FitLine>
     );
   };
 
   return (
-    <div className="relative w-full max-w-xl flex justify-center">
-      <div className="relative w-full max-w-md lg:max-w-xl transform -rotate-2">
+    <div className="relative w-full max-w-xl lg:max-w-2xl flex justify-center">
+      <div className="relative w-full max-w-md lg:max-w-2xl transform -rotate-2">
         <motion.div
           animate={getAnimationVariants()}
           className={`math-problem-container flex flex-col lg:flex-row items-center justify-center p-5 sm:p-8 rounded-2xl bg-neo-surface border-4 border-neo-ink box-shadow-hard w-full ${isAnimating && feedback === 'correct' ? 'animate-success' :
             isAnimating && feedback === 'incorrect' ? 'animate-error' : ''
             }`}
         >
-          <div className="flex flex-col items-center transform rotate-2 min-w-0 max-w-full">
+          <div className="flex flex-col items-center transform rotate-2 w-full min-w-0 lg:flex-1">
             {renderEquation()}
           </div>
 
